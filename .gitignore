@@ -22,3 +22,5 @@ Bench2Drive/
 .venv/
 *.pyc
 .claw/sessions/
+carla-web-bridge/tests/
+oh-my-codex/
