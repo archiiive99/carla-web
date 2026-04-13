@@ -1,0 +1,126 @@
+"""Map/navigation endpoints."""
+
+from __future__ import annotations
+
+import asyncio
+
+from fastapi import APIRouter, HTTPException
+
+from src.carla_client import carla_manager
+from src.models.schemas import RouteQueryRequest, WaypointQuery
+from src.utils.serialization import carla_transform_to_dict
+
+router = APIRouter(prefix="/api/map", tags=["navigation"])
+
+
+def _require_connection() -> None:
+    if not carla_manager.is_connected:
+        raise HTTPException(status_code=503, detail="Not connected to CARLA server")
+
+
+@router.get("/topology")
+async def get_topology():
+    _require_connection()
+
+    def _get():
+        world = carla_manager.world
+        carla_map = world.get_map()
+        topology = carla_map.get_topology()
+        edges = []
+        for wp_start, wp_end in topology:
+            edges.append({
+                "start": {
+                    "id": wp_start.id,
+                    "road_id": wp_start.road_id,
+                    "lane_id": wp_start.lane_id,
+                    "transform": carla_transform_to_dict(wp_start.transform).model_dump(),
+                },
+                "end": {
+                    "id": wp_end.id,
+                    "road_id": wp_end.road_id,
+                    "lane_id": wp_end.lane_id,
+                    "transform": carla_transform_to_dict(wp_end.transform).model_dump(),
+                },
+            })
+        return {"topology": edges, "count": len(edges)}
+
+    return await asyncio.to_thread(_get)
+
+
+@router.post("/route")
+async def compute_route(req: RouteQueryRequest):
+    _require_connection()
+
+    def _compute():
+        try:
+            import carla
+
+            world = carla_manager.world
+            carla_map = world.get_map()
+
+            origin_loc = carla.Location(x=req.origin.x, y=req.origin.y, z=req.origin.z)
+            dest_loc = carla.Location(
+                x=req.destination.x, y=req.destination.y, z=req.destination.z
+            )
+
+            wp_start = carla_map.get_waypoint(origin_loc)
+            wp_end = carla_map.get_waypoint(dest_loc)
+
+            if wp_start is None or wp_end is None:
+                raise HTTPException(status_code=400, detail="Could not find waypoints")
+
+            from agents.navigation.global_route_planner import GlobalRoutePlanner
+
+            grp = GlobalRoutePlanner(carla_map, sampling_resolution=2.0)
+            route = grp.trace_route(wp_start.transform.location, wp_end.transform.location)
+
+            waypoints = []
+            for wp, road_option in route:
+                waypoints.append({
+                    "transform": carla_transform_to_dict(wp.transform).model_dump(),
+                    "road_option": str(road_option),
+                    "road_id": wp.road_id,
+                    "lane_id": wp.lane_id,
+                })
+            return {"route": waypoints, "count": len(waypoints)}
+        except HTTPException:
+            raise
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    return await asyncio.to_thread(_compute)
+
+
+@router.get("/waypoint")
+async def get_nearest_waypoint(x: float, y: float, z: float = 0.0):
+    _require_connection()
+
+    def _get():
+        try:
+            import carla
+
+            carla_map = carla_manager.world.get_map()
+            loc = carla.Location(x=x, y=y, z=z)
+            wp = carla_map.get_waypoint(loc)
+            if wp is None:
+                raise HTTPException(status_code=404, detail="No waypoint found")
+            return {
+                "id": wp.id,
+                "road_id": wp.road_id,
+                "section_id": wp.section_id,
+                "lane_id": wp.lane_id,
+                "is_junction": wp.is_junction,
+                "lane_width": wp.lane_width,
+                "lane_type": str(wp.lane_type),
+                "transform": carla_transform_to_dict(wp.transform).model_dump(),
+            }
+        except HTTPException:
+            raise
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    return await asyncio.to_thread(_get)

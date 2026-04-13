@@ -1,0 +1,14 @@
+services:
+  bridge:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - CARLA_HOST=host.docker.internal
+      - CARLA_PORT=2000
+      - CORS_ORIGINS=http://localhost:3000
+      - JPEG_QUALITY=80
+      - MAX_CLIENTS=10
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

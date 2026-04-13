@@ -69,31 +69,33 @@ else
     echo "Found git credentials."
 fi
 
-# -- PREREQUISITES INSTALL STEP --
-if [ $skip_prerequisites -eq 0 ]; then
-    python_path=python3
-    if [ "$python_root" != "" ]; then
-        python_path=${python_root}/python3
-    fi
-    echo "Installing prerequisites..."
-    sudo -E bash -x Util/SetupUtils/InstallPrerequisites.sh --python-path=$python_path
-else
-    echo "Skipping prerequisites install step."
-fi
+# -- PREREQUISITES INSTALL STEP -- (SKIPPED: already installed)
+echo "Skipping prerequisites install step (already done)."
+# if [ $skip_prerequisites -eq 0 ]; then
+#     python_path=python3
+#     if [ "$python_root" != "" ]; then
+#         python_path=${python_root}/python3
+#     fi
+#     echo "Installing prerequisites..."
+#     sudo -E bash -x Util/SetupUtils/InstallPrerequisites.sh --python-path=$python_path
+# else
+#     echo "Skipping prerequisites install step."
+# fi
 
-# -- CLONE CONTENT --
-if [ -d $workspace_path/Unreal/CarlaUnreal/Content ]; then
-    echo "Found CARLA content."
-else
-    echo "Could not find CARLA content. Downloading..."
-    mkdir -p $workspace_path/Unreal/CarlaUnreal/Content
-    git \
-        -C $workspace_path/Unreal/CarlaUnreal/Content \
-        clone \
-        -b ue5-dev \
-        https://bitbucket.org/carla-simulator/carla-content.git \
-        Carla
-fi
+# -- CLONE CONTENT -- (SKIPPED: already cloned)
+echo "Found CARLA content (already cloned)."
+# if [ -d $workspace_path/Unreal/CarlaUnreal/Content ]; then
+#     echo "Found CARLA content."
+# else
+#     echo "Could not find CARLA content. Downloading..."
+#     mkdir -p $workspace_path/Unreal/CarlaUnreal/Content
+#     git \
+#         -C $workspace_path/Unreal/CarlaUnreal/Content \
+#         clone \
+#         -b ue5-dev \
+#         https://bitbucket.org/carla-simulator/carla-content.git \
+#         Carla
+# fi
 
 # -- DOWNLOAD + BUILD UNREAL ENGINE --
 if [ ! -z $CARLA_UNREAL_ENGINE_PATH ] && [ -d $CARLA_UNREAL_ENGINE_PATH ]; then

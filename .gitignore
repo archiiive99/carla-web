@@ -15,3 +15,10 @@ CMakeSettings.json
 .clangd
 
 Help.md
+carla-web/
+ui/
+claw-code/
+Bench2Drive/
+.venv/
+*.pyc
+.claw/sessions/
