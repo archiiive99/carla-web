@@ -25,8 +25,12 @@ async def websocket_endpoint(ws: WebSocket) -> None:
     def on_unsubscribe(sensor_id: int, client_id: str) -> None:
         sm.unsubscribe(sensor_id, client_id)
 
+    def on_set_rate(sensor_id: int, client_id: str, target_fps: float) -> float:
+        return sm.set_subscriber_rate(sensor_id, client_id, target_fps, is_ceiling=True)
+
     await ws_broadcaster.handle_connection(
         ws,
         on_subscribe=on_subscribe,
         on_unsubscribe=on_unsubscribe,
+        on_set_rate=on_set_rate,
     )

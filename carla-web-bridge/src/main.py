@@ -4,16 +4,21 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import time
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
+from src.adaptive_rate import AdaptiveRateController
 from src.carla_client import carla_manager
-from src.config import BRIDGE_HOST, BRIDGE_PORT, CORS_ORIGINS
+from src.config import BRIDGE_HOST, BRIDGE_PORT, CORS_ORIGINS, WORLD_TICK_INTERVAL
+from src.control_helpers import apply_vehicle_control
+from src.models.schemas import VehicleControl
+from src.realtime_session import RealtimeSessionManager
 from src.sensor_manager import SensorManager
 from src.ws_broadcaster import ws_broadcaster
 
@@ -23,60 +28,107 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+def _is_test_mode() -> bool:
+    return os.getenv("CARLA_WEB_BRIDGE_TESTING") in {"1", "true", "yes"} or os.getenv("PYTEST_CURRENT_TEST") is not None
+
 # Global sensor manager (needs references to carla_manager and ws_broadcaster)
 sensor_manager = SensorManager(carla_manager, ws_broadcaster)
+realtime_session = RealtimeSessionManager(carla_manager, sensor_manager)
+adaptive_controller = AdaptiveRateController(sensor_manager, ws_broadcaster)
 
 
 _tick_task: asyncio.Task | None = None
+_session_task: asyncio.Task | None = None
 
 
 async def _world_tick_loop() -> None:
-    """Broadcast all actor transforms every tick when connected."""
+    """Drive the CARLA simulation and broadcast tick metadata.
+
+    CARLA runs in synchronous mode with fixed_delta_seconds=0.05 (20 FPS).
+    We must call world.tick() each cycle to advance the physics simulation.
+    Without this, vehicles don't move and the world is frozen.
+    """
     from src.utils.serialization import encode_world_tick
 
     while True:
-        await asyncio.sleep(0.05)  # 20Hz
-        if not carla_manager.is_connected or ws_broadcaster.client_count == 0:
+        await asyncio.sleep(WORLD_TICK_INTERVAL)
+        if not carla_manager.is_connected:
             continue
         try:
-            def _get_tick_data():
+            def _tick_and_get_data():
                 world = carla_manager.world
+                # Advance the simulation one step (required for sync mode)
+                world.tick()
                 snapshot = world.get_snapshot()
-                actors = world.get_actors()
+                # Include ego vehicle snapshot for real-time camera following
+                actors = []
+                ego_id = realtime_session.default_vehicle_id
+                if ego_id is not None:
+                    ego_snap = snapshot.find(ego_id)
+                    if ego_snap is not None:
+                        actors.append(ego_snap)
                 return encode_world_tick(
                     snapshot.frame,
                     snapshot.elapsed_seconds,
-                    list(actors),
+                    actors,
                 )
-            tick_data = await asyncio.to_thread(_get_tick_data)
-            await ws_broadcaster.broadcast_world_tick(tick_data)
+            tick_data = await asyncio.to_thread(_tick_and_get_data)
+            if ws_broadcaster.client_count > 0:
+                await ws_broadcaster.broadcast_world_tick(tick_data)
         except Exception as exc:
             logger.debug("World tick error: %s", exc)
+
+
+async def _session_loop() -> None:
+    """Background session maintenance is intentionally disabled.
+
+    The managed CARLA session is created lazily from the realtime-session
+    endpoint instead of being polled continuously. Continuous background actor
+    probing has proven unstable on this local UE5/CARLA runtime.
+    """
+    while True:
+        await asyncio.sleep(3600)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup: connect to CARLA. Shutdown: cleanup."""
-    global _tick_task
+    global _tick_task, _session_task
     logger.info("CARLA Web Bridge starting…")
     sensor_manager.set_loop(asyncio.get_running_loop())
+    if _is_test_mode():
+        logger.info("CARLA Web Bridge test mode: skipping background CARLA connect/tick tasks")
+        yield
+        logger.info("CARLA Web Bridge test mode stopped.")
+        return
+    adaptive_controller.start(asyncio.get_running_loop())
 
     # Start CARLA connection in background (non-blocking)
     connect_task = asyncio.create_task(carla_manager.connect())
     _tick_task = asyncio.create_task(_world_tick_loop())
+    _session_task = asyncio.create_task(_session_loop())
 
     yield
 
     # Shutdown
     logger.info("Shutting down…")
+    adaptive_controller.stop()
     if _tick_task:
         _tick_task.cancel()
         try:
             await _tick_task
         except asyncio.CancelledError:
             pass
+    if _session_task:
+        _session_task.cancel()
+        try:
+            await _session_task
+        except asyncio.CancelledError:
+            pass
     connect_task.cancel()
-    await sensor_manager.destroy_all()
+    # Hot reload must not tear down live CARLA actors. The next bridge worker
+    # rehydrates existing sensors/actors from the running simulator.
     await carla_manager.disconnect()
     logger.info("CARLA Web Bridge stopped.")
 
@@ -142,6 +194,7 @@ async def health_check():
         "carla_connected": carla_manager.is_connected,
         "ws_clients": ws_broadcaster.client_count,
         "active_sensors": len(sensor_manager.get_sensor_ids()),
+        **realtime_session.snapshot(),
     }
 
 
@@ -150,10 +203,50 @@ async def get_info():
     return {
         "bridge_version": "0.1.0",
         "carla_connected": carla_manager.is_connected,
-        "carla_version": carla_manager.client.get_server_version() if carla_manager.is_connected else None,
+        "carla_version": await asyncio.to_thread(carla_manager.get_server_version) if carla_manager.is_connected else None,
         "active_sensors": len(sensor_manager.get_sensor_ids()),
         "ws_clients": ws_broadcaster.client_count,
+        **realtime_session.snapshot(),
     }
+
+
+@app.get("/api/realtime/session")
+async def get_realtime_session():
+    if carla_manager.is_connected:
+        realtime_session.arm()
+        try:
+            await realtime_session.ensure_running()
+        except Exception as exc:
+            logger.warning("Realtime session request failed softly: %s", exc)
+    return realtime_session.snapshot()
+
+
+@app.post("/api/realtime/control")
+async def apply_realtime_control(req: VehicleControl):
+    if not carla_manager.is_connected:
+        raise HTTPException(status_code=503, detail="Not connected to CARLA server")
+
+    vehicle_id = realtime_session.default_vehicle_id
+    if vehicle_id is None:
+        raise HTTPException(status_code=409, detail="Managed ego vehicle is not ready")
+
+    def _ctrl():
+        try:
+            import carla
+
+            actor = carla_manager.world.get_actor(vehicle_id)
+            if actor is None:
+                raise HTTPException(status_code=404, detail=f"Managed ego vehicle {vehicle_id} not found")
+            apply_vehicle_control(actor, req, carla)
+            return {"status": "control_applied", "id": vehicle_id, "managed_ego": True}
+        except HTTPException:
+            raise
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    return await asyncio.to_thread(_ctrl)
 
 
 if __name__ == "__main__":

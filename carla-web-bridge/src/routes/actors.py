@@ -7,6 +7,7 @@ import asyncio
 from fastapi import APIRouter, HTTPException
 
 from src.carla_client import carla_manager
+from src.control_helpers import apply_vehicle_control
 from src.models.schemas import (
     ActorInfo,
     AutopilotRequest,
@@ -46,15 +47,34 @@ async def count_actors():
 @router.get("")
 async def list_actors():
     _require_connection()
+    from src.main import realtime_session
 
     def _get():
         world = carla_manager.world
         actors = world.get_actors()
+        seen_ids = set()
         result = []
         for a in actors:
             if a.type_id.startswith("traffic.") and "light" not in a.type_id:
                 continue
+            seen_ids.add(a.id)
             result.append(serialize_actor(a).model_dump())
+        # Fix CARLA inconsistency: get_actors() may not include managed/spawned actors
+        missing_ids = set()
+        if realtime_session.default_vehicle_id is not None:
+            missing_ids.add(realtime_session.default_vehicle_id)
+        if realtime_session.default_camera_id is not None:
+            missing_ids.add(realtime_session.default_camera_id)
+        missing_ids.update(carla_manager.tracked_actor_ids)
+        for actor_id in missing_ids - seen_ids:
+            try:
+                managed = world.get_actor(actor_id)
+                if managed is not None and getattr(managed, "is_alive", False):
+                    if managed.type_id.startswith("traffic.") and "light" not in managed.type_id:
+                        continue
+                    result.append(serialize_actor(managed).model_dump())
+            except Exception:
+                pass
         return {"actors": result, "count": len(result)}
 
     return await asyncio.to_thread(_get)
@@ -63,6 +83,10 @@ async def list_actors():
 @router.delete("/all")
 async def destroy_all_actors():
     _require_connection()
+    from src.main import realtime_session, sensor_manager
+
+    await realtime_session.reset(destroy_managed=True, reason="destroy all actors")
+    await sensor_manager.destroy_all()
 
     def _destroy_all():
         try:
@@ -75,7 +99,7 @@ async def destroy_all_actors():
                         actor.stop()
                     actor.destroy()
                     destroyed += 1
-            carla_manager._spawned_actor_ids.clear()
+            carla_manager.clear_tracked_actors()
             return {"status": "destroyed", "count": destroyed}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
@@ -204,25 +228,34 @@ async def spawn_sensor(req: SpawnSensorRequest):
 @router.delete("/{actor_id}")
 async def destroy_actor(actor_id: int):
     _require_connection()
+    from src.main import realtime_session, sensor_manager
 
-    def _destroy():
-        try:
-            actor = carla_manager.world.get_actor(actor_id)
-            if actor is None:
-                raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
-            if actor.type_id.startswith("sensor."):
-                actor.stop()
-            actor.destroy()
-            carla_manager.untrack_actor(actor_id)
-            return {"status": "destroyed", "id": actor_id}
-        except HTTPException:
-            raise
-        except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+    actor = await asyncio.to_thread(carla_manager.get_actor, actor_id)
+    if actor is None:
+        raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
 
-    return await asyncio.to_thread(_destroy)
+    if actor.type_id.startswith("sensor."):
+        await sensor_manager.destroy_sensor(actor_id)
+    else:
+        def _destroy():
+            try:
+                current_actor = carla_manager.world.get_actor(actor_id)
+                if current_actor is None:
+                    raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
+                current_actor.destroy()
+                carla_manager.untrack_actor(actor_id)
+                return {"status": "destroyed", "id": actor_id}
+            except HTTPException:
+                raise
+            except RuntimeError as e:
+                raise HTTPException(status_code=400, detail=str(e))
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        await asyncio.to_thread(_destroy)
+
+    await realtime_session.invalidate_actor(actor_id, reason=f"actor {actor_id} destroyed")
+    return {"status": "destroyed", "id": actor_id}
 
 
 @router.post("/{actor_id}/control")
@@ -236,14 +269,11 @@ async def apply_control(actor_id: int, req: VehicleControl):
             actor = carla_manager.world.get_actor(actor_id)
             if actor is None:
                 raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
-            ctrl = carla.VehicleControl(
-                throttle=req.throttle,
-                steer=req.steer,
-                brake=req.brake,
-                hand_brake=req.hand_brake,
-                reverse=req.reverse,
-            )
-            actor.apply_control(ctrl)
+            apply_vehicle_control(actor, req, carla)
+            # Do NOT tick here — the background _world_tick_loop in main.py
+            # is the single tick source.  A second tick() call races with
+            # the loop and can cause CARLA to consume the control before
+            # physics actually applies it, resulting in near-zero movement.
             return {"status": "control_applied", "id": actor_id}
         except HTTPException:
             raise

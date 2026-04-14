@@ -14,6 +14,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BRIDGE_DIR="$SCRIPT_DIR/carla-web-bridge"
 FRONTEND_DIR="$SCRIPT_DIR/carla-web"
 UE5_DIR="${CARLA_UNREAL_ENGINE_PATH:-/home/song99/UnrealEngine5_carla}"
+UPROJECT_PATH="$SCRIPT_DIR/Unreal/CarlaUnreal/CarlaUnreal.uproject"
+ENGINE_PROJECT_LINK="$UE5_DIR/CarlaUnreal"
 
 FRONTEND_PORT=58336
 BRIDGE_PORT=58337
@@ -48,8 +50,9 @@ trap cleanup EXIT INT TERM
 if [ "$NO_CARLA" = false ]; then
   echo "[1/3] Starting CARLA server (GPU $GPU_ID)..."
   export CUDA_VISIBLE_DEVICES=$GPU_ID
+  ln -sfn "$SCRIPT_DIR/Unreal/CarlaUnreal" "$ENGINE_PROJECT_LINK"
   "$UE5_DIR/Engine/Binaries/Linux/UnrealEditor" \
-    "$SCRIPT_DIR/Unreal/CarlaUnreal/CarlaUnreal.uproject" \
+    "$UPROJECT_PATH" \
     -game -RenderOffScreen -nosound -unattended \
     -ResX=640 -ResY=480 -carla-rpc-port=$CARLA_PORT \
     > /tmp/carla-server.log 2>&1 &

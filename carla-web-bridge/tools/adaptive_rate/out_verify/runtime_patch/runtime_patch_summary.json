@@ -1,0 +1,10 @@
+{
+  "fps_before_patch": 20.0,
+  "fps_during_patch": 10.0,
+  "fps_after_restore": 20.0,
+  "decode_errors": 0,
+  "artifacts": {
+    "csv": "out_verify/runtime_patch/runtime_patch.csv",
+    "plot": "out_verify/runtime_patch/runtime_patch.png"
+  }
+}

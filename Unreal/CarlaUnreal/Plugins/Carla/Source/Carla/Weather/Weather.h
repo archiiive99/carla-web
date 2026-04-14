@@ -17,7 +17,7 @@
 class ASensor;
 class ASceneCaptureCamera;
 
-UCLASS(Abstract)
+UCLASS()
 class CARLA_API AWeather : public AActor
 {
   GENERATED_BODY()

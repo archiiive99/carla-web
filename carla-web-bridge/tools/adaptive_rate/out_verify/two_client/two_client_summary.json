@@ -1,0 +1,12 @@
+{
+  "duration_s": 60,
+  "decode_delay_ms": 180.0,
+  "fast_ok_fraction": 1.0,
+  "slow_drop_fraction_at_15s": 0.7626953125,
+  "slow_post_downgrade_baseline_fps": 1.0,
+  "slow_tail_crossings": 0,
+  "artifacts": {
+    "csv": "out_verify/two_client/two_client.csv",
+    "plot": "out_verify/two_client/two_client.png"
+  }
+}

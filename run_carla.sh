@@ -10,6 +10,8 @@
 
 UE5_DIR="${CARLA_UNREAL_ENGINE_PATH:-/home/song99/UnrealEngine5_carla}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+UPROJECT_PATH="$SCRIPT_DIR/Unreal/CarlaUnreal/CarlaUnreal.uproject"
+ENGINE_PROJECT_LINK="$UE5_DIR/CarlaUnreal"
 CARLA_PORT=58338
 GPU_ID=0
 BG=false
@@ -55,11 +57,14 @@ start_carla() {
 
   echo "[$(date +%H:%M:%S)] Starting CARLA on GPU $GPU_ID, port $CARLA_PORT..."
   export CUDA_VISIBLE_DEVICES=$GPU_ID
+  ln -sfn "$SCRIPT_DIR/Unreal/CarlaUnreal" "$ENGINE_PROJECT_LINK"
 
   "$UE5_DIR/Engine/Binaries/Linux/UnrealEditor" \
-    "$SCRIPT_DIR/Unreal/CarlaUnreal/CarlaUnreal.uproject" \
+    "$UPROJECT_PATH" \
     -game -RenderOffScreen -nosound -unattended \
     -ResX=640 -ResY=480 -carla-rpc-port=$CARLA_PORT \
+    -graphicsadapter=$GPU_ID \
+    -ExecCmds="r.RayTracing=0,r.RHIThread.Enable 0,r.RHICmdBypass 1" \
     >> "$LOG_FILE" 2>&1 &
   CARLA_PID=$!
   disown $CARLA_PID

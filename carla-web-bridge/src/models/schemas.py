@@ -94,6 +94,13 @@ class ActorInfo(BaseModel):
     transform: Transform = Field(default_factory=Transform)
     velocity: Vector3 = Field(default_factory=Vector3)
     is_alive: bool = True
+    parent_id: int | None = None
+    role_name: str | None = None
+    traffic_light_state: str | None = None  # "Red"|"Yellow"|"Green"|"Off"|"Unknown" for TL actors
+    vehicle_color: str | None = None
+    vehicle_driver_id: str | None = None
+    vehicle_generation: str | None = None
+    vehicle_wheel_count: int | None = None
 
 
 class SpawnVehicleRequest(BaseModel):

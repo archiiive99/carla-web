@@ -16,6 +16,10 @@ from src.utils.serialization import serialize_weather
 
 router = APIRouter(prefix="/api/simulation", tags=["simulation"])
 
+_paused = False
+_pre_pause_sync_mode: bool | None = None
+_pre_pause_fixed_delta: float | None = None
+
 
 def _require_connection() -> None:
     if not carla_manager.is_connected:
@@ -24,6 +28,7 @@ def _require_connection() -> None:
 
 @router.get("/status", response_model=SimulationStatus)
 async def get_status():
+    global _paused
     if not carla_manager.is_connected:
         return SimulationStatus(connected=False)
 
@@ -33,8 +38,8 @@ async def get_status():
         snapshot = world.get_snapshot()
         return SimulationStatus(
             connected=True,
-            running=not settings.synchronous_mode or True,
-            paused=False,
+            running=not _paused,
+            paused=_paused,
             tick=snapshot.frame,
             elapsed_time=snapshot.elapsed_seconds,
             map=world.get_map().name,
@@ -51,22 +56,54 @@ async def get_status():
 
 @router.post("/play")
 async def play():
+    global _paused, _pre_pause_sync_mode, _pre_pause_fixed_delta
     _require_connection()
 
     def _play():
         world = carla_manager.world
         settings = world.get_settings()
-        if settings.synchronous_mode:
+        if _paused:
+            settings.synchronous_mode = (
+                _pre_pause_sync_mode if _pre_pause_sync_mode is not None else False
+            )
+            settings.fixed_delta_seconds = _pre_pause_fixed_delta
+            world.apply_settings(settings)
+        elif settings.synchronous_mode:
             world.tick()
         return {"status": "playing"}
 
-    return await asyncio.to_thread(_play)
+    result = await asyncio.to_thread(_play)
+    _paused = False
+    return result
 
 
 @router.post("/pause")
 async def pause():
+    global _paused, _pre_pause_sync_mode, _pre_pause_fixed_delta
     _require_connection()
-    return {"status": "paused"}
+
+    def _pause():
+        world = carla_manager.world
+        settings = world.get_settings()
+        current_fixed_delta = settings.fixed_delta_seconds
+        if current_fixed_delta is None or current_fixed_delta <= 0:
+            current_fixed_delta = 0.05
+        settings.synchronous_mode = True
+        settings.fixed_delta_seconds = current_fixed_delta
+        world.apply_settings(settings)
+        return {
+            "status": "paused",
+            "sync_mode": settings.synchronous_mode,
+            "fixed_delta": settings.fixed_delta_seconds,
+        }
+
+    world = carla_manager.world
+    settings = await asyncio.to_thread(world.get_settings)
+    _pre_pause_sync_mode = settings.synchronous_mode
+    _pre_pause_fixed_delta = settings.fixed_delta_seconds
+    result = await asyncio.to_thread(_pause)
+    _paused = True
+    return result
 
 
 @router.post("/step")
@@ -119,6 +156,11 @@ async def update_settings(req: SimulationSettings):
 @router.post("/reload")
 async def reload_map():
     _require_connection()
+    from src.main import realtime_session, sensor_manager
+
+    await realtime_session.reset(destroy_managed=True, reason="reload world")
+    await sensor_manager.destroy_all()
+    carla_manager.clear_tracked_actors()
 
     def _reload():
         carla_manager.client.reload_world()

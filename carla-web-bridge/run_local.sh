@@ -3,7 +3,7 @@
 # CARLA Web Bridge — Local development launcher
 #
 # Usage:
-#   ./run_local.sh                    # Default: localhost:8000
+#   ./run_local.sh                    # Default: localhost:58337
 #   ./run_local.sh --port 9000        # Custom port
 #   ./run_local.sh --carla-host 192.168.1.100  # Remote CARLA server
 #
@@ -13,10 +13,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Defaults
-BRIDGE_PORT="${BRIDGE_PORT:-8000}"
+BRIDGE_PORT="${BRIDGE_PORT:-58337}"
 CARLA_HOST="${CARLA_HOST:-localhost}"
-CARLA_PORT="${CARLA_PORT:-2000}"
-CORS_ORIGINS="${CORS_ORIGINS:-http://localhost:3000}"
+CARLA_PORT="${CARLA_PORT:-58338}"
+CORS_ORIGINS="${CORS_ORIGINS:-http://localhost:58336,http://127.0.0.1:58336}"
 
 # Parse CLI args
 while [[ $# -gt 0 ]]; do
@@ -29,10 +29,10 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  --port PORT          Bridge port (default: 8000)"
+            echo "  --port PORT          Bridge port (default: 58337)"
             echo "  --carla-host HOST    CARLA server host (default: localhost)"
-            echo "  --carla-port PORT    CARLA server port (default: 2000)"
-            echo "  --cors ORIGINS       CORS origins (default: http://localhost:3000)"
+            echo "  --carla-port PORT    CARLA server port (default: 58338)"
+            echo "  --cors ORIGINS       CORS origins (default: http://localhost:58336,http://127.0.0.1:58336)"
             echo "  -h, --help           Show this help"
             exit 0
             ;;
@@ -74,9 +74,22 @@ echo "║  Docs:    http://localhost:${BRIDGE_PORT}/docs          ║"
 echo "╚══════════════════════════════════════════════╝"
 echo ""
 
-# Run with auto-reload for development
-exec uvicorn src.main:app \
-    --host 0.0.0.0 \
-    --port "$BRIDGE_PORT" \
-    --reload \
-    --reload-dir src
+# Run with auto-reload for development + supervisor that respawns on crash.
+# libcarla occasionally aborts the process with `libc++abi: terminating`
+# (a native std::exception that bypasses Python try/except). uvicorn --reload
+# only restarts on file changes, so without this loop the worker stays dead.
+RESTART_DELAY="${BRIDGE_RESTART_DELAY:-2}"
+while true; do
+    uvicorn src.main:app \
+        --host 0.0.0.0 \
+        --port "$BRIDGE_PORT" \
+        --reload \
+        --reload-dir src
+    ec=$?
+    # Clean exit (Ctrl-C / SIGTERM) → stop.
+    if [ "$ec" -eq 0 ] || [ "$ec" -eq 130 ]; then
+        break
+    fi
+    echo "[bridge supervisor] uvicorn exited with code $ec; restarting in ${RESTART_DELAY}s…" >&2
+    sleep "$RESTART_DELAY"
+done

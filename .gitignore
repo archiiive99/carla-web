@@ -15,7 +15,6 @@ CMakeSettings.json
 .clangd
 
 Help.md
-carla-web/
 ui/
 claw-code/
 Bench2Drive/
@@ -24,3 +23,27 @@ Bench2Drive/
 .claw/sessions/
 carla-web-bridge/tests/
 oh-my-codex/
+.omx/
+.claude/
+carla-web-bridge/audit_*/
+carla-web-bridge/baseline/
+carla-web-bridge/live_audit/
+carla-web-bridge/native_jpeg_pairs/
+carla-web-bridge/native_jpeg_pairs_off/
+carla-web-bridge/tmp_pairs/
+carla-web-bridge/test-results/
+carla-web-bridge/playwright-report/
+carla-web-bridge/carla-web-bridge/
+Unreal/CarlaUnreal/CarlaUnreal
+Unreal/CarlaUnreal/Engine
+Unreal/Engine
+carla-web/node_modules/
+carla-web/dist/
+carla-web/dist-*/
+carla-web/test-results/
+carla-web/playwright-report/
+carla-web/e2e/screenshots/
+# Large CARLA glb mesh extracts — 3.6GB total, exceeds github repo limits.
+# Host externally or move to git-LFS after the initial push.
+carla-web/public/assets/carla/*.glb
+carla-web/Town01_Opt/

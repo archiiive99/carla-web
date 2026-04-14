@@ -62,12 +62,64 @@ def classify_actor(type_id: str) -> str:
 def serialize_actor(actor: Any) -> ActorInfo:
     t = actor.get_transform()
     v = actor.get_velocity()
+    parent_id: int | None = None
+    try:
+        parent = getattr(actor, "parent", None)
+        if parent is not None:
+            parent_id = int(parent.id)
+    except Exception:
+        parent_id = None
+    role_name: str | None = None
+    vehicle_color: str | None = None
+    vehicle_driver_id: str | None = None
+    vehicle_generation: str | None = None
+    vehicle_wheel_count: int | None = None
+    try:
+        attrs = getattr(actor, "attributes", None) or {}
+        value = attrs.get("role_name")
+        if value:
+            role_name = str(value)
+        color = attrs.get("color")
+        if color:
+            vehicle_color = str(color)
+        driver_id = attrs.get("driver_id")
+        if driver_id:
+            vehicle_driver_id = str(driver_id)
+        generation = attrs.get("generation")
+        if generation:
+            vehicle_generation = str(generation)
+        wheels = attrs.get("number_of_wheels")
+        if wheels is not None:
+            try:
+                vehicle_wheel_count = int(str(wheels))
+            except Exception:
+                vehicle_wheel_count = None
+    except Exception:
+        role_name = None
+        vehicle_color = None
+        vehicle_driver_id = None
+        vehicle_generation = None
+        vehicle_wheel_count = None
+    tl_state: str | None = None
+    if actor.type_id.startswith("traffic.traffic_light"):
+        try:
+            st = actor.get_state()
+            tl_state = str(st).split(".")[-1]  # "TrafficLightState.Red" → "Red"
+        except Exception:
+            tl_state = None
     return ActorInfo(
         id=actor.id,
         type_id=actor.type_id,
         type=classify_actor(actor.type_id),
         transform=carla_transform_to_dict(t),
         velocity=carla_vector_to_dict(v),
+        parent_id=parent_id,
+        role_name=role_name,
+        traffic_light_state=tl_state,
+        vehicle_color=vehicle_color,
+        vehicle_driver_id=vehicle_driver_id,
+        vehicle_generation=vehicle_generation,
+        vehicle_wheel_count=vehicle_wheel_count,
     )
 
 
@@ -122,3 +174,37 @@ def encode_world_tick(frame: int, timestamp: float, actors: list[Any]) -> bytes:
             v.x, v.y, v.z,
         )
     return buf
+
+
+def encode_world_tick_from_snapshot(snapshot: Any) -> bytes:
+    """Encode world tick data from a CARLA world snapshot.
+
+    Using actor snapshots avoids walking live Actor handles for every client tick,
+    which is significantly cheaper and avoids extra CARLA RPC churn.
+    """
+    timestamp = float(getattr(snapshot, "elapsed_seconds", 0.0))
+    if not timestamp:
+        ts_obj = getattr(snapshot, "timestamp", None)
+        timestamp = float(getattr(ts_obj, "elapsed_seconds", 0.0))
+
+    actors = list(snapshot)
+    buf = bytearray(struct.pack("<IdI", int(snapshot.frame), timestamp, len(actors)))
+    for actor in actors:
+        transform = actor.get_transform()
+        velocity = actor.get_velocity()
+        buf.extend(
+            struct.pack(
+                "<I9f",
+                int(actor.id),
+                float(transform.location.x),
+                float(transform.location.y),
+                float(transform.location.z),
+                float(transform.rotation.pitch),
+                float(transform.rotation.yaw),
+                float(transform.rotation.roll),
+                float(velocity.x),
+                float(velocity.y),
+                float(velocity.z),
+            )
+        )
+    return bytes(buf)

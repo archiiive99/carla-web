@@ -26,6 +26,7 @@
 #include "Engine/DecalActor.h"
 #include "Engine/LevelStreaming.h"
 #include "Engine/LocalPlayer.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/StaticMeshActor.h"
 #include "EngineUtils.h"
@@ -54,6 +55,18 @@ ACarlaGameModeBase::ACarlaGameModeBase(const FObjectInitializer& ObjectInitializ
 
   // HUD
   HUDClass = ACarlaHUD::StaticClass();
+
+  static ConstructorHelpers::FClassFinder<AWeather> WeatherBlueprintClass(
+      TEXT("/Game/Carla/Blueprints/Weather/BP_CarlaWeather"));
+  if (WeatherBlueprintClass.Succeeded()) {
+    WeatherClass = WeatherBlueprintClass.Class;
+  } else {
+    WeatherClass = AWeather::StaticClass();
+    UE_LOG(
+        LogCarla,
+        Warning,
+        TEXT("Weather blueprint not found, falling back to native AWeather"));
+  }
 
   TaggerDelegate = CreateDefaultSubobject<UTaggerDelegate>(TEXT("TaggerDelegate"));
   CarlaSettingsDelegate = CreateDefaultSubobject<UCarlaSettingsDelegate>(TEXT("CarlaSettingsDelegate"));
@@ -143,7 +156,18 @@ void ACarlaGameModeBase::InitGame(
   else if (WeatherClass != nullptr) {
     Episode->Weather = World->SpawnActor<AWeather>(WeatherClass);
   } else {
-    UE_LOG(LogCarla, Error, TEXT("Missing weather class!"));
+    UClass* LoadedWeatherClass = StaticLoadClass(
+        AWeather::StaticClass(),
+        nullptr,
+        TEXT("/Game/Carla/Blueprints/Weather/BP_CarlaWeather.BP_CarlaWeather_C"));
+    if (LoadedWeatherClass != nullptr) {
+      WeatherClass = LoadedWeatherClass;
+      Episode->Weather = World->SpawnActor<AWeather>(WeatherClass);
+      UE_LOG(LogCarla, Warning, TEXT("WeatherClass was unset; loaded BP_CarlaWeather fallback"));
+    } else {
+      Episode->Weather = World->SpawnActor<AWeather>(AWeather::StaticClass());
+      UE_LOG(LogCarla, Warning, TEXT("Weather blueprint missing; spawned native AWeather fallback"));
+    }
   }
 
   GameInstance->NotifyInitGame();

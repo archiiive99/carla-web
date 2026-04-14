@@ -1,0 +1,462 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.0.2, pluggy-1.6.0 -- /home/song99/carla/carla-web-bridge/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /data1/song99/carla/carla-web-bridge
+configfile: pyproject.toml
+plugins: asyncio-1.3.0, anyio-4.13.0
+asyncio: mode=auto, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 8 items
+
+tools/e2e/test_e1_actor_lifecycle.py::test_e1_actor_lifecycle 
+-------------------------------- live log start --------------------------------
+17:28:31 [INFO] e2e: --- E1 start --- (tools/e2e/test_e1_actor_lifecycle.py::test_e1_actor_lifecycle)
+-------------------------------- live log setup --------------------------------
+17:28:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+17:28:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+17:28:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+-------------------------------- live log call ---------------------------------
+17:28:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/blueprints/vehicles "HTTP/1.1 200 OK"
+17:28:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/world/spawn-points "HTTP/1.1 200 OK"
+17:28:32 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/vehicle "HTTP/1.1 201 Created"
+17:28:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:32 [INFO] e2e.helpers: spawn_test_vehicle: id=171 blueprint=vehicle.taxi.ford listed_role=autopilot
+17:28:32 [INFO] e2e.E1: spawned actor id=171 blueprint=vehicle.taxi.ford
+17:28:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:32 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/171 "HTTP/1.1 200 OK"
+17:28:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+PASSED                                                                   [ 12%]------------------------------ live log logreport ------------------------------
+17:28:32 [INFO] e2e: --- E1 end: PASS in 1.24 s ---
+
+------------------------------ live log teardown -------------------------------
+17:28:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+
+tools/e2e/test_e2_sensor_stream.py::test_e2_sensor_stream_roundtrip 
+-------------------------------- live log start --------------------------------
+17:28:34 [INFO] e2e: --- E2 start --- (tools/e2e/test_e2_sensor_stream.py::test_e2_sensor_stream_roundtrip)
+-------------------------------- live log setup --------------------------------
+17:28:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+17:28:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+-------------------------------- live log call ---------------------------------
+17:28:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/blueprints/vehicles "HTTP/1.1 200 OK"
+17:28:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/world/spawn-points "HTTP/1.1 200 OK"
+17:28:35 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/vehicle "HTTP/1.1 201 Created"
+17:28:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:35 [INFO] e2e.helpers: spawn_test_vehicle: id=172 blueprint=vehicle.taxi.ford listed_role=autopilot
+17:28:35 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/sensor "HTTP/1.1 201 Created"
+17:28:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:35 [INFO] e2e.E2: spawned vehicle=172 camera=173
+17:28:44 [INFO] e2e.E2: E2 frame stats: duplicates=0 skips=0 frames=[102, 103, 104, 105, 106, 107, 108, 109, 110, 111]
+17:28:48 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/173 "HTTP/1.1 200 OK"
+17:28:48 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:48 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/172 "HTTP/1.1 200 OK"
+17:28:48 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+PASSED                                                                   [ 25%]------------------------------ live log logreport ------------------------------
+17:28:48 [INFO] e2e: --- E2 end: PASS in 13.32 s ---
+
+------------------------------ live log teardown -------------------------------
+17:28:49 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:49 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+
+tools/e2e/test_e4_weather.py::test_e4_weather_change 
+-------------------------------- live log start --------------------------------
+17:28:49 [INFO] e2e: --- E4 start --- (tools/e2e/test_e4_weather.py::test_e4_weather_change)
+-------------------------------- live log setup --------------------------------
+17:28:49 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:50 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+17:28:50 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/world/weather "HTTP/1.1 200 OK"
+17:28:50 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+-------------------------------- live log call ---------------------------------
+17:28:50 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/world/weather "HTTP/1.1 200 OK"
+17:28:51 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/world/weather "HTTP/1.1 200 OK"
+FAILED                                                                   [ 37%]------------------------------ live log logreport ------------------------------
+17:28:51 [INFO] e2e: --- E4 end: FAIL in 0.98 s ---
+
+------------------------------ live log teardown -------------------------------
+17:28:51 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/world/weather "HTTP/1.1 200 OK"
+17:28:52 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:53 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+
+tools/e2e/test_e6_slow_client.py::test_e6_slow_client_isolation 
+-------------------------------- live log start --------------------------------
+17:28:53 [INFO] e2e: --- E6 start --- (tools/e2e/test_e6_slow_client.py::test_e6_slow_client_isolation)
+-------------------------------- live log setup --------------------------------
+17:28:53 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:54 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+17:28:54 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+-------------------------------- live log call ---------------------------------
+17:28:54 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/blueprints/vehicles "HTTP/1.1 200 OK"
+17:28:54 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/world/spawn-points "HTTP/1.1 200 OK"
+17:28:54 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/vehicle "HTTP/1.1 201 Created"
+17:28:54 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:54 [INFO] e2e.helpers: spawn_test_vehicle: id=174 blueprint=vehicle.taxi.ford listed_role=autopilot
+17:28:54 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/sensor "HTTP/1.1 201 Created"
+17:28:54 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:28:54 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:29:27 [INFO] e2e.E6: E6 baseline fast N=21 mean=393.7ms stddev=285.2ms p95=852.6ms | with-slow fast N=56 mean=331.2ms stddev=242.1ms p95=868.1ms | slow=20
+17:29:37 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/175 "HTTP/1.1 200 OK"
+17:29:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:29:38 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/174 "HTTP/1.1 200 OK"
+17:29:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+PASSED                                                                   [ 50%]------------------------------ live log logreport ------------------------------
+17:29:38 [INFO] e2e: --- E6 end: PASS in 43.84 s ---
+
+------------------------------ live log teardown -------------------------------
+17:29:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:29:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+
+tools/e2e/test_e7_sensor_destroy.py::test_e7_sensor_destroy_midstream 
+-------------------------------- live log start --------------------------------
+17:29:39 [INFO] e2e: --- E7 start --- (tools/e2e/test_e7_sensor_destroy.py::test_e7_sensor_destroy_midstream)
+-------------------------------- live log setup --------------------------------
+17:29:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:29:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+17:29:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+-------------------------------- live log call ---------------------------------
+17:29:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/blueprints/vehicles "HTTP/1.1 200 OK"
+17:29:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/world/spawn-points "HTTP/1.1 200 OK"
+17:29:42 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/vehicle "HTTP/1.1 201 Created"
+17:29:42 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:29:42 [INFO] e2e.helpers: spawn_test_vehicle: id=176 blueprint=vehicle.taxi.ford listed_role=autopilot
+17:29:43 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/sensor "HTTP/1.1 201 Created"
+17:29:43 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:29:52 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/177 "HTTP/1.1 200 OK"
+17:29:52 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:29:58 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/176 "HTTP/1.1 200 OK"
+17:29:58 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+FAILED                                                                   [ 62%]------------------------------ live log logreport ------------------------------
+17:29:58 [INFO] e2e: --- E7 end: FAIL in 17.39 s ---
+
+------------------------------ live log teardown -------------------------------
+17:29:58 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:29:59 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+
+tools/e2e/test_e8_concurrent_subs.py::test_e8_concurrent_subscribers 
+-------------------------------- live log start --------------------------------
+17:29:59 [INFO] e2e: --- E8 start --- (tools/e2e/test_e8_concurrent_subs.py::test_e8_concurrent_subscribers)
+-------------------------------- live log setup --------------------------------
+17:30:00 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:01 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+17:30:01 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+-------------------------------- live log call ---------------------------------
+17:30:02 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/blueprints/vehicles "HTTP/1.1 200 OK"
+17:30:02 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/world/spawn-points "HTTP/1.1 200 OK"
+17:30:02 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/vehicle "HTTP/1.1 201 Created"
+17:30:02 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:02 [INFO] e2e.helpers: spawn_test_vehicle: id=178 blueprint=vehicle.taxi.ford listed_role=autopilot
+17:30:03 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/sensor "HTTP/1.1 201 Created"
+17:30:03 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:13 [INFO] e2e.E8: E8 streams=[20, 20, 20, 20, 20] common=20 union=20 overlap=100.0%
+17:30:14 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/179 "HTTP/1.1 200 OK"
+17:30:14 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:14 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:14 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/178 "HTTP/1.1 200 OK"
+17:30:14 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+PASSED                                                                   [ 75%]------------------------------ live log logreport ------------------------------
+17:30:14 [INFO] e2e: --- E8 end: PASS in 13.63 s ---
+
+------------------------------ live log teardown -------------------------------
+17:30:15 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:16 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+
+tools/e2e/test_e5_recording.py::test_e5_recording_roundtrip 
+-------------------------------- live log start --------------------------------
+17:30:16 [INFO] e2e: --- E5 start --- (tools/e2e/test_e5_recording.py::test_e5_recording_roundtrip)
+-------------------------------- live log setup --------------------------------
+17:30:16 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:16 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+17:30:16 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+-------------------------------- live log call ---------------------------------
+17:30:17 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/recording/start "HTTP/1.1 200 OK"
+17:30:17 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/blueprints/vehicles "HTTP/1.1 200 OK"
+17:30:17 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/world/spawn-points "HTTP/1.1 200 OK"
+17:30:18 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/vehicle "HTTP/1.1 201 Created"
+17:30:18 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:18 [INFO] e2e.helpers: spawn_test_vehicle: id=180 blueprint=vehicle.taxi.ford listed_role=autopilot
+17:30:18 [INFO] e2e.E5: recording vehicle=180 into e2e_e5_1776155416.log
+17:30:18 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:18 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:18 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:19 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:19 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:19 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:19 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:19 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:19 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:19 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:19 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:19 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:20 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:20 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:20 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:20 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:20 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:20 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:20 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:20 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:20 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:21 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:21 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:21 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:21 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:21 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:21 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:21 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:21 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:21 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:22 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:22 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:22 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:22 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:22 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:22 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:22 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:22 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:22 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:23 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:23 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:23 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:23 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:23 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:23 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:23 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:23 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:23 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:24 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:24 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:24 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:24 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:24 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:24 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:24 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:24 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:24 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:25 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:25 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:25 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:25 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:25 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:25 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:25 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:25 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:25 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:26 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:26 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:26 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:26 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:26 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:26 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:26 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:26 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:26 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:27 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:27 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:27 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:27 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:27 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:27 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:27 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:27 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:27 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:28 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:28 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:28 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:28 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:28 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:28 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:28 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:28 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:28 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:29 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:29 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:29 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:29 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:29 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:29 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:29 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:29 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/recording/stop "HTTP/1.1 200 OK"
+17:30:30 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/replay/start "HTTP/1.1 200 OK"
+17:30:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:31 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:32 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:33 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:34 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:35 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:36 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:36 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:36 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:36 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:36 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:36 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:36 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:36 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:36 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:37 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:38 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:39 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:40 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:41 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:42 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:42 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:42 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:42 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:42 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:42 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:42 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/recording/stop "HTTP/1.1 200 OK"
+17:30:42 [INFO] httpx: HTTP Request: POST http://127.0.0.1:58337/api/replay/stop "HTTP/1.1 200 OK"
+17:30:43 [INFO] httpx: HTTP Request: DELETE http://127.0.0.1:58337/api/actors/180 "HTTP/1.1 200 OK"
+17:30:43 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:43 [INFO] e2e.E5: E5 displacement=6.107 m, replay best-offset=0 samples, max-axis error=3.959 m (tol=5.00)
+PASSED                                                                   [ 87%]------------------------------ live log logreport ------------------------------
+17:30:43 [INFO] e2e: --- E5 end: PASS in 26.89 s ---
+
+------------------------------ live log teardown -------------------------------
+17:30:44 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:44 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+
+tools/e2e/test_e3_hot_reload.py::test_e3_hot_reload_adoption 
+-------------------------------- live log start --------------------------------
+17:30:44 [INFO] e2e: --- E3 start --- (tools/e2e/test_e3_hot_reload.py::test_e3_hot_reload_adoption)
+-------------------------------- live log setup --------------------------------
+17:30:44 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+17:30:45 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+-------------------------------- live log call ---------------------------------
+17:30:45 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors/count "HTTP/1.1 200 OK"
+17:30:45 [INFO] e2e.E3: baseline vehicle=169 camera=170 world_count=170
+17:30:46 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+17:30:46 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 503 Service Unavailable"
+17:30:47 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:47 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:47 [INFO] e2e.E3: cycle 1 OK (snapshot vehicle=169 inferred_vehicle=169 inferred_camera=170)
+17:30:47 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+17:30:47 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+17:30:48 [INFO] httpx: HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+XFAIL (quarantined hot-reload adoption instability: cycle 2 expected...) [100%]------------------------------ live log logreport ------------------------------
+17:30:48 [INFO] e2e: --- E3 end: SKIP in 3.28 s ---
+
+
+=================================== FAILURES ===================================
+____________________________ test_e4_weather_change ____________________________
+tools/e2e/test_e4_weather.py:64: in test_e4_weather_change
+    assert math.isclose(current[key], TARGET[key], abs_tol=0.5)
+E   assert False
+E    +  where False = <built-in function isclose>(10.0, 90.0, abs_tol=0.5)
+E    +    where <built-in function isclose> = math.isclose
+------------------------------ Captured log setup ------------------------------
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/world/weather "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1740 HTTP Request: POST http://127.0.0.1:58337/api/world/weather "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/world/weather "HTTP/1.1 200 OK"
+---------------------------- Captured log teardown -----------------------------
+INFO     httpx:_client.py:1740 HTTP Request: POST http://127.0.0.1:58337/api/world/weather "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+_______________________ test_e7_sensor_destroy_midstream _______________________
+tools/e2e/test_e7_sensor_destroy.py:49: in test_e7_sensor_destroy_midstream
+    assert len(frames) >= 3, f"got {len(frames)} frames before destroy"
+E   AssertionError: got 1 frames before destroy
+E   assert 1 >= 3
+E    +  where 1 = len([DecodedCameraFrame(channel=1, sensor_id=177, width=320, height=240, frame=275, timestamp=133.81081145163625, jpeg=b'\xff\xd8\xff\xe2\x02\\ICC_PROFILE\x00\x01\x01\x00\x00\x02Llcms\x04@\x00\x00mntrRGB XYZ \x07\xea\x00\x04\x00\x0e\x00\x08\x00\x1a\x003acspAPPL\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf6\xd6\x00\x01\x00\x00\x00\x00\xd3-lcms\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bdesc\x00\x00\x01\x08\x00\x00\x006cprt\x00\x00\x01@\x00\x00\x00Lwtpt\x00\x00\x01\x8c\x00\x00\x00\x14chad\x00\x00\x01\xa0\x00\x00\x00,rXYZ\x00\x00\x01\xcc\x00\x00\x00\x14bXYZ\x00\x00\x01\xe0\x00\x00\x00\x14gXYZ\x00\x00\x01\xf4\x00\x00\x00\x14rTRC\x00\x00\x02\x08\x00\x00\x00 gTRC\x00\x00\x02\x08\x00\x00\x00 bTRC\x00\x00\x02\x08\x00\x00\x00 chrm\x00\x00\x02(\x00\x00\x00$mluc\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x0cenUS\x00\x00\x00\x1a\x00\x00\x00\x1c\x00s\x00R\x00G\x00B\x00 \x00b\x00u\x00i\x00l\x00t\x00-\x00i\x00n\x00\x00mluc\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x0cenUS\x00\x00\x000\x00\...R\xeaV\xd1\x1bE2I#a\x8ax#\xda\xa1\x96\x98d{Q\x91\xedHa\x9f\xa5\x19\x1e\xd4\x00dTnGcM\t\xb1\x94U\x90\x14P\x01E\x00(4\xb4\x00Q@\x05\x14\x00Q@\x05\'4\x00\x94P\x01E\x00\x14P\x01E\x00\x14P\x01E\x00J\xe4$a\x07~\xb5\x15(\x95.\xc1E2B\x8a\x00(\xa0\x02\x8a\x00(\xa0\x02\x8a\x00(\xa0\x02\x8a\x00)E\x00-\x14\x00Q@\x05\x14\x00QH\x06\xd1L\x02\x8a\x00(\xa0\x02\x8a\x00(\xa0\x02\xa4E\x01\x0b\x9f\xc2\x93*(a$\x9c\x9ei)\x92\x14P\x01E\x00\x14P\x01E\x00\x14P\x01E\x00\x14P\x01E\x00\x14P\x02\x8aZ@\x14S\x00\xa2\x80\n(\x01\xb4P\x01E\x00\x14P\x01E\x00\x14P\x03\x91w6)\xf30\xe1W\xa0\x15=JZ"**\x89\n(\x00\xa2\x80\n(\x00\xa2\x80\n(\x00\xa2\x80\n(\x00\xa2\x80\n(\x00\xa5\x14\x00\xb4P\x80(\xa0\x02\x8a\x00m\x14\x00Q@\x05\x14\x00Q@\x05\x14\x012m\x8e2O,zqP\xd4\xae\xe5KE`\xa2\xa8\x90\xa2\x80\n(\x00\xa2\x80\n(\x00\xa2\x80\n(\x00\xa2\x80\n(\x00\xa2\x80\n(\x01E- \n)\x80Q@\r\xa2\x80\n(\x00\xa2\x80\n(\x00\xa2\x80\x14\x92z\x9c\xd2P\x01E\x00\x14P\x01E\x00\x14P\x01E\x00\x14P\x01E\x00\x14P\x01E\x00\x14P\x01E\x00\x14\xa0\xd0\x02\xd1H\x02\x8a\x00m\x14\xc0(\xa0\x02\x8a\x00(\xa0\x02\x8a\x00(\xa0\x02\x8a\x00(\xa0\x02\x8a\x00(\xa0\x02\x8a\x00(\xa0\x02\x8a\x00(\xa0\x02\x8a\x00(\xa0\x02\x8a\x00(\x14\x00\xa2\x96\x90\x05\x14\x01\xff\xd9')])
+------------------------------ Captured log setup ------------------------------
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/health "HTTP/1.1 200 OK"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/blueprints/vehicles "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/world/spawn-points "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/vehicle "HTTP/1.1 201 Created"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+INFO     e2e.helpers:helpers.py:174 spawn_test_vehicle: id=176 blueprint=vehicle.taxi.ford listed_role=autopilot
+INFO     httpx:_client.py:1740 HTTP Request: POST http://127.0.0.1:58337/api/actors/spawn/sensor "HTTP/1.1 201 Created"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: DELETE http://127.0.0.1:58337/api/actors/177 "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: DELETE http://127.0.0.1:58337/api/actors/176 "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+---------------------------- Captured log teardown -----------------------------
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/actors "HTTP/1.1 200 OK"
+INFO     httpx:_client.py:1740 HTTP Request: GET http://127.0.0.1:58337/api/realtime/session "HTTP/1.1 200 OK"
+- generated xml file: /data1/song99/carla/carla-web-bridge/tools/e2e/fixtures/junit_run1.xml -
+=========================== short test summary info ============================
+FAILED tools/e2e/test_e4_weather.py::test_e4_weather_change - assert False
+FAILED tools/e2e/test_e7_sensor_destroy.py::test_e7_sensor_destroy_midstream
+============== 2 failed, 5 passed, 1 xfailed in 137.90s (0:02:17) ==============

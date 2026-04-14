@@ -1,0 +1,10 @@
+{
+  "duration_s": 90,
+  "fps_at_30s": 30.0,
+  "fps_at_32s": 1.0,
+  "fps_at_62s": 30.0,
+  "artifacts": {
+    "csv": "out_verify/viewport_inactive/viewport_inactive.csv",
+    "plot": "out_verify/viewport_inactive/viewport_inactive.png"
+  }
+}

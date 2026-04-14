@@ -71,6 +71,11 @@ async def list_maps():
 @router.post("/load")
 async def load_map(req: LoadMapRequest):
     _require_connection()
+    from src.main import realtime_session, sensor_manager
+
+    await realtime_session.reset(destroy_managed=True, reason=f"load map {req.map_name}")
+    await sensor_manager.destroy_all()
+    carla_manager.clear_tracked_actors()
 
     def _load():
         carla_manager.client.load_world(req.map_name)
@@ -142,28 +147,31 @@ async def list_weather_presets():
 @router.get("/spectator")
 async def get_spectator():
     _require_connection()
-
-    def _get():
+    try:
         spec = carla_manager.world.get_spectator()
-        return serialize_actor(spec).model_dump()
-
-    return await asyncio.to_thread(_get)
+        return {"transform": carla_transform_to_dict(spec.get_transform()).model_dump()}
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=501,
+            detail="Spectator API unavailable in current CARLA runtime",
+        ) from e
 
 
 @router.post("/spectator")
 async def set_spectator(req: Transform):
     _require_connection()
-
-    def _set():
-        try:
-            spec = carla_manager.world.get_spectator()
-            t = dict_to_carla_transform(req)
-            spec.set_transform(t)
-            return {"status": "ok"}
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-
-    return await asyncio.to_thread(_set)
+    try:
+        spec = carla_manager.world.get_spectator()
+        t = dict_to_carla_transform(req)
+        spec.set_transform(t)
+        return {"status": "ok"}
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=501,
+            detail="Spectator API unavailable in current CARLA runtime",
+        ) from e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/spawn-points")

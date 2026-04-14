@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 
@@ -10,6 +11,7 @@ from src.carla_client import carla_manager
 from src.models.schemas import StartRecordingRequest, StartReplayRequest
 
 router = APIRouter(prefix="/api", tags=["recording"])
+_recording_history: list[str] = []
 
 
 def _require_connection() -> None:
@@ -24,6 +26,8 @@ async def start_recording(req: StartRecordingRequest):
     def _start():
         try:
             carla_manager.client.start_recorder(req.filename)
+            if req.filename not in _recording_history:
+                _recording_history.insert(0, req.filename)
             return {"status": "recording", "filename": req.filename}
         except RuntimeError as e:
             raise HTTPException(status_code=400, detail=str(e))
@@ -54,8 +58,20 @@ async def list_recordings():
     _require_connection()
 
     def _list():
-        result = carla_manager.client.show_recorder_file_info("", True)
-        return {"recordings": result}
+        cwd = Path.cwd()
+        disk_files = sorted(
+            {
+                path.name
+                for path in cwd.rglob("*.log")
+                if path.is_file()
+            },
+            reverse=True,
+        )
+        merged = []
+        for filename in [*_recording_history, *disk_files]:
+            if filename not in merged:
+                merged.append(filename)
+        return {"recordings": merged}
 
     return await asyncio.to_thread(_list)
 

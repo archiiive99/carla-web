@@ -1,0 +1,2937 @@
+{
+  "version": "2.0",
+  "generatedAt": "2026-04-13",
+  "totalAssets": 462,
+  "categories": {
+    "Bicycle": {
+      "count": 5,
+      "totalSize": 472632
+    },
+    "Bridge": {
+      "count": 7,
+      "totalSize": 776936
+    },
+    "Building": {
+      "count": 177,
+      "totalSize": 764576220
+    },
+    "Bus": {
+      "count": 3,
+      "totalSize": 64545684
+    },
+    "Car": {
+      "count": 43,
+      "totalSize": 180589876
+    },
+    "CityTile": {
+      "count": 1,
+      "totalSize": 26040
+    },
+    "ColorCalibrator": {
+      "count": 1,
+      "totalSize": 1430488
+    },
+    "Door": {
+      "count": 1,
+      "totalSize": 48412
+    },
+    "Dynamic": {
+      "count": 10,
+      "totalSize": 444224
+    },
+    "FX": {
+      "count": 2,
+      "totalSize": 4856
+    },
+    "Fence": {
+      "count": 16,
+      "totalSize": 3360712
+    },
+    "GenericMaterials": {
+      "count": 1,
+      "totalSize": 1432084
+    },
+    "GroundFloor": {
+      "count": 6,
+      "totalSize": 498668
+    },
+    "GuardRail": {
+      "count": 9,
+      "totalSize": 358428
+    },
+    "Motorcycle": {
+      "count": 9,
+      "totalSize": 2642532
+    },
+    "Other": {
+      "count": 7,
+      "totalSize": 282056
+    },
+    "Pole": {
+      "count": 14,
+      "totalSize": 494712
+    },
+    "RailTrack": {
+      "count": 3,
+      "totalSize": 1402024
+    },
+    "Road": {
+      "count": 10,
+      "totalSize": 546120
+    },
+    "RoadLine": {
+      "count": 5,
+      "totalSize": 343188
+    },
+    "Rock": {
+      "count": 9,
+      "totalSize": 1285328
+    },
+    "Showcase": {
+      "count": 1,
+      "totalSize": 27596
+    },
+    "SideWalk": {
+      "count": 13,
+      "totalSize": 3754796
+    },
+    "Slop": {
+      "count": 3,
+      "totalSize": 13972
+    },
+    "SmallWindow": {
+      "count": 1,
+      "totalSize": 29756
+    },
+    "Static": {
+      "count": 10,
+      "totalSize": 8869440
+    },
+    "StreetLight": {
+      "count": 4,
+      "totalSize": 65528
+    },
+    "Terrain": {
+      "count": 1,
+      "totalSize": 1375604
+    },
+    "TrafficLight": {
+      "count": 11,
+      "totalSize": 419776
+    },
+    "TrafficSign": {
+      "count": 16,
+      "totalSize": 444552
+    },
+    "Truck": {
+      "count": 13,
+      "totalSize": 161915836
+    },
+    "Vegetation": {
+      "count": 22,
+      "totalSize": 147628536
+    },
+    "Wall": {
+      "count": 11,
+      "totalSize": 7586688
+    },
+    "Water": {
+      "count": 6,
+      "totalSize": 68716
+    },
+    "Windows": {
+      "count": 7,
+      "totalSize": 398272
+    },
+    "Windows1": {
+      "count": 1,
+      "totalSize": 36688
+    },
+    "Windows2": {
+      "count": 1,
+      "totalSize": 50420
+    },
+    "Windows3": {
+      "count": 1,
+      "totalSize": 25140
+    },
+    "Windows4": {
+      "count": 1,
+      "totalSize": 38880
+    }
+  },
+  "assets": [
+    {
+      "name": "Bicycle_Leisure",
+      "file": "Bicycle_Leisure.glb",
+      "category": "Bicycle",
+      "size": 89032
+    },
+    {
+      "name": "Bicycle_SM_RoadBike",
+      "file": "Bicycle_SM_RoadBike.glb",
+      "category": "Bicycle",
+      "size": 114168
+    },
+    {
+      "name": "Bicycle_SM_sc_LeisureBike",
+      "file": "Bicycle_SM_sc_LeisureBike.glb",
+      "category": "Bicycle",
+      "size": 89408
+    },
+    {
+      "name": "Bicycle_SM_sc_Roadbike",
+      "file": "Bicycle_SM_sc_Roadbike.glb",
+      "category": "Bicycle",
+      "size": 86648
+    },
+    {
+      "name": "Bicycle_SM_sc_crossbike",
+      "file": "Bicycle_SM_sc_crossbike.glb",
+      "category": "Bicycle",
+      "size": 93376
+    },
+    {
+      "name": "Bridge_SM_Beam01",
+      "file": "Bridge_SM_Beam01.glb",
+      "category": "Bridge",
+      "size": 2984
+    },
+    {
+      "name": "Bridge_SM_BridgeSupport01",
+      "file": "Bridge_SM_BridgeSupport01.glb",
+      "category": "Bridge",
+      "size": 41040
+    },
+    {
+      "name": "Bridge_SM_BridgeSupport02_A",
+      "file": "Bridge_SM_BridgeSupport02_A.glb",
+      "category": "Bridge",
+      "size": 13756
+    },
+    {
+      "name": "Bridge_SM_BridgeSupport02_B",
+      "file": "Bridge_SM_BridgeSupport02_B.glb",
+      "category": "Bridge",
+      "size": 13756
+    },
+    {
+      "name": "Bridge_SM_BridgeSupport02_C",
+      "file": "Bridge_SM_BridgeSupport02_C.glb",
+      "category": "Bridge",
+      "size": 27432
+    },
+    {
+      "name": "Bridge_SM_Pier01",
+      "file": "Bridge_SM_Pier01.glb",
+      "category": "Bridge",
+      "size": 71344
+    },
+    {
+      "name": "Bridge_SM_Pier01_Square",
+      "file": "Bridge_SM_Pier01_Square.glb",
+      "category": "Bridge",
+      "size": 606624
+    },
+    {
+      "name": "Building_BridgeSupport",
+      "file": "Building_BridgeSupport.glb",
+      "category": "Building",
+      "size": 40660
+    },
+    {
+      "name": "Building_Pier01",
+      "file": "Building_Pier01.glb",
+      "category": "Building",
+      "size": 70964
+    },
+    {
+      "name": "Building_SM_Apt01_C",
+      "file": "Building_SM_Apt01_C.glb",
+      "category": "Building",
+      "size": 565308
+    },
+    {
+      "name": "Building_SM_Apt04_A",
+      "file": "Building_SM_Apt04_A.glb",
+      "category": "Building",
+      "size": 202924
+    },
+    {
+      "name": "Building_SM_Apt04_B",
+      "file": "Building_SM_Apt04_B.glb",
+      "category": "Building",
+      "size": 673348
+    },
+    {
+      "name": "Building_SM_Apt05_A",
+      "file": "Building_SM_Apt05_A.glb",
+      "category": "Building",
+      "size": 200388
+    },
+    {
+      "name": "Building_SM_Apt07_A",
+      "file": "Building_SM_Apt07_A.glb",
+      "category": "Building",
+      "size": 239644
+    },
+    {
+      "name": "Building_SM_Apt08_A",
+      "file": "Building_SM_Apt08_A.glb",
+      "category": "Building",
+      "size": 188200
+    },
+    {
+      "name": "Building_SM_Apt09",
+      "file": "Building_SM_Apt09.glb",
+      "category": "Building",
+      "size": 1751128
+    },
+    {
+      "name": "Building_SM_Apt10",
+      "file": "Building_SM_Apt10.glb",
+      "category": "Building",
+      "size": 2635860
+    },
+    {
+      "name": "Building_SM_Apt11",
+      "file": "Building_SM_Apt11.glb",
+      "category": "Building",
+      "size": 5093148
+    },
+    {
+      "name": "Building_SM_Apt12_A",
+      "file": "Building_SM_Apt12_A.glb",
+      "category": "Building",
+      "size": 578260
+    },
+    {
+      "name": "Building_SM_Apt12_B",
+      "file": "Building_SM_Apt12_B.glb",
+      "category": "Building",
+      "size": 654784
+    },
+    {
+      "name": "Building_SM_Apt13",
+      "file": "Building_SM_Apt13.glb",
+      "category": "Building",
+      "size": 856068
+    },
+    {
+      "name": "Building_SM_Apt14",
+      "file": "Building_SM_Apt14.glb",
+      "category": "Building",
+      "size": 1319320
+    },
+    {
+      "name": "Building_SM_Apt15_A",
+      "file": "Building_SM_Apt15_A.glb",
+      "category": "Building",
+      "size": 7580
+    },
+    {
+      "name": "Building_SM_Apt15_B",
+      "file": "Building_SM_Apt15_B.glb",
+      "category": "Building",
+      "size": 7580
+    },
+    {
+      "name": "Building_SM_Apt15_C",
+      "file": "Building_SM_Apt15_C.glb",
+      "category": "Building",
+      "size": 8736
+    },
+    {
+      "name": "Building_SM_Apt15_D",
+      "file": "Building_SM_Apt15_D.glb",
+      "category": "Building",
+      "size": 7592
+    },
+    {
+      "name": "Building_SM_Apt18_A",
+      "file": "Building_SM_Apt18_A.glb",
+      "category": "Building",
+      "size": 2134968
+    },
+    {
+      "name": "Building_SM_Apt18_B",
+      "file": "Building_SM_Apt18_B.glb",
+      "category": "Building",
+      "size": 2519304
+    },
+    {
+      "name": "Building_SM_Apt18_C",
+      "file": "Building_SM_Apt18_C.glb",
+      "category": "Building",
+      "size": 2786496
+    },
+    {
+      "name": "Building_SM_Apt19_A",
+      "file": "Building_SM_Apt19_A.glb",
+      "category": "Building",
+      "size": 492176
+    },
+    {
+      "name": "Building_SM_Apt19_BG",
+      "file": "Building_SM_Apt19_BG.glb",
+      "category": "Building",
+      "size": 2100956
+    },
+    {
+      "name": "Building_SM_Apt20_A",
+      "file": "Building_SM_Apt20_A.glb",
+      "category": "Building",
+      "size": 381456
+    },
+    {
+      "name": "Building_SM_Apt20_B",
+      "file": "Building_SM_Apt20_B.glb",
+      "category": "Building",
+      "size": 1266272
+    },
+    {
+      "name": "Building_SM_Apt20_C",
+      "file": "Building_SM_Apt20_C.glb",
+      "category": "Building",
+      "size": 1804552
+    },
+    {
+      "name": "Building_SM_Apt20_D",
+      "file": "Building_SM_Apt20_D.glb",
+      "category": "Building",
+      "size": 265316
+    },
+    {
+      "name": "Building_SM_Apt20_E",
+      "file": "Building_SM_Apt20_E.glb",
+      "category": "Building",
+      "size": 1716012
+    },
+    {
+      "name": "Building_SM_Apt20_F",
+      "file": "Building_SM_Apt20_F.glb",
+      "category": "Building",
+      "size": 1220468
+    },
+    {
+      "name": "Building_SM_Apt21_A",
+      "file": "Building_SM_Apt21_A.glb",
+      "category": "Building",
+      "size": 2664236
+    },
+    {
+      "name": "Building_SM_Apt22",
+      "file": "Building_SM_Apt22.glb",
+      "category": "Building",
+      "size": 3652952
+    },
+    {
+      "name": "Building_SM_Apt23",
+      "file": "Building_SM_Apt23.glb",
+      "category": "Building",
+      "size": 1529300
+    },
+    {
+      "name": "Building_SM_Apt24_A",
+      "file": "Building_SM_Apt24_A.glb",
+      "category": "Building",
+      "size": 5164400
+    },
+    {
+      "name": "Building_SM_Apt24_B",
+      "file": "Building_SM_Apt24_B.glb",
+      "category": "Building",
+      "size": 3597536
+    },
+    {
+      "name": "Building_SM_Apt24_C",
+      "file": "Building_SM_Apt24_C.glb",
+      "category": "Building",
+      "size": 5597980
+    },
+    {
+      "name": "Building_SM_Apt25_A",
+      "file": "Building_SM_Apt25_A.glb",
+      "category": "Building",
+      "size": 7065232
+    },
+    {
+      "name": "Building_SM_Apt25_B",
+      "file": "Building_SM_Apt25_B.glb",
+      "category": "Building",
+      "size": 6311020
+    },
+    {
+      "name": "Building_SM_Apt25_C",
+      "file": "Building_SM_Apt25_C.glb",
+      "category": "Building",
+      "size": 4611172
+    },
+    {
+      "name": "Building_SM_Apt25_D",
+      "file": "Building_SM_Apt25_D.glb",
+      "category": "Building",
+      "size": 3370748
+    },
+    {
+      "name": "Building_SM_Apt25_E",
+      "file": "Building_SM_Apt25_E.glb",
+      "category": "Building",
+      "size": 1623440
+    },
+    {
+      "name": "Building_SM_Apt25_F",
+      "file": "Building_SM_Apt25_F.glb",
+      "category": "Building",
+      "size": 4310772
+    },
+    {
+      "name": "Building_SM_Apt25_G",
+      "file": "Building_SM_Apt25_G.glb",
+      "category": "Building",
+      "size": 2067928
+    },
+    {
+      "name": "Building_SM_Apt25_H",
+      "file": "Building_SM_Apt25_H.glb",
+      "category": "Building",
+      "size": 3301356
+    },
+    {
+      "name": "Building_SM_Apt25_I",
+      "file": "Building_SM_Apt25_I.glb",
+      "category": "Building",
+      "size": 1683136
+    },
+    {
+      "name": "Building_SM_Apt25_J",
+      "file": "Building_SM_Apt25_J.glb",
+      "category": "Building",
+      "size": 1590476
+    },
+    {
+      "name": "Building_SM_Apt25_K",
+      "file": "Building_SM_Apt25_K.glb",
+      "category": "Building",
+      "size": 1373564
+    },
+    {
+      "name": "Building_SM_Apt25_L",
+      "file": "Building_SM_Apt25_L.glb",
+      "category": "Building",
+      "size": 1241752
+    },
+    {
+      "name": "Building_SM_Apt25_M",
+      "file": "Building_SM_Apt25_M.glb",
+      "category": "Building",
+      "size": 2923428
+    },
+    {
+      "name": "Building_SM_Apt25_N",
+      "file": "Building_SM_Apt25_N.glb",
+      "category": "Building",
+      "size": 3370944
+    },
+    {
+      "name": "Building_SM_Apt25_O",
+      "file": "Building_SM_Apt25_O.glb",
+      "category": "Building",
+      "size": 1623576
+    },
+    {
+      "name": "Building_SM_Apt25_P",
+      "file": "Building_SM_Apt25_P.glb",
+      "category": "Building",
+      "size": 4310576
+    },
+    {
+      "name": "Building_SM_Apt26_A",
+      "file": "Building_SM_Apt26_A.glb",
+      "category": "Building",
+      "size": 7042108
+    },
+    {
+      "name": "Building_SM_Apt26_B",
+      "file": "Building_SM_Apt26_B.glb",
+      "category": "Building",
+      "size": 6608940
+    },
+    {
+      "name": "Building_SM_Apt26_C",
+      "file": "Building_SM_Apt26_C.glb",
+      "category": "Building",
+      "size": 5996164
+    },
+    {
+      "name": "Building_SM_Apt26_D",
+      "file": "Building_SM_Apt26_D.glb",
+      "category": "Building",
+      "size": 7833408
+    },
+    {
+      "name": "Building_SM_Apt26_E",
+      "file": "Building_SM_Apt26_E.glb",
+      "category": "Building",
+      "size": 7350812
+    },
+    {
+      "name": "Building_SM_Apt26_F",
+      "file": "Building_SM_Apt26_F.glb",
+      "category": "Building",
+      "size": 8681812
+    },
+    {
+      "name": "Building_SM_Apt27_A",
+      "file": "Building_SM_Apt27_A.glb",
+      "category": "Building",
+      "size": 8777600
+    },
+    {
+      "name": "Building_SM_Apt27_B",
+      "file": "Building_SM_Apt27_B.glb",
+      "category": "Building",
+      "size": 12895440
+    },
+    {
+      "name": "Building_SM_Apt27_C",
+      "file": "Building_SM_Apt27_C.glb",
+      "category": "Building",
+      "size": 15323332
+    },
+    {
+      "name": "Building_SM_Apt27_D_Corner",
+      "file": "Building_SM_Apt27_D_Corner.glb",
+      "category": "Building",
+      "size": 11158756
+    },
+    {
+      "name": "Building_SM_Apt27_E",
+      "file": "Building_SM_Apt27_E.glb",
+      "category": "Building",
+      "size": 7690588
+    },
+    {
+      "name": "Building_SM_Apt28_A",
+      "file": "Building_SM_Apt28_A.glb",
+      "category": "Building",
+      "size": 8520308
+    },
+    {
+      "name": "Building_SM_Apt28_B",
+      "file": "Building_SM_Apt28_B.glb",
+      "category": "Building",
+      "size": 15393020
+    },
+    {
+      "name": "Building_SM_Apt28_C",
+      "file": "Building_SM_Apt28_C.glb",
+      "category": "Building",
+      "size": 11765572
+    },
+    {
+      "name": "Building_SM_Apt28_D",
+      "file": "Building_SM_Apt28_D.glb",
+      "category": "Building",
+      "size": 13921240
+    },
+    {
+      "name": "Building_SM_Apt28_E_Corner",
+      "file": "Building_SM_Apt28_E_Corner.glb",
+      "category": "Building",
+      "size": 10398384
+    },
+    {
+      "name": "Building_SM_Apt29_A",
+      "file": "Building_SM_Apt29_A.glb",
+      "category": "Building",
+      "size": 16871524
+    },
+    {
+      "name": "Building_SM_Apt29_B",
+      "file": "Building_SM_Apt29_B.glb",
+      "category": "Building",
+      "size": 19490580
+    },
+    {
+      "name": "Building_SM_Apt29_C",
+      "file": "Building_SM_Apt29_C.glb",
+      "category": "Building",
+      "size": 10277208
+    },
+    {
+      "name": "Building_SM_Apt29_D",
+      "file": "Building_SM_Apt29_D.glb",
+      "category": "Building",
+      "size": 12320820
+    },
+    {
+      "name": "Building_SM_Apt29_E",
+      "file": "Building_SM_Apt29_E.glb",
+      "category": "Building",
+      "size": 6862088
+    },
+    {
+      "name": "Building_SM_Apt29_F_Corner",
+      "file": "Building_SM_Apt29_F_Corner.glb",
+      "category": "Building",
+      "size": 16685732
+    },
+    {
+      "name": "Building_SM_Apt30_A",
+      "file": "Building_SM_Apt30_A.glb",
+      "category": "Building",
+      "size": 24925844
+    },
+    {
+      "name": "Building_SM_Apt30_B",
+      "file": "Building_SM_Apt30_B.glb",
+      "category": "Building",
+      "size": 13180936
+    },
+    {
+      "name": "Building_SM_Apt30_C",
+      "file": "Building_SM_Apt30_C.glb",
+      "category": "Building",
+      "size": 18222628
+    },
+    {
+      "name": "Building_SM_Apt30_D",
+      "file": "Building_SM_Apt30_D.glb",
+      "category": "Building",
+      "size": 16698740
+    },
+    {
+      "name": "Building_SM_Apt30_E_Corner",
+      "file": "Building_SM_Apt30_E_Corner.glb",
+      "category": "Building",
+      "size": 9800952
+    },
+    {
+      "name": "Building_SM_Apt31_A",
+      "file": "Building_SM_Apt31_A.glb",
+      "category": "Building",
+      "size": 20248556
+    },
+    {
+      "name": "Building_SM_Apt31_B",
+      "file": "Building_SM_Apt31_B.glb",
+      "category": "Building",
+      "size": 14619672
+    },
+    {
+      "name": "Building_SM_Apt31_C",
+      "file": "Building_SM_Apt31_C.glb",
+      "category": "Building",
+      "size": 9637976
+    },
+    {
+      "name": "Building_SM_Apt31_D_Corner",
+      "file": "Building_SM_Apt31_D_Corner.glb",
+      "category": "Building",
+      "size": 14898620
+    },
+    {
+      "name": "Building_SM_Apt31_E_Corner",
+      "file": "Building_SM_Apt31_E_Corner.glb",
+      "category": "Building",
+      "size": 8733888
+    },
+    {
+      "name": "Building_SM_Apt32_A",
+      "file": "Building_SM_Apt32_A.glb",
+      "category": "Building",
+      "size": 14270092
+    },
+    {
+      "name": "Building_SM_Apt32_B",
+      "file": "Building_SM_Apt32_B.glb",
+      "category": "Building",
+      "size": 3110496
+    },
+    {
+      "name": "Building_SM_Apt33_A",
+      "file": "Building_SM_Apt33_A.glb",
+      "category": "Building",
+      "size": 46815508
+    },
+    {
+      "name": "Building_SM_Apt34_A",
+      "file": "Building_SM_Apt34_A.glb",
+      "category": "Building",
+      "size": 17082220
+    },
+    {
+      "name": "Building_SM_Apt35_A",
+      "file": "Building_SM_Apt35_A.glb",
+      "category": "Building",
+      "size": 36540568
+    },
+    {
+      "name": "Building_SM_Block05_A",
+      "file": "Building_SM_Block05_A.glb",
+      "category": "Building",
+      "size": 200388
+    },
+    {
+      "name": "Building_SM_Church",
+      "file": "Building_SM_Church.glb",
+      "category": "Building",
+      "size": 235428
+    },
+    {
+      "name": "Building_SM_Construction",
+      "file": "Building_SM_Construction.glb",
+      "category": "Building",
+      "size": 342828
+    },
+    {
+      "name": "Building_SM_Crag",
+      "file": "Building_SM_Crag.glb",
+      "category": "Building",
+      "size": 2627600
+    },
+    {
+      "name": "Building_SM_CvC",
+      "file": "Building_SM_CvC.glb",
+      "category": "Building",
+      "size": 2239064
+    },
+    {
+      "name": "Building_SM_Factory01",
+      "file": "Building_SM_Factory01.glb",
+      "category": "Building",
+      "size": 322952
+    },
+    {
+      "name": "Building_SM_Factory02",
+      "file": "Building_SM_Factory02.glb",
+      "category": "Building",
+      "size": 267984
+    },
+    {
+      "name": "Building_SM_Factory03",
+      "file": "Building_SM_Factory03.glb",
+      "category": "Building",
+      "size": 592984
+    },
+    {
+      "name": "Building_SM_Farm03",
+      "file": "Building_SM_Farm03.glb",
+      "category": "Building",
+      "size": 223332
+    },
+    {
+      "name": "Building_SM_Farm04",
+      "file": "Building_SM_Farm04.glb",
+      "category": "Building",
+      "size": 102396
+    },
+    {
+      "name": "Building_SM_Garage",
+      "file": "Building_SM_Garage.glb",
+      "category": "Building",
+      "size": 24144
+    },
+    {
+      "name": "Building_SM_GasStation",
+      "file": "Building_SM_GasStation.glb",
+      "category": "Building",
+      "size": 425584
+    },
+    {
+      "name": "Building_SM_GuardShelter",
+      "file": "Building_SM_GuardShelter.glb",
+      "category": "Building",
+      "size": 85568
+    },
+    {
+      "name": "Building_SM_HotelHall_Opt",
+      "file": "Building_SM_HotelHall_Opt.glb",
+      "category": "Building",
+      "size": 19280
+    },
+    {
+      "name": "Building_SM_House01",
+      "file": "Building_SM_House01.glb",
+      "category": "Building",
+      "size": 133244
+    },
+    {
+      "name": "Building_SM_House02",
+      "file": "Building_SM_House02.glb",
+      "category": "Building",
+      "size": 163264
+    },
+    {
+      "name": "Building_SM_House03",
+      "file": "Building_SM_House03.glb",
+      "category": "Building",
+      "size": 107624
+    },
+    {
+      "name": "Building_SM_House04",
+      "file": "Building_SM_House04.glb",
+      "category": "Building",
+      "size": 189152
+    },
+    {
+      "name": "Building_SM_House05_B",
+      "file": "Building_SM_House05_B.glb",
+      "category": "Building",
+      "size": 249376
+    },
+    {
+      "name": "Building_SM_House06",
+      "file": "Building_SM_House06.glb",
+      "category": "Building",
+      "size": 175544
+    },
+    {
+      "name": "Building_SM_House07_A",
+      "file": "Building_SM_House07_A.glb",
+      "category": "Building",
+      "size": 75348
+    },
+    {
+      "name": "Building_SM_House08",
+      "file": "Building_SM_House08.glb",
+      "category": "Building",
+      "size": 593196
+    },
+    {
+      "name": "Building_SM_House09",
+      "file": "Building_SM_House09.glb",
+      "category": "Building",
+      "size": 374848
+    },
+    {
+      "name": "Building_SM_House10",
+      "file": "Building_SM_House10.glb",
+      "category": "Building",
+      "size": 154904
+    },
+    {
+      "name": "Building_SM_House11",
+      "file": "Building_SM_House11.glb",
+      "category": "Building",
+      "size": 229644
+    },
+    {
+      "name": "Building_SM_House12_A",
+      "file": "Building_SM_House12_A.glb",
+      "category": "Building",
+      "size": 109744
+    },
+    {
+      "name": "Building_SM_House14_C",
+      "file": "Building_SM_House14_C.glb",
+      "category": "Building",
+      "size": 58276
+    },
+    {
+      "name": "Building_SM_House15_A",
+      "file": "Building_SM_House15_A.glb",
+      "category": "Building",
+      "size": 143024
+    },
+    {
+      "name": "Building_SM_House16",
+      "file": "Building_SM_House16.glb",
+      "category": "Building",
+      "size": 976568
+    },
+    {
+      "name": "Building_SM_House16_A",
+      "file": "Building_SM_House16_A.glb",
+      "category": "Building",
+      "size": 976368
+    },
+    {
+      "name": "Building_SM_House17_A",
+      "file": "Building_SM_House17_A.glb",
+      "category": "Building",
+      "size": 1299252
+    },
+    {
+      "name": "Building_SM_House17_B",
+      "file": "Building_SM_House17_B.glb",
+      "category": "Building",
+      "size": 1366868
+    },
+    {
+      "name": "Building_SM_House17_C",
+      "file": "Building_SM_House17_C.glb",
+      "category": "Building",
+      "size": 1737108
+    },
+    {
+      "name": "Building_SM_House18_A",
+      "file": "Building_SM_House18_A.glb",
+      "category": "Building",
+      "size": 1503696
+    },
+    {
+      "name": "Building_SM_House18_B",
+      "file": "Building_SM_House18_B.glb",
+      "category": "Building",
+      "size": 1564676
+    },
+    {
+      "name": "Building_SM_House18_C",
+      "file": "Building_SM_House18_C.glb",
+      "category": "Building",
+      "size": 1259528
+    },
+    {
+      "name": "Building_SM_House18_D",
+      "file": "Building_SM_House18_D.glb",
+      "category": "Building",
+      "size": 1620556
+    },
+    {
+      "name": "Building_SM_House18_E",
+      "file": "Building_SM_House18_E.glb",
+      "category": "Building",
+      "size": 916988
+    },
+    {
+      "name": "Building_SM_House18_F",
+      "file": "Building_SM_House18_F.glb",
+      "category": "Building",
+      "size": 1518676
+    },
+    {
+      "name": "Building_SM_House_13",
+      "file": "Building_SM_House_13.glb",
+      "category": "Building",
+      "size": 245632
+    },
+    {
+      "name": "Building_SM_HumanHall",
+      "file": "Building_SM_HumanHall.glb",
+      "category": "Building",
+      "size": 3651564
+    },
+    {
+      "name": "Building_SM_Kiosk01",
+      "file": "Building_SM_Kiosk01.glb",
+      "category": "Building",
+      "size": 50304
+    },
+    {
+      "name": "Building_SM_Kiosk02",
+      "file": "Building_SM_Kiosk02.glb",
+      "category": "Building",
+      "size": 54872
+    },
+    {
+      "name": "Building_SM_Kiosk03_A",
+      "file": "Building_SM_Kiosk03_A.glb",
+      "category": "Building",
+      "size": 30252
+    },
+    {
+      "name": "Building_SM_Kiosk03_B",
+      "file": "Building_SM_Kiosk03_B.glb",
+      "category": "Building",
+      "size": 30260
+    },
+    {
+      "name": "Building_SM_Mansion01",
+      "file": "Building_SM_Mansion01.glb",
+      "category": "Building",
+      "size": 220516
+    },
+    {
+      "name": "Building_SM_Mansion02",
+      "file": "Building_SM_Mansion02.glb",
+      "category": "Building",
+      "size": 274788
+    },
+    {
+      "name": "Building_SM_Mansion03",
+      "file": "Building_SM_Mansion03.glb",
+      "category": "Building",
+      "size": 230220
+    },
+    {
+      "name": "Building_SM_Mansion04",
+      "file": "Building_SM_Mansion04.glb",
+      "category": "Building",
+      "size": 322784
+    },
+    {
+      "name": "Building_SM_Museum01",
+      "file": "Building_SM_Museum01.glb",
+      "category": "Building",
+      "size": 716852
+    },
+    {
+      "name": "Building_SM_Museum02",
+      "file": "Building_SM_Museum02.glb",
+      "category": "Building",
+      "size": 785436
+    },
+    {
+      "name": "Building_SM_Parking",
+      "file": "Building_SM_Parking.glb",
+      "category": "Building",
+      "size": 385788
+    },
+    {
+      "name": "Building_SM_ParkingRamp",
+      "file": "Building_SM_ParkingRamp.glb",
+      "category": "Building",
+      "size": 647992
+    },
+    {
+      "name": "Building_SM_Skysc01",
+      "file": "Building_SM_Skysc01.glb",
+      "category": "Building",
+      "size": 6164
+    },
+    {
+      "name": "Building_SM_Skysc02",
+      "file": "Building_SM_Skysc02.glb",
+      "category": "Building",
+      "size": 9424
+    },
+    {
+      "name": "Building_SM_Skysc03",
+      "file": "Building_SM_Skysc03.glb",
+      "category": "Building",
+      "size": 12656
+    },
+    {
+      "name": "Building_SM_Skysc04_A",
+      "file": "Building_SM_Skysc04_A.glb",
+      "category": "Building",
+      "size": 17596
+    },
+    {
+      "name": "Building_SM_Skysc04_B",
+      "file": "Building_SM_Skysc04_B.glb",
+      "category": "Building",
+      "size": 6236
+    },
+    {
+      "name": "Building_SM_Skysc04_C",
+      "file": "Building_SM_Skysc04_C.glb",
+      "category": "Building",
+      "size": 4852
+    },
+    {
+      "name": "Building_SM_Skysc05",
+      "file": "Building_SM_Skysc05.glb",
+      "category": "Building",
+      "size": 16776
+    },
+    {
+      "name": "Building_SM_Skysc06",
+      "file": "Building_SM_Skysc06.glb",
+      "category": "Building",
+      "size": 8052
+    },
+    {
+      "name": "Building_SM_Skysc07",
+      "file": "Building_SM_Skysc07.glb",
+      "category": "Building",
+      "size": 4484100
+    },
+    {
+      "name": "Building_SM_Skysc08",
+      "file": "Building_SM_Skysc08.glb",
+      "category": "Building",
+      "size": 1638660
+    },
+    {
+      "name": "Building_SM_Skysc09",
+      "file": "Building_SM_Skysc09.glb",
+      "category": "Building",
+      "size": 2546804
+    },
+    {
+      "name": "Building_SM_Skysc10",
+      "file": "Building_SM_Skysc10.glb",
+      "category": "Building",
+      "size": 1506216
+    },
+    {
+      "name": "Building_SM_Skysc11",
+      "file": "Building_SM_Skysc11.glb",
+      "category": "Building",
+      "size": 1349468
+    },
+    {
+      "name": "Building_SM_Skysc12",
+      "file": "Building_SM_Skysc12.glb",
+      "category": "Building",
+      "size": 4566680
+    },
+    {
+      "name": "Building_SM_Skysc13_A",
+      "file": "Building_SM_Skysc13_A.glb",
+      "category": "Building",
+      "size": 7267004
+    },
+    {
+      "name": "Building_SM_Skysc13_B",
+      "file": "Building_SM_Skysc13_B.glb",
+      "category": "Building",
+      "size": 6593160
+    },
+    {
+      "name": "Building_SM_Skysc13_C",
+      "file": "Building_SM_Skysc13_C.glb",
+      "category": "Building",
+      "size": 5515112
+    },
+    {
+      "name": "Building_SM_Skysc14_A",
+      "file": "Building_SM_Skysc14_A.glb",
+      "category": "Building",
+      "size": 5688448
+    },
+    {
+      "name": "Building_SM_Skysc14_B",
+      "file": "Building_SM_Skysc14_B.glb",
+      "category": "Building",
+      "size": 7926180
+    },
+    {
+      "name": "Building_SM_Skysc14_C",
+      "file": "Building_SM_Skysc14_C.glb",
+      "category": "Building",
+      "size": 7519892
+    },
+    {
+      "name": "Building_SM_Skysc15_A",
+      "file": "Building_SM_Skysc15_A.glb",
+      "category": "Building",
+      "size": 6963308
+    },
+    {
+      "name": "Building_SM_Skysc15_B",
+      "file": "Building_SM_Skysc15_B.glb",
+      "category": "Building",
+      "size": 5040268
+    },
+    {
+      "name": "Building_SM_Skysc16_A",
+      "file": "Building_SM_Skysc16_A.glb",
+      "category": "Building",
+      "size": 9073620
+    },
+    {
+      "name": "Building_SM_Skysc16_B",
+      "file": "Building_SM_Skysc16_B.glb",
+      "category": "Building",
+      "size": 7259048
+    },
+    {
+      "name": "Building_SM_Skysc16_C",
+      "file": "Building_SM_Skysc16_C.glb",
+      "category": "Building",
+      "size": 6648096
+    },
+    {
+      "name": "Building_SM_Skysc17_A",
+      "file": "Building_SM_Skysc17_A.glb",
+      "category": "Building",
+      "size": 7764324
+    },
+    {
+      "name": "Building_SM_Skysc17_B",
+      "file": "Building_SM_Skysc17_B.glb",
+      "category": "Building",
+      "size": 7484504
+    },
+    {
+      "name": "Building_SM_VillaLarge",
+      "file": "Building_SM_VillaLarge.glb",
+      "category": "Building",
+      "size": 1514476
+    },
+    {
+      "name": "Building_SM_VillaSmall",
+      "file": "Building_SM_VillaSmall.glb",
+      "category": "Building",
+      "size": 668832
+    },
+    {
+      "name": "Building_SM_farm01",
+      "file": "Building_SM_farm01.glb",
+      "category": "Building",
+      "size": 208924
+    },
+    {
+      "name": "Building_SM_farm02",
+      "file": "Building_SM_farm02.glb",
+      "category": "Building",
+      "size": 100480
+    },
+    {
+      "name": "Building_SM_farm_windmill",
+      "file": "Building_SM_farm_windmill.glb",
+      "category": "Building",
+      "size": 196184
+    },
+    {
+      "name": "Building_SM_medicineBuilding01",
+      "file": "Building_SM_medicineBuilding01.glb",
+      "category": "Building",
+      "size": 2280368
+    },
+    {
+      "name": "Building_SM_medicineBuilding02",
+      "file": "Building_SM_medicineBuilding02.glb",
+      "category": "Building",
+      "size": 2320036
+    },
+    {
+      "name": "Building_SM_medicineBuilding03",
+      "file": "Building_SM_medicineBuilding03.glb",
+      "category": "Building",
+      "size": 2088884
+    },
+    {
+      "name": "Bus_MitsubishiFuso",
+      "file": "Bus_MitsubishiFuso.glb",
+      "category": "Bus",
+      "size": 32257780
+    },
+    {
+      "name": "Bus_SM_MitsubishiFusoRosa_Parked",
+      "file": "Bus_SM_MitsubishiFusoRosa_Parked.glb",
+      "category": "Bus",
+      "size": 32259348
+    },
+    {
+      "name": "Bus_SM_SC_MitsubishiFusoRosa",
+      "file": "Bus_SM_SC_MitsubishiFusoRosa.glb",
+      "category": "Bus",
+      "size": 28556
+    },
+    {
+      "name": "Car_AudiTT",
+      "file": "Car_AudiTT.glb",
+      "category": "Car",
+      "size": 144404
+    },
+    {
+      "name": "Car_AudiTT_Parked",
+      "file": "Car_AudiTT_Parked.glb",
+      "category": "Car",
+      "size": 1451004
+    },
+    {
+      "name": "Car_Cybertruck",
+      "file": "Car_Cybertruck.glb",
+      "category": "Car",
+      "size": 2097880
+    },
+    {
+      "name": "Car_SM_AudiTT_Parked",
+      "file": "Car_SM_AudiTT_Parked.glb",
+      "category": "Car",
+      "size": 1455092
+    },
+    {
+      "name": "Car_SM_BMWIsetta_Parked",
+      "file": "Car_SM_BMWIsetta_Parked.glb",
+      "category": "Car",
+      "size": 593872
+    },
+    {
+      "name": "Car_SM_ChevroletImpala_Parked",
+      "file": "Car_SM_ChevroletImpala_Parked.glb",
+      "category": "Car",
+      "size": 1554556
+    },
+    {
+      "name": "Car_SM_CitroenC3_Parked",
+      "file": "Car_SM_CitroenC3_Parked.glb",
+      "category": "Car",
+      "size": 1797348
+    },
+    {
+      "name": "Car_SM_Cybertruck_Parked",
+      "file": "Car_SM_Cybertruck_Parked.glb",
+      "category": "Car",
+      "size": 2099500
+    },
+    {
+      "name": "Car_SM_DodgeChargerCop_Parked",
+      "file": "Car_SM_DodgeChargerCop_Parked.glb",
+      "category": "Car",
+      "size": 22209084
+    },
+    {
+      "name": "Car_SM_DodgeCharger_Parked",
+      "file": "Car_SM_DodgeCharger_Parked.glb",
+      "category": "Car",
+      "size": 21706180
+    },
+    {
+      "name": "Car_SM_FordCrown01_Parked",
+      "file": "Car_SM_FordCrown01_Parked.glb",
+      "category": "Car",
+      "size": 6536196
+    },
+    {
+      "name": "Car_SM_FordCrown02_Parked",
+      "file": "Car_SM_FordCrown02_Parked.glb",
+      "category": "Car",
+      "size": 21476740
+    },
+    {
+      "name": "Car_SM_JeepWranglerRubicon_Parked",
+      "file": "Car_SM_JeepWranglerRubicon_Parked.glb",
+      "category": "Car",
+      "size": 1005524
+    },
+    {
+      "name": "Car_SM_LincolnMKZ_Parked",
+      "file": "Car_SM_LincolnMKZ_Parked.glb",
+      "category": "Car",
+      "size": 33773988
+    },
+    {
+      "name": "Car_SM_MercedesCCC_Parked",
+      "file": "Car_SM_MercedesCCC_Parked.glb",
+      "category": "Car",
+      "size": 6092004
+    },
+    {
+      "name": "Car_SM_MiniCooper_Old_Parked",
+      "file": "Car_SM_MiniCooper_Old_Parked.glb",
+      "category": "Car",
+      "size": 2117052
+    },
+    {
+      "name": "Car_SM_MiniCooper_Parked",
+      "file": "Car_SM_MiniCooper_Parked.glb",
+      "category": "Car",
+      "size": 23716844
+    },
+    {
+      "name": "Car_SM_Mustang_Parked",
+      "file": "Car_SM_Mustang_Parked.glb",
+      "category": "Car",
+      "size": 279600
+    },
+    {
+      "name": "Car_SM_NissanPatrol_Old_Parked",
+      "file": "Car_SM_NissanPatrol_Old_Parked.glb",
+      "category": "Car",
+      "size": 2868784
+    },
+    {
+      "name": "Car_SM_NissanPatrol_Parked",
+      "file": "Car_SM_NissanPatrol_Parked.glb",
+      "category": "Car",
+      "size": 18443612
+    },
+    {
+      "name": "Car_SM_SeatLeon_Parked",
+      "file": "Car_SM_SeatLeon_Parked.glb",
+      "category": "Car",
+      "size": 1701784
+    },
+    {
+      "name": "Car_SM_Tazzari",
+      "file": "Car_SM_Tazzari.glb",
+      "category": "Car",
+      "size": 3419512
+    },
+    {
+      "name": "Car_SM_ToyotaPrius_Parked",
+      "file": "Car_SM_ToyotaPrius_Parked.glb",
+      "category": "Car",
+      "size": 2241068
+    },
+    {
+      "name": "Car_SM_sc_AudiA2",
+      "file": "Car_SM_sc_AudiA2.glb",
+      "category": "Car",
+      "size": 104656
+    },
+    {
+      "name": "Car_SM_sc_BMWGranTourer",
+      "file": "Car_SM_sc_BMWGranTourer.glb",
+      "category": "Car",
+      "size": 115928
+    },
+    {
+      "name": "Car_SM_sc_BMWIsetta",
+      "file": "Car_SM_sc_BMWIsetta.glb",
+      "category": "Car",
+      "size": 112836
+    },
+    {
+      "name": "Car_SM_sc_ChevroletImpala",
+      "file": "Car_SM_sc_ChevroletImpala.glb",
+      "category": "Car",
+      "size": 87600
+    },
+    {
+      "name": "Car_SM_sc_CitroenC3",
+      "file": "Car_SM_sc_CitroenC3.glb",
+      "category": "Car",
+      "size": 122104
+    },
+    {
+      "name": "Car_SM_sc_Cybertruck",
+      "file": "Car_SM_sc_Cybertruck.glb",
+      "category": "Car",
+      "size": 39480
+    },
+    {
+      "name": "Car_SM_sc_DodgeCharger",
+      "file": "Car_SM_sc_DodgeCharger.glb",
+      "category": "Car",
+      "size": 103720
+    },
+    {
+      "name": "Car_SM_sc_DodgeChargerCop",
+      "file": "Car_SM_sc_DodgeChargerCop.glb",
+      "category": "Car",
+      "size": 122008
+    },
+    {
+      "name": "Car_SM_sc_Etron",
+      "file": "Car_SM_sc_Etron.glb",
+      "category": "Car",
+      "size": 77636
+    },
+    {
+      "name": "Car_SM_sc_FordCrown01",
+      "file": "Car_SM_sc_FordCrown01.glb",
+      "category": "Car",
+      "size": 53972
+    },
+    {
+      "name": "Car_SM_sc_FordCrown02",
+      "file": "Car_SM_sc_FordCrown02.glb",
+      "category": "Car",
+      "size": 53972
+    },
+    {
+      "name": "Car_SM_sc_JeepWranglerRubicon",
+      "file": "Car_SM_sc_JeepWranglerRubicon.glb",
+      "category": "Car",
+      "size": 83388
+    },
+    {
+      "name": "Car_SM_sc_LincolnMKZ",
+      "file": "Car_SM_sc_LincolnMKZ.glb",
+      "category": "Car",
+      "size": 77872
+    },
+    {
+      "name": "Car_SM_sc_Mini2021",
+      "file": "Car_SM_sc_Mini2021.glb",
+      "category": "Car",
+      "size": 74408
+    },
+    {
+      "name": "Car_SM_sc_Mustang",
+      "file": "Car_SM_sc_Mustang.glb",
+      "category": "Car",
+      "size": 78544
+    },
+    {
+      "name": "Car_SM_sc_NissanMicra",
+      "file": "Car_SM_sc_NissanMicra.glb",
+      "category": "Car",
+      "size": 118016
+    },
+    {
+      "name": "Car_SM_sc_NissanPatrol",
+      "file": "Car_SM_sc_NissanPatrol.glb",
+      "category": "Car",
+      "size": 64000
+    },
+    {
+      "name": "Car_SM_sc_TeslaM3",
+      "file": "Car_SM_sc_TeslaM3.glb",
+      "category": "Car",
+      "size": 85956
+    },
+    {
+      "name": "Car_SM_sc_ToyotaPrius",
+      "file": "Car_SM_sc_ToyotaPrius.glb",
+      "category": "Car",
+      "size": 87156
+    },
+    {
+      "name": "Car_SM_sc_audiTT",
+      "file": "Car_SM_sc_audiTT.glb",
+      "category": "Car",
+      "size": 144996
+    },
+    {
+      "name": "CityTile",
+      "file": "CityTile.glb",
+      "category": "CityTile",
+      "size": 26040
+    },
+    {
+      "name": "ColorCalibrator",
+      "file": "ColorCalibrator.glb",
+      "category": "ColorCalibrator",
+      "size": 1430488
+    },
+    {
+      "name": "Door",
+      "file": "Door.glb",
+      "category": "Door",
+      "size": 48412
+    },
+    {
+      "name": "Dynamic_DirtDebris",
+      "file": "Dynamic_DirtDebris.glb",
+      "category": "Dynamic",
+      "size": 87488
+    },
+    {
+      "name": "Dynamic_SM_BarBottle",
+      "file": "Dynamic_SM_BarBottle.glb",
+      "category": "Dynamic",
+      "size": 3740
+    },
+    {
+      "name": "Dynamic_SM_Barrel",
+      "file": "Dynamic_SM_Barrel.glb",
+      "category": "Dynamic",
+      "size": 9000
+    },
+    {
+      "name": "Dynamic_SM_CreasedBox01",
+      "file": "Dynamic_SM_CreasedBox01.glb",
+      "category": "Dynamic",
+      "size": 14184
+    },
+    {
+      "name": "Dynamic_SM_RoadBlocker_03",
+      "file": "Dynamic_SM_RoadBlocker_03.glb",
+      "category": "Dynamic",
+      "size": 121744
+    },
+    {
+      "name": "Dynamic_SM_StreetBarrier",
+      "file": "Dynamic_SM_StreetBarrier.glb",
+      "category": "Dynamic",
+      "size": 29520
+    },
+    {
+      "name": "Dynamic_SM_TrafficCones_01",
+      "file": "Dynamic_SM_TrafficCones_01.glb",
+      "category": "Dynamic",
+      "size": 63560
+    },
+    {
+      "name": "Dynamic_SM_TrafficCones_02",
+      "file": "Dynamic_SM_TrafficCones_02.glb",
+      "category": "Dynamic",
+      "size": 8132
+    },
+    {
+      "name": "Dynamic_SM_TrafficCones_03",
+      "file": "Dynamic_SM_TrafficCones_03.glb",
+      "category": "Dynamic",
+      "size": 75500
+    },
+    {
+      "name": "Dynamic_SM_WarningConstruction",
+      "file": "Dynamic_SM_WarningConstruction.glb",
+      "category": "Dynamic",
+      "size": 31356
+    },
+    {
+      "name": "FX_Leaf",
+      "file": "FX_Leaf.glb",
+      "category": "FX",
+      "size": 2268
+    },
+    {
+      "name": "FX_SM_Leaf05_A",
+      "file": "FX_SM_Leaf05_A.glb",
+      "category": "FX",
+      "size": 2588
+    },
+    {
+      "name": "Fence_SM_Fence01",
+      "file": "Fence_SM_Fence01.glb",
+      "category": "Fence",
+      "size": 15212
+    },
+    {
+      "name": "Fence_SM_Fence02_B",
+      "file": "Fence_SM_Fence02_B.glb",
+      "category": "Fence",
+      "size": 30208
+    },
+    {
+      "name": "Fence_SM_FenceCorner",
+      "file": "Fence_SM_FenceCorner.glb",
+      "category": "Fence",
+      "size": 30436
+    },
+    {
+      "name": "Fence_SM_FenceMiddle",
+      "file": "Fence_SM_FenceMiddle.glb",
+      "category": "Fence",
+      "size": 27840
+    },
+    {
+      "name": "Fence_SM_FenceWood",
+      "file": "Fence_SM_FenceWood.glb",
+      "category": "Fence",
+      "size": 27824
+    },
+    {
+      "name": "Fence_SM_UrbanFence02",
+      "file": "Fence_SM_UrbanFence02.glb",
+      "category": "Fence",
+      "size": 15172
+    },
+    {
+      "name": "Fence_SM_Wall01",
+      "file": "Fence_SM_Wall01.glb",
+      "category": "Fence",
+      "size": 4568
+    },
+    {
+      "name": "Fence_SM_Wall02",
+      "file": "Fence_SM_Wall02.glb",
+      "category": "Fence",
+      "size": 32708
+    },
+    {
+      "name": "Fence_SM_WireFence",
+      "file": "Fence_SM_WireFence.glb",
+      "category": "Fence",
+      "size": 17040
+    },
+    {
+      "name": "Fence_SM_Wired_Fence",
+      "file": "Fence_SM_Wired_Fence.glb",
+      "category": "Fence",
+      "size": 1536408
+    },
+    {
+      "name": "Fence_SM_fence03_A",
+      "file": "Fence_SM_fence03_A.glb",
+      "category": "Fence",
+      "size": 20972
+    },
+    {
+      "name": "Fence_SM_fence04_A",
+      "file": "Fence_SM_fence04_A.glb",
+      "category": "Fence",
+      "size": 26120
+    },
+    {
+      "name": "Fence_SM_fence05_A",
+      "file": "Fence_SM_fence05_A.glb",
+      "category": "Fence",
+      "size": 8728
+    },
+    {
+      "name": "Fence_SM_fence06_B",
+      "file": "Fence_SM_fence06_B.glb",
+      "category": "Fence",
+      "size": 26120
+    },
+    {
+      "name": "Fence_SM_fence07_A",
+      "file": "Fence_SM_fence07_A.glb",
+      "category": "Fence",
+      "size": 5292
+    },
+    {
+      "name": "Fence_Wired",
+      "file": "Fence_Wired.glb",
+      "category": "Fence",
+      "size": 1536064
+    },
+    {
+      "name": "GenericMaterials_SM_ColorCalibrator",
+      "file": "GenericMaterials_SM_ColorCalibrator.glb",
+      "category": "GenericMaterials",
+      "size": 1432084
+    },
+    {
+      "name": "GroundFloor_shop1_250_V1",
+      "file": "GroundFloor_shop1_250_V1.glb",
+      "category": "GroundFloor",
+      "size": 80660
+    },
+    {
+      "name": "GroundFloor_shop1_500_V1",
+      "file": "GroundFloor_shop1_500_V1.glb",
+      "category": "GroundFloor",
+      "size": 88180
+    },
+    {
+      "name": "GroundFloor_shop1_600_V1",
+      "file": "GroundFloor_shop1_600_V1.glb",
+      "category": "GroundFloor",
+      "size": 195020
+    },
+    {
+      "name": "GroundFloor_shop2_250_V1",
+      "file": "GroundFloor_shop2_250_V1.glb",
+      "category": "GroundFloor",
+      "size": 41796
+    },
+    {
+      "name": "GroundFloor_shop2_500_V1",
+      "file": "GroundFloor_shop2_500_V1.glb",
+      "category": "GroundFloor",
+      "size": 58780
+    },
+    {
+      "name": "GroundFloor_shop3_500_V1",
+      "file": "GroundFloor_shop3_500_V1.glb",
+      "category": "GroundFloor",
+      "size": 34232
+    },
+    {
+      "name": "GuardRail",
+      "file": "GuardRail.glb",
+      "category": "GuardRail",
+      "size": 37228
+    },
+    {
+      "name": "GuardRail_SM_GuardRail_high",
+      "file": "GuardRail_SM_GuardRail_high.glb",
+      "category": "GuardRail",
+      "size": 127080
+    },
+    {
+      "name": "GuardRail_SM_Guardrail",
+      "file": "GuardRail_SM_Guardrail.glb",
+      "category": "GuardRail",
+      "size": 38284
+    },
+    {
+      "name": "GuardRail_SM_Guardrail02",
+      "file": "GuardRail_SM_Guardrail02.glb",
+      "category": "GuardRail",
+      "size": 49764
+    },
+    {
+      "name": "GuardRail_SM_Guardrail_UAB",
+      "file": "GuardRail_SM_Guardrail_UAB.glb",
+      "category": "GuardRail",
+      "size": 37572
+    },
+    {
+      "name": "GuardRail_SM_SecFence01",
+      "file": "GuardRail_SM_SecFence01.glb",
+      "category": "GuardRail",
+      "size": 7928
+    },
+    {
+      "name": "GuardRail_SM_SecFence02",
+      "file": "GuardRail_SM_SecFence02.glb",
+      "category": "GuardRail",
+      "size": 9800
+    },
+    {
+      "name": "GuardRail_SM_SecFence03",
+      "file": "GuardRail_SM_SecFence03.glb",
+      "category": "GuardRail",
+      "size": 40788
+    },
+    {
+      "name": "GuardRail_SM_SecWaterDrums01",
+      "file": "GuardRail_SM_SecWaterDrums01.glb",
+      "category": "GuardRail",
+      "size": 9984
+    },
+    {
+      "name": "Motorcycle_Harley",
+      "file": "Motorcycle_Harley.glb",
+      "category": "Motorcycle",
+      "size": 365068
+    },
+    {
+      "name": "Motorcycle_SM_Harley",
+      "file": "Motorcycle_SM_Harley.glb",
+      "category": "Motorcycle",
+      "size": 367412
+    },
+    {
+      "name": "Motorcycle_SM_KawasakiNinja",
+      "file": "Motorcycle_SM_KawasakiNinja.glb",
+      "category": "Motorcycle",
+      "size": 279640
+    },
+    {
+      "name": "Motorcycle_SM_Vespa",
+      "file": "Motorcycle_SM_Vespa.glb",
+      "category": "Motorcycle",
+      "size": 164164
+    },
+    {
+      "name": "Motorcycle_SM_Yamaha",
+      "file": "Motorcycle_SM_Yamaha.glb",
+      "category": "Motorcycle",
+      "size": 424804
+    },
+    {
+      "name": "Motorcycle_SM_Yamaha_v1",
+      "file": "Motorcycle_SM_Yamaha_v1.glb",
+      "category": "Motorcycle",
+      "size": 656264
+    },
+    {
+      "name": "Motorcycle_SM_sc_Harley",
+      "file": "Motorcycle_SM_sc_Harley.glb",
+      "category": "Motorcycle",
+      "size": 79372
+    },
+    {
+      "name": "Motorcycle_SM_sc_KawasakiNinja",
+      "file": "Motorcycle_SM_sc_KawasakiNinja.glb",
+      "category": "Motorcycle",
+      "size": 109104
+    },
+    {
+      "name": "Motorcycle_SM_sc_Yamaha",
+      "file": "Motorcycle_SM_sc_Yamaha.glb",
+      "category": "Motorcycle",
+      "size": 196704
+    },
+    {
+      "name": "Other_SM_Banner01",
+      "file": "Other_SM_Banner01.glb",
+      "category": "Other",
+      "size": 33780
+    },
+    {
+      "name": "Other_SM_Banner02",
+      "file": "Other_SM_Banner02.glb",
+      "category": "Other",
+      "size": 33780
+    },
+    {
+      "name": "Other_SM_DirtDebris01",
+      "file": "Other_SM_DirtDebris01.glb",
+      "category": "Other",
+      "size": 88208
+    },
+    {
+      "name": "Other_SM_DirtDebris03",
+      "file": "Other_SM_DirtDebris03.glb",
+      "category": "Other",
+      "size": 76880
+    },
+    {
+      "name": "Other_SM_SkatePark03",
+      "file": "Other_SM_SkatePark03.glb",
+      "category": "Other",
+      "size": 30292
+    },
+    {
+      "name": "Other_SM_StairField",
+      "file": "Other_SM_StairField.glb",
+      "category": "Other",
+      "size": 6692
+    },
+    {
+      "name": "Other_SM_wire",
+      "file": "Other_SM_wire.glb",
+      "category": "Other",
+      "size": 12424
+    },
+    {
+      "name": "Pole_Electric",
+      "file": "Pole_Electric.glb",
+      "category": "Pole",
+      "size": 129784
+    },
+    {
+      "name": "Pole_SM_DoblePole01",
+      "file": "Pole_SM_DoblePole01.glb",
+      "category": "Pole",
+      "size": 27360
+    },
+    {
+      "name": "Pole_SM_ElectricPole01_A",
+      "file": "Pole_SM_ElectricPole01_A.glb",
+      "category": "Pole",
+      "size": 21740
+    },
+    {
+      "name": "Pole_SM_ElectricPole01_B",
+      "file": "Pole_SM_ElectricPole01_B.glb",
+      "category": "Pole",
+      "size": 21620
+    },
+    {
+      "name": "Pole_SM_Flag_Tall",
+      "file": "Pole_SM_Flag_Tall.glb",
+      "category": "Pole",
+      "size": 18568
+    },
+    {
+      "name": "Pole_SM_Highway06_Pole",
+      "file": "Pole_SM_Highway06_Pole.glb",
+      "category": "Pole",
+      "size": 70728
+    },
+    {
+      "name": "Pole_SM_Pole01",
+      "file": "Pole_SM_Pole01.glb",
+      "category": "Pole",
+      "size": 4192
+    },
+    {
+      "name": "Pole_SM_Pole02",
+      "file": "Pole_SM_Pole02.glb",
+      "category": "Pole",
+      "size": 21212
+    },
+    {
+      "name": "Pole_SM_Pole03",
+      "file": "Pole_SM_Pole03.glb",
+      "category": "Pole",
+      "size": 21612
+    },
+    {
+      "name": "Pole_SM_Pole04",
+      "file": "Pole_SM_Pole04.glb",
+      "category": "Pole",
+      "size": 4152
+    },
+    {
+      "name": "Pole_SM_Pole10",
+      "file": "Pole_SM_Pole10.glb",
+      "category": "Pole",
+      "size": 12784
+    },
+    {
+      "name": "Pole_SM_ReflectiveBollard01",
+      "file": "Pole_SM_ReflectiveBollard01.glb",
+      "category": "Pole",
+      "size": 22808
+    },
+    {
+      "name": "Pole_SM_TrafficLightBase01",
+      "file": "Pole_SM_TrafficLightBase01.glb",
+      "category": "Pole",
+      "size": 54140
+    },
+    {
+      "name": "Pole_SM_TrafficLightPole02",
+      "file": "Pole_SM_TrafficLightPole02.glb",
+      "category": "Pole",
+      "size": 64012
+    },
+    {
+      "name": "RailTrack",
+      "file": "RailTrack.glb",
+      "category": "RailTrack",
+      "size": 1080784
+    },
+    {
+      "name": "RailTrack_SM_RailTrain01",
+      "file": "RailTrack_SM_RailTrain01.glb",
+      "category": "RailTrack",
+      "size": 160620
+    },
+    {
+      "name": "RailTrack_SM_RailTrain02",
+      "file": "RailTrack_SM_RailTrain02.glb",
+      "category": "RailTrack",
+      "size": 160620
+    },
+    {
+      "name": "Road_Part3",
+      "file": "Road_Part3.glb",
+      "category": "Road",
+      "size": 48368
+    },
+    {
+      "name": "Road_Ramp03",
+      "file": "Road_Ramp03.glb",
+      "category": "Road",
+      "size": 8176
+    },
+    {
+      "name": "Road_Ramp04",
+      "file": "Road_Ramp04.glb",
+      "category": "Road",
+      "size": 8584
+    },
+    {
+      "name": "Road_SM_Ramp01",
+      "file": "Road_SM_Ramp01.glb",
+      "category": "Road",
+      "size": 8836
+    },
+    {
+      "name": "Road_SM_Ramp02",
+      "file": "Road_SM_Ramp02.glb",
+      "category": "Road",
+      "size": 9636
+    },
+    {
+      "name": "Road_SM_Ramp03",
+      "file": "Road_SM_Ramp03.glb",
+      "category": "Road",
+      "size": 8552
+    },
+    {
+      "name": "Road_SM_Ramp04",
+      "file": "Road_SM_Ramp04.glb",
+      "category": "Road",
+      "size": 8960
+    },
+    {
+      "name": "Road_SM_Road_01",
+      "file": "Road_SM_Road_01.glb",
+      "category": "Road",
+      "size": 323120
+    },
+    {
+      "name": "Road_SM_Town01_RoadUnique_Part2",
+      "file": "Road_SM_Town01_RoadUnique_Part2.glb",
+      "category": "Road",
+      "size": 72776
+    },
+    {
+      "name": "Road_SM_Town01_RoadUnique_Part3",
+      "file": "Road_SM_Town01_RoadUnique_Part3.glb",
+      "category": "Road",
+      "size": 49112
+    },
+    {
+      "name": "RoadLine_Marking",
+      "file": "RoadLine_Marking.glb",
+      "category": "RoadLine",
+      "size": 89788
+    },
+    {
+      "name": "RoadLine_SM_Town10HD_LaneMarking_1",
+      "file": "RoadLine_SM_Town10HD_LaneMarking_1.glb",
+      "category": "RoadLine",
+      "size": 48180
+    },
+    {
+      "name": "RoadLine_SM_Town10HD_LaneMarking_2",
+      "file": "RoadLine_SM_Town10HD_LaneMarking_2.glb",
+      "category": "RoadLine",
+      "size": 57864
+    },
+    {
+      "name": "RoadLine_SM_Town10HD_LaneMarking_3",
+      "file": "RoadLine_SM_Town10HD_LaneMarking_3.glb",
+      "category": "RoadLine",
+      "size": 90596
+    },
+    {
+      "name": "RoadLine_SM_Town10HD_LaneMarking_4",
+      "file": "RoadLine_SM_Town10HD_LaneMarking_4.glb",
+      "category": "RoadLine",
+      "size": 56760
+    },
+    {
+      "name": "Rock_01F",
+      "file": "Rock_01F.glb",
+      "category": "Rock",
+      "size": 176440
+    },
+    {
+      "name": "Rock_SM_Rock01_A",
+      "file": "Rock_SM_Rock01_A.glb",
+      "category": "Rock",
+      "size": 182108
+    },
+    {
+      "name": "Rock_SM_Rock01_D",
+      "file": "Rock_SM_Rock01_D.glb",
+      "category": "Rock",
+      "size": 188788
+    },
+    {
+      "name": "Rock_SM_Rock01_E",
+      "file": "Rock_SM_Rock01_E.glb",
+      "category": "Rock",
+      "size": 216804
+    },
+    {
+      "name": "Rock_SM_Rock01_H",
+      "file": "Rock_SM_Rock01_H.glb",
+      "category": "Rock",
+      "size": 190684
+    },
+    {
+      "name": "Rock_SM_Rock02_A",
+      "file": "Rock_SM_Rock02_A.glb",
+      "category": "Rock",
+      "size": 67852
+    },
+    {
+      "name": "Rock_SM_Rock02_C",
+      "file": "Rock_SM_Rock02_C.glb",
+      "category": "Rock",
+      "size": 47724
+    },
+    {
+      "name": "Rock_SM_Rock03_A",
+      "file": "Rock_SM_Rock03_A.glb",
+      "category": "Rock",
+      "size": 20308
+    },
+    {
+      "name": "Rock_SM_Rock04_A",
+      "file": "Rock_SM_Rock04_A.glb",
+      "category": "Rock",
+      "size": 194620
+    },
+    {
+      "name": "Showcase",
+      "file": "Showcase.glb",
+      "category": "Showcase",
+      "size": 27596
+    },
+    {
+      "name": "SideWalk_CurbWidth",
+      "file": "SideWalk_CurbWidth.glb",
+      "category": "SideWalk",
+      "size": 1047552
+    },
+    {
+      "name": "SideWalk_DrainCurb",
+      "file": "SideWalk_DrainCurb.glb",
+      "category": "SideWalk",
+      "size": 46580
+    },
+    {
+      "name": "SideWalk_SM_CurbWidth_01",
+      "file": "SideWalk_SM_CurbWidth_01.glb",
+      "category": "SideWalk",
+      "size": 35036
+    },
+    {
+      "name": "SideWalk_SM_CurbWidth_05",
+      "file": "SideWalk_SM_CurbWidth_05.glb",
+      "category": "SideWalk",
+      "size": 1047896
+    },
+    {
+      "name": "SideWalk_SM_Curb_01",
+      "file": "SideWalk_SM_Curb_01.glb",
+      "category": "SideWalk",
+      "size": 35080
+    },
+    {
+      "name": "SideWalk_SM_Curb_02",
+      "file": "SideWalk_SM_Curb_02.glb",
+      "category": "SideWalk",
+      "size": 40052
+    },
+    {
+      "name": "SideWalk_SM_Curb_03",
+      "file": "SideWalk_SM_Curb_03.glb",
+      "category": "SideWalk",
+      "size": 34024
+    },
+    {
+      "name": "SideWalk_SM_Curb_Manhole",
+      "file": "SideWalk_SM_Curb_Manhole.glb",
+      "category": "SideWalk",
+      "size": 1310892
+    },
+    {
+      "name": "SideWalk_SM_DrainCurb_01",
+      "file": "SideWalk_SM_DrainCurb_01.glb",
+      "category": "SideWalk",
+      "size": 46832
+    },
+    {
+      "name": "SideWalk_SM_DrainCurb_03",
+      "file": "SideWalk_SM_DrainCurb_03.glb",
+      "category": "SideWalk",
+      "size": 46924
+    },
+    {
+      "name": "SideWalk_SM_SidewalkV2",
+      "file": "SideWalk_SM_SidewalkV2.glb",
+      "category": "SideWalk",
+      "size": 8048
+    },
+    {
+      "name": "SideWalk_SM_stairT10",
+      "file": "SideWalk_SM_stairT10.glb",
+      "category": "SideWalk",
+      "size": 48176
+    },
+    {
+      "name": "SideWalk_V2",
+      "file": "SideWalk_V2.glb",
+      "category": "SideWalk",
+      "size": 7704
+    },
+    {
+      "name": "Slop_01",
+      "file": "Slop_01.glb",
+      "category": "Slop",
+      "size": 4672
+    },
+    {
+      "name": "Slop_02",
+      "file": "Slop_02.glb",
+      "category": "Slop",
+      "size": 4660
+    },
+    {
+      "name": "Slop_03",
+      "file": "Slop_03.glb",
+      "category": "Slop",
+      "size": 4640
+    },
+    {
+      "name": "SmallWindow",
+      "file": "SmallWindow.glb",
+      "category": "SmallWindow",
+      "size": 29756
+    },
+    {
+      "name": "Static_SM_HighwayLight01",
+      "file": "Static_SM_HighwayLight01.glb",
+      "category": "Static",
+      "size": 34732
+    },
+    {
+      "name": "Static_SM_HighwayLight02",
+      "file": "Static_SM_HighwayLight02.glb",
+      "category": "Static",
+      "size": 62668
+    },
+    {
+      "name": "Static_SM_SpotLight01",
+      "file": "Static_SM_SpotLight01.glb",
+      "category": "Static",
+      "size": 11264
+    },
+    {
+      "name": "Static_SM_StreetLight01",
+      "file": "Static_SM_StreetLight01.glb",
+      "category": "Static",
+      "size": 33212
+    },
+    {
+      "name": "Static_SM_StreetLight02",
+      "file": "Static_SM_StreetLight02.glb",
+      "category": "Static",
+      "size": 55876
+    },
+    {
+      "name": "Static_SM_StreetLight03",
+      "file": "Static_SM_StreetLight03.glb",
+      "category": "Static",
+      "size": 54576
+    },
+    {
+      "name": "Static_SM_StreetLight04",
+      "file": "Static_SM_StreetLight04.glb",
+      "category": "Static",
+      "size": 8481868
+    },
+    {
+      "name": "Static_SM_StreetLight05",
+      "file": "Static_SM_StreetLight05.glb",
+      "category": "Static",
+      "size": 20948
+    },
+    {
+      "name": "Static_SM_StreetLight06",
+      "file": "Static_SM_StreetLight06.glb",
+      "category": "Static",
+      "size": 80956
+    },
+    {
+      "name": "Static_SM_StreetLight07",
+      "file": "Static_SM_StreetLight07.glb",
+      "category": "Static",
+      "size": 33340
+    },
+    {
+      "name": "StreetLight_Bollard",
+      "file": "StreetLight_Bollard.glb",
+      "category": "StreetLight",
+      "size": 18420
+    },
+    {
+      "name": "StreetLight_Freeway",
+      "file": "StreetLight_Freeway.glb",
+      "category": "StreetLight",
+      "size": 13968
+    },
+    {
+      "name": "StreetLight_SM_Bollard01",
+      "file": "StreetLight_SM_Bollard01.glb",
+      "category": "StreetLight",
+      "size": 18796
+    },
+    {
+      "name": "StreetLight_SM_FreewayLights01",
+      "file": "StreetLight_SM_FreewayLights01.glb",
+      "category": "StreetLight",
+      "size": 14344
+    },
+    {
+      "name": "Terrain_Town15",
+      "file": "Terrain_Town15.glb",
+      "category": "Terrain",
+      "size": 1375604
+    },
+    {
+      "name": "TrafficLight_Crosswalk",
+      "file": "TrafficLight_Crosswalk.glb",
+      "category": "TrafficLight",
+      "size": 90968
+    },
+    {
+      "name": "TrafficLight_Horizontal",
+      "file": "TrafficLight_Horizontal.glb",
+      "category": "TrafficLight",
+      "size": 71304
+    },
+    {
+      "name": "TrafficLight_SM_Crosswalk",
+      "file": "TrafficLight_SM_Crosswalk.glb",
+      "category": "TrafficLight",
+      "size": 57776
+    },
+    {
+      "name": "TrafficLight_SM_Holster01",
+      "file": "TrafficLight_SM_Holster01.glb",
+      "category": "TrafficLight",
+      "size": 19976
+    },
+    {
+      "name": "TrafficLight_SM_Pedestrian01_B",
+      "file": "TrafficLight_SM_Pedestrian01_B.glb",
+      "category": "TrafficLight",
+      "size": 25488
+    },
+    {
+      "name": "TrafficLight_SM_Pole03",
+      "file": "TrafficLight_SM_Pole03.glb",
+      "category": "TrafficLight",
+      "size": 10048
+    },
+    {
+      "name": "TrafficLight_SM_Pole04",
+      "file": "TrafficLight_SM_Pole04.glb",
+      "category": "TrafficLight",
+      "size": 12128
+    },
+    {
+      "name": "TrafficLight_SM_PushButton01",
+      "file": "TrafficLight_SM_PushButton01.glb",
+      "category": "TrafficLight",
+      "size": 12056
+    },
+    {
+      "name": "TrafficLight_SM_Signal01_A",
+      "file": "TrafficLight_SM_Signal01_A.glb",
+      "category": "TrafficLight",
+      "size": 26200
+    },
+    {
+      "name": "TrafficLight_SM_Signal01_C",
+      "file": "TrafficLight_SM_Signal01_C.glb",
+      "category": "TrafficLight",
+      "size": 26424
+    },
+    {
+      "name": "TrafficLight_SM_Signal02_A",
+      "file": "TrafficLight_SM_Signal02_A.glb",
+      "category": "TrafficLight",
+      "size": 67408
+    },
+    {
+      "name": "TrafficSign_NoStopping",
+      "file": "TrafficSign_NoStopping.glb",
+      "category": "TrafficSign",
+      "size": 119688
+    },
+    {
+      "name": "TrafficSign_SM_AllTraffic01_A",
+      "file": "TrafficSign_SM_AllTraffic01_A.glb",
+      "category": "TrafficSign",
+      "size": 12904
+    },
+    {
+      "name": "TrafficSign_SM_BikeSign01",
+      "file": "TrafficSign_SM_BikeSign01.glb",
+      "category": "TrafficSign",
+      "size": 10484
+    },
+    {
+      "name": "TrafficSign_SM_Crosswalk01",
+      "file": "TrafficSign_SM_Crosswalk01.glb",
+      "category": "TrafficSign",
+      "size": 10596
+    },
+    {
+      "name": "TrafficSign_SM_DoNoEnter01",
+      "file": "TrafficSign_SM_DoNoEnter01.glb",
+      "category": "TrafficSign",
+      "size": 5860
+    },
+    {
+      "name": "TrafficSign_SM_Highway01",
+      "file": "TrafficSign_SM_Highway01.glb",
+      "category": "TrafficSign",
+      "size": 3032
+    },
+    {
+      "name": "TrafficSign_SM_Highway02",
+      "file": "TrafficSign_SM_Highway02.glb",
+      "category": "TrafficSign",
+      "size": 7164
+    },
+    {
+      "name": "TrafficSign_SM_NoStopping02_B",
+      "file": "TrafficSign_SM_NoStopping02_B.glb",
+      "category": "TrafficSign",
+      "size": 120432
+    },
+    {
+      "name": "TrafficSign_SM_NoTrucks01",
+      "file": "TrafficSign_SM_NoTrucks01.glb",
+      "category": "TrafficSign",
+      "size": 37468
+    },
+    {
+      "name": "TrafficSign_SM_OneWay02_R",
+      "file": "TrafficSign_SM_OneWay02_R.glb",
+      "category": "TrafficSign",
+      "size": 27740
+    },
+    {
+      "name": "TrafficSign_SM_Parking07",
+      "file": "TrafficSign_SM_Parking07.glb",
+      "category": "TrafficSign",
+      "size": 19432
+    },
+    {
+      "name": "TrafficSign_SM_PedestrianStop01",
+      "file": "TrafficSign_SM_PedestrianStop01.glb",
+      "category": "TrafficSign",
+      "size": 10600
+    },
+    {
+      "name": "TrafficSign_SM_RoundSign",
+      "file": "TrafficSign_SM_RoundSign.glb",
+      "category": "TrafficSign",
+      "size": 19892
+    },
+    {
+      "name": "TrafficSign_SM_School01",
+      "file": "TrafficSign_SM_School01.glb",
+      "category": "TrafficSign",
+      "size": 10592
+    },
+    {
+      "name": "TrafficSign_SM_StopSignAhead01",
+      "file": "TrafficSign_SM_StopSignAhead01.glb",
+      "category": "TrafficSign",
+      "size": 18160
+    },
+    {
+      "name": "TrafficSign_SM_UabSign_Head_01",
+      "file": "TrafficSign_SM_UabSign_Head_01.glb",
+      "category": "TrafficSign",
+      "size": 10508
+    },
+    {
+      "name": "Truck_CarlaCola",
+      "file": "Truck_CarlaCola.glb",
+      "category": "Truck",
+      "size": 27508368
+    },
+    {
+      "name": "Truck_SM_ActrosFiretruck_Parked",
+      "file": "Truck_SM_ActrosFiretruck_Parked.glb",
+      "category": "Truck",
+      "size": 30934752
+    },
+    {
+      "name": "Truck_SM_Ambulance_Parked",
+      "file": "Truck_SM_Ambulance_Parked.glb",
+      "category": "Truck",
+      "size": 21919844
+    },
+    {
+      "name": "Truck_SM_CarlaCola_Parked",
+      "file": "Truck_SM_CarlaCola_Parked.glb",
+      "category": "Truck",
+      "size": 27510520
+    },
+    {
+      "name": "Truck_SM_EuropeanHGV_Parked",
+      "file": "Truck_SM_EuropeanHGV_Parked.glb",
+      "category": "Truck",
+      "size": 29700248
+    },
+    {
+      "name": "Truck_SM_MercedesSprinter_Parked",
+      "file": "Truck_SM_MercedesSprinter_Parked.glb",
+      "category": "Truck",
+      "size": 19958676
+    },
+    {
+      "name": "Truck_SM_VolkswagenT2_Parked",
+      "file": "Truck_SM_VolkswagenT2_Parked.glb",
+      "category": "Truck",
+      "size": 4050048
+    },
+    {
+      "name": "Truck_SM_sc_ActrosFiretruck",
+      "file": "Truck_SM_sc_ActrosFiretruck.glb",
+      "category": "Truck",
+      "size": 43092
+    },
+    {
+      "name": "Truck_SM_sc_Ambulance",
+      "file": "Truck_SM_sc_Ambulance.glb",
+      "category": "Truck",
+      "size": 52992
+    },
+    {
+      "name": "Truck_SM_sc_Carlacola",
+      "file": "Truck_SM_sc_Carlacola.glb",
+      "category": "Truck",
+      "size": 65220
+    },
+    {
+      "name": "Truck_SM_sc_EuropeanHGV",
+      "file": "Truck_SM_sc_EuropeanHGV.glb",
+      "category": "Truck",
+      "size": 50080
+    },
+    {
+      "name": "Truck_SM_sc_MercedesSprinter",
+      "file": "Truck_SM_sc_MercedesSprinter.glb",
+      "category": "Truck",
+      "size": 91796
+    },
+    {
+      "name": "Truck_SM_sc_VolkswagenT2",
+      "file": "Truck_SM_sc_VolkswagenT2.glb",
+      "category": "Truck",
+      "size": 30200
+    },
+    {
+      "name": "Vegetation_Oak",
+      "file": "Vegetation_Oak.glb",
+      "category": "Vegetation",
+      "size": 1278844
+    },
+    {
+      "name": "Vegetation_Pine02",
+      "file": "Vegetation_Pine02.glb",
+      "category": "Vegetation",
+      "size": 240820
+    },
+    {
+      "name": "Vegetation_SM_Aporosa",
+      "file": "Vegetation_SM_Aporosa.glb",
+      "category": "Vegetation",
+      "size": 15197100
+    },
+    {
+      "name": "Vegetation_SM_AporosaBase01_A",
+      "file": "Vegetation_SM_AporosaBase01_A.glb",
+      "category": "Vegetation",
+      "size": 2349784
+    },
+    {
+      "name": "Vegetation_SM_Ash01_A",
+      "file": "Vegetation_SM_Ash01_A.glb",
+      "category": "Vegetation",
+      "size": 457748
+    },
+    {
+      "name": "Vegetation_SM_Cypress",
+      "file": "Vegetation_SM_Cypress.glb",
+      "category": "Vegetation",
+      "size": 221044
+    },
+    {
+      "name": "Vegetation_SM_Cypress01_L_A",
+      "file": "Vegetation_SM_Cypress01_L_A.glb",
+      "category": "Vegetation",
+      "size": 37420
+    },
+    {
+      "name": "Vegetation_SM_Maple01_M_A",
+      "file": "Vegetation_SM_Maple01_M_A.glb",
+      "category": "Vegetation",
+      "size": 1507528
+    },
+    {
+      "name": "Vegetation_SM_Maple01_M_B",
+      "file": "Vegetation_SM_Maple01_M_B.glb",
+      "category": "Vegetation",
+      "size": 3106056
+    },
+    {
+      "name": "Vegetation_SM_Oak01_M_H",
+      "file": "Vegetation_SM_Oak01_M_H.glb",
+      "category": "Vegetation",
+      "size": 435224
+    },
+    {
+      "name": "Vegetation_SM_OakBase01_L_B",
+      "file": "Vegetation_SM_OakBase01_L_B.glb",
+      "category": "Vegetation",
+      "size": 2584348
+    },
+    {
+      "name": "Vegetation_SM_OakBase01_L_D",
+      "file": "Vegetation_SM_OakBase01_L_D.glb",
+      "category": "Vegetation",
+      "size": 1280112
+    },
+    {
+      "name": "Vegetation_SM_PalmTree01_A",
+      "file": "Vegetation_SM_PalmTree01_A.glb",
+      "category": "Vegetation",
+      "size": 86344
+    },
+    {
+      "name": "Vegetation_SM_PalmTree02_B",
+      "file": "Vegetation_SM_PalmTree02_B.glb",
+      "category": "Vegetation",
+      "size": 96456
+    },
+    {
+      "name": "Vegetation_SM_Pine01_A",
+      "file": "Vegetation_SM_Pine01_A.glb",
+      "category": "Vegetation",
+      "size": 9282960
+    },
+    {
+      "name": "Vegetation_SM_Pine01_B",
+      "file": "Vegetation_SM_Pine01_B.glb",
+      "category": "Vegetation",
+      "size": 12740772
+    },
+    {
+      "name": "Vegetation_SM_Pine02_B",
+      "file": "Vegetation_SM_Pine02_B.glb",
+      "category": "Vegetation",
+      "size": 241136
+    },
+    {
+      "name": "Vegetation_SM_Platanus03",
+      "file": "Vegetation_SM_Platanus03.glb",
+      "category": "Vegetation",
+      "size": 310584
+    },
+    {
+      "name": "Vegetation_SM_PlatanusBase01_A",
+      "file": "Vegetation_SM_PlatanusBase01_A.glb",
+      "category": "Vegetation",
+      "size": 96064
+    },
+    {
+      "name": "Vegetation_SM_QuercusRubra01_B",
+      "file": "Vegetation_SM_QuercusRubra01_B.glb",
+      "category": "Vegetation",
+      "size": 86513184
+    },
+    {
+      "name": "Vegetation_SM_Sassafras01_C",
+      "file": "Vegetation_SM_Sassafras01_C.glb",
+      "category": "Vegetation",
+      "size": 273380
+    },
+    {
+      "name": "Vegetation_SM_WhiteAshBase02_A",
+      "file": "Vegetation_SM_WhiteAshBase02_A.glb",
+      "category": "Vegetation",
+      "size": 9291628
+    },
+    {
+      "name": "Wall_Fountain",
+      "file": "Wall_Fountain.glb",
+      "category": "Wall",
+      "size": 225336
+    },
+    {
+      "name": "Wall_SM_ParkWallCorner",
+      "file": "Wall_SM_ParkWallCorner.glb",
+      "category": "Wall",
+      "size": 47372
+    },
+    {
+      "name": "Wall_SM_Town01_Wall01_Part1",
+      "file": "Wall_SM_Town01_Wall01_Part1.glb",
+      "category": "Wall",
+      "size": 38148
+    },
+    {
+      "name": "Wall_SM_Town01_Wall02",
+      "file": "Wall_SM_Town01_Wall02.glb",
+      "category": "Wall",
+      "size": 233824
+    },
+    {
+      "name": "Wall_SM_Town01_Wall03",
+      "file": "Wall_SM_Town01_Wall03.glb",
+      "category": "Wall",
+      "size": 210604
+    },
+    {
+      "name": "Wall_SM_Town01_Wall04",
+      "file": "Wall_SM_Town01_Wall04.glb",
+      "category": "Wall",
+      "size": 3169008
+    },
+    {
+      "name": "Wall_SM_Town01_Wall05",
+      "file": "Wall_SM_Town01_Wall05.glb",
+      "category": "Wall",
+      "size": 257056
+    },
+    {
+      "name": "Wall_SM_Wall06",
+      "file": "Wall_SM_Wall06.glb",
+      "category": "Wall",
+      "size": 8316
+    },
+    {
+      "name": "Wall_SM_WallHighWay_1",
+      "file": "Wall_SM_WallHighWay_1.glb",
+      "category": "Wall",
+      "size": 3000
+    },
+    {
+      "name": "Wall_SM_fountainBig_T03",
+      "file": "Wall_SM_fountainBig_T03.glb",
+      "category": "Wall",
+      "size": 225716
+    },
+    {
+      "name": "Wall_Town01",
+      "file": "Wall_Town01.glb",
+      "category": "Wall",
+      "size": 3168308
+    },
+    {
+      "name": "Water_SM_Fountain01",
+      "file": "Water_SM_Fountain01.glb",
+      "category": "Water",
+      "size": 8520
+    },
+    {
+      "name": "Water_SM_Fountain02",
+      "file": "Water_SM_Fountain02.glb",
+      "category": "Water",
+      "size": 14148
+    },
+    {
+      "name": "Water_SM_Lake01",
+      "file": "Water_SM_Lake01.glb",
+      "category": "Water",
+      "size": 2976
+    },
+    {
+      "name": "Water_SM_Sea01",
+      "file": "Water_SM_Sea01.glb",
+      "category": "Water",
+      "size": 14852
+    },
+    {
+      "name": "Water_SM_Sea02",
+      "file": "Water_SM_Sea02.glb",
+      "category": "Water",
+      "size": 13816
+    },
+    {
+      "name": "Water_Sea",
+      "file": "Water_Sea.glb",
+      "category": "Water",
+      "size": 14404
+    },
+    {
+      "name": "Windows_window1_250_V1",
+      "file": "Windows_window1_250_V1.glb",
+      "category": "Windows",
+      "size": 31496
+    },
+    {
+      "name": "Windows_window1_400_V1",
+      "file": "Windows_window1_400_V1.glb",
+      "category": "Windows",
+      "size": 58404
+    },
+    {
+      "name": "Windows_window1_500_V1",
+      "file": "Windows_window1_500_V1.glb",
+      "category": "Windows",
+      "size": 59140
+    },
+    {
+      "name": "Windows_window1_600_V1",
+      "file": "Windows_window1_600_V1.glb",
+      "category": "Windows",
+      "size": 105504
+    },
+    {
+      "name": "Windows_window2_250_V1",
+      "file": "Windows_window2_250_V1.glb",
+      "category": "Windows",
+      "size": 56116
+    },
+    {
+      "name": "Windows_window2_250_V2",
+      "file": "Windows_window2_250_V2.glb",
+      "category": "Windows",
+      "size": 56116
+    },
+    {
+      "name": "Windows_window3_250_V1",
+      "file": "Windows_window3_250_V1.glb",
+      "category": "Windows",
+      "size": 31496
+    },
+    {
+      "name": "Windows1",
+      "file": "Windows1.glb",
+      "category": "Windows1",
+      "size": 36688
+    },
+    {
+      "name": "Windows2",
+      "file": "Windows2.glb",
+      "category": "Windows2",
+      "size": 50420
+    },
+    {
+      "name": "Windows3",
+      "file": "Windows3.glb",
+      "category": "Windows3",
+      "size": 25140
+    },
+    {
+      "name": "Windows4",
+      "file": "Windows4.glb",
+      "category": "Windows4",
+      "size": 38880
+    }
+  ]
+}

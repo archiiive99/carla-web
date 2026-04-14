@@ -2,6 +2,55 @@
 
 Frame format: [1B channel][4B payload_length][payload...]
 All multi-byte integers are little-endian.
+
+Client → Bridge JSON control messages:
+
+    Text channel:
+        {"action": "subscribe",   "sensor_id": <int>}
+        {"action": "unsubscribe", "sensor_id": <int>}
+        {"action": "set_rate",    "sensor_id": <int>, "target_fps": <number>}
+        {"action": "stats",       ... see schema below ...}
+
+    Binary channel:
+        Channel.SUBSCRIBE   payload := UTF-8 JSON {"sensor_id": <int>}
+        Channel.UNSUBSCRIBE payload := UTF-8 JSON {"sensor_id": <int>}
+        Channel.CONTROL     payload := UTF-8 JSON {"action": "set_rate", ...}
+        Channel.CLIENT_STATS payload := UTF-8 JSON identical to the text
+                                "stats" payload.
+
+    Authoritative stats schema for D2:
+        {
+          "action": "stats",
+          "ts_client_ms": 1713024000000,
+          "sensors": {
+            "5": {
+              "queue_backlog": 2,
+              "decode_lag_ms": 45,
+              "frames_dropped": 0,
+              "frames_received": 30
+            },
+            "9": { ... }
+          },
+          "rtt_ms": 28,
+          "viewport_active": true
+        }
+
+    Adaptive control rule (Bridge side — see src/adaptive_rate.py):
+      * Sample period: 1 Hz.
+      * BACKLOG_HIGH when the latest queue_backlog > 3 OR the backlog rises
+        across the latest 3 samples.
+      * DECODE_LAG_HIGH when the latest decode_lag_ms > 100.
+      * HEALTHY when the latest 5 samples all have queue_backlog ≤ 1 and
+        decode_lag_ms ≤ 40.
+      * BACKLOG_HIGH or DECODE_LAG_HIGH → effective_fps *= 0.75, floor 1 fps.
+      * HEALTHY and effective_fps < target_fps and 10 s since the last
+        adjustment → effective_fps *= 1.25, capped at target_fps.
+      * No further downgrade occurs within 2 s of a previous downgrade.
+      * viewport_active=false forces effective_fps = 1.0 until the client
+        reports viewport_active=true again, at which point the bridge restores
+        target_fps immediately.
+      * All decisions are per-(client, sensor); one slow client never reduces
+        the cadence of another subscriber on the same sensor.
 """
 
 from __future__ import annotations
