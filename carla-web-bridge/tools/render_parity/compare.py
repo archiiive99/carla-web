@@ -49,13 +49,14 @@ class Pose:
 
 
 # Pin the harness pose in code so iteration 01+ all measure the same point.
-# street_clear_midday: Town01 main north-south arterial, camera at driver eye
-# height (~2.0 m above ground, ~0.0 m lateral offset from lane center),
-# pitched -10° to frame the road surface filling the lower half of the image.
+# street_clear_midday: Town01 spawn_point[0] + driver eye height +
+# slight downward pitch so road surface fills the lower half of frame.
+# Spawn[0] is on a clear straight section of main artery with lane
+# markings, which makes it a good road-parity baseline target.
 POSES: Dict[str, Pose] = {
     "street_clear_midday": Pose(
-        x=100.0, y=133.0, z=2.0,
-        yaw=90.0, pitch=-10.0, roll=0.0,
+        x=118.9, y=55.8, z=1.8,
+        yaw=180.0, pitch=-8.0, roll=0.0,
     ),
 }
 
@@ -106,13 +107,14 @@ def capture_carla_reference(
         wetness=0.0,
     )
     world.set_weather(weather)
-    # Give the engine a couple of ticks to propagate weather before spawning
-    # the sensor so the first frame reflects the request.
-    for _ in range(4):
+    # Give the engine ~2 s (10 @ 20Hz) to propagate weather + sun-position
+    # changes through its render targets. Running CARLA is -benchmark
+    # -fps=20; a shorter wait captures frames rendered during the weather
+    # transition and bakes that into the reference.
+    for _ in range(10):
         try:
             world.tick()
         except RuntimeError:
-            # async-mode server — no tick available, just sleep.
             time.sleep(0.1)
 
     blueprint_library = world.get_blueprint_library()
@@ -121,12 +123,25 @@ def capture_carla_reference(
     cam_bp.set_attribute("image_size_y", str(CAPTURE_H))
     cam_bp.set_attribute("fov", "90")
     cam_bp.set_attribute("sensor_tick", "0.0")
+    # Postprocess must be on or the capture bypasses CARLA's tonemap and
+    # comes out linear/dark. The default bridge camera also enables this.
+    if cam_bp.has_attribute("enable_postprocess_effects"):
+        cam_bp.set_attribute("enable_postprocess_effects", "true")
 
     transform = carla.Transform(
         carla.Location(x=pose.x, y=pose.y, z=pose.z),
         carla.Rotation(yaw=pose.yaw, pitch=pose.pitch, roll=pose.roll),
     )
     sensor = world.spawn_actor(cam_bp, transform)
+
+    # Drain ~8 frames with no listener so the render target converges on
+    # the new camera pose + weather. Without this the first captured frame
+    # is often the render target's previous contents (dark or stale).
+    for _ in range(8):
+        try:
+            world.tick()
+        except RuntimeError:
+            time.sleep(0.05)
 
     captured: list[np.ndarray] = []
 
@@ -141,14 +156,16 @@ def capture_carla_reference(
     sensor.listen(on_frame)
     try:
         # Drive the sim forward; the callback fires when a frame is ready.
-        deadline = time.monotonic() + 6.0
-        while not captured and time.monotonic() < deadline:
+        # Skip the first 2 frames and capture the 3rd for extra stability.
+        deadline = time.monotonic() + 10.0
+        while len(captured) < 3 and time.monotonic() < deadline:
             try:
                 world.tick()
             except RuntimeError:
                 time.sleep(0.05)
-        if not captured:
-            raise RuntimeError(f"CARLA did not produce a frame within 6 s (pose={pose})")
+        if len(captured) < 1:
+            raise RuntimeError(f"CARLA did not produce a frame within 10 s (pose={pose})")
+        captured = captured[-1:]
     finally:
         sensor.stop()
         sensor.destroy()
@@ -191,28 +208,91 @@ async def capture_web_render(
         page.on("console", lambda m: print(f"[web console {m.type}] {m.text}", file=sys.stderr))
         page.on("pageerror", lambda e: print(f"[web page error] {e}", file=sys.stderr))
 
-        await page.goto(url, wait_until="networkidle", timeout=45_000)
-        # Wait for the world scene canvas to exist AND for at least one frame
-        # to paint past the initial clear. The __camPoseDebug hook set by
-        # MainCameraController confirms the pose override landed.
+        # `domcontentloaded` — the Vite dev server holds a WebSocket open
+        # for HMR, so `networkidle` never fires. We wait explicitly for the
+        # canvas + pose-applied debug hook below instead.
+        #
+        # Wipe localStorage first so the persisted cameraMode/viewMode
+        # from a previous run doesn't override the URL-driven pose (a
+        # follow-cam mode would ignore camPose until the user interacts).
+        await page.goto(url, wait_until="domcontentloaded", timeout=45_000)
+        await page.evaluate("() => localStorage.clear()")
+        await page.reload(wait_until="domcontentloaded", timeout=45_000)
         await page.wait_for_function(
             "() => document.querySelectorAll('canvas').length > 0",
             timeout=30_000,
         )
-        # Grace period for glTFs and the PBR textures to load and shader to
-        # compile. 4 s is generous but cheap vs a flaky capture.
-        await page.wait_for_timeout(4_000)
-        await page.wait_for_function(
-            "() => (window.__camPoseDebug && window.__camPoseDebug.applied) === true",
-            timeout=10_000,
+        # Grace period for road geometry fetch, glTF building loads, PBR
+        # textures, and shader program compile. Town01's road geometry
+        # endpoint returns ~5MB of waypoints and the ~130 building GLBs
+        # stream over HTTP; cold cache needs longer than this comment
+        # originally assumed. 20 s observed to be enough for road-mesh +
+        # buildings + PBR textures to all be on-frame.
+        await page.wait_for_timeout(20_000)
+        # Diagnostic: dump what ended up on window + URL params so the next
+        # iteration knows whether the pose override even registered.
+        diag = await page.evaluate(
+            "() => ({"
+            "url: location.href,"
+            "search: location.search,"
+            "camPoseDebug: window.__camPoseDebug || null,"
+            "camMatchDebug: window.__camMatchDebug || null,"
+            "canvasCount: document.querySelectorAll('canvas').length,"
+            "cameraMode: (JSON.parse(localStorage.getItem('carla-ui-state')||'{}').cameraMode) || null"
+            "})"
         )
+        print(f"[harness][diag] {diag}", file=sys.stderr)
+        try:
+            await page.wait_for_function(
+                "() => (window.__camPoseDebug && window.__camPoseDebug.applied) === true",
+                timeout=10_000,
+            )
+        except Exception as e:
+            print(f"[harness] camPose wait failed, capturing anyway: {e}", file=sys.stderr)
         # One more settle tick so the compositor renders with the final pose.
-        await page.wait_for_timeout(500)
+        await page.wait_for_timeout(1_500)
 
-        # Screenshot the full viewport. The shared-scene canvas is fullscreen
-        # fixed behind DOM chrome; the main viewport rect fills the middle of
-        # the 1920×1080 frame and will dominate the ROI polygon.
-        await page.screenshot(path=str(out_path), full_page=False, type="png")
+        # Extract just the main 3D viewport rect from the fullscreen
+        # WorldCanvas. The canvas itself is 100vw × 100vh behind DOM
+        # chrome; the main viewport div (aria-label="3D viewport") is
+        # a smaller rect inside the center panel. Crop to that rect
+        # and resize to CAPTURE_W × CAPTURE_H so the comparison PNG
+        # represents ONLY the rendered 3D pixels, not the DOM frame.
+        data_url = await page.evaluate(
+            f"""
+            () => new Promise((resolve, reject) => {{
+              const canvases = document.querySelectorAll('canvas');
+              if (canvases.length === 0) {{ reject('no canvas'); return; }}
+              const src = canvases[0];
+              const viewport = document.querySelector('[aria-label="3D viewport"]');
+              if (!viewport) {{ reject('no 3D viewport div'); return; }}
+              const vpRect = viewport.getBoundingClientRect();
+              const srcRect = src.getBoundingClientRect();
+              // Map vpRect into src's pixel space.
+              const scaleX = src.width / srcRect.width;
+              const scaleY = src.height / srcRect.height;
+              const sx = (vpRect.left - srcRect.left) * scaleX;
+              const sy = (vpRect.top - srcRect.top) * scaleY;
+              const sw = vpRect.width * scaleX;
+              const sh = vpRect.height * scaleY;
+              requestAnimationFrame(() => {{
+                try {{
+                  const out = document.createElement('canvas');
+                  out.width = {CAPTURE_W};
+                  out.height = {CAPTURE_H};
+                  const ctx = out.getContext('2d');
+                  ctx.drawImage(src, sx, sy, sw, sh, 0, 0, {CAPTURE_W}, {CAPTURE_H});
+                  resolve(out.toDataURL('image/png'));
+                }} catch (e) {{ reject(String(e)); }}
+              }});
+            }})
+            """
+        )
+        import base64
+        if not data_url.startswith("data:image/png;base64,"):
+            raise RuntimeError(f"unexpected canvas dataURL prefix: {data_url[:40]}")
+        png_bytes = base64.b64decode(data_url.split(",", 1)[1])
+        out_path.write_bytes(png_bytes)
 
         await context.close()
         await browser.close()

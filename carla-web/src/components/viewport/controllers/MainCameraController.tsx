@@ -149,9 +149,13 @@ export function MainCameraController({ camera }: MainCameraControllerProps) {
   }, [mode]);
 
   useFrame(() => {
-    if (mode === "orbit") return;
-
+    // URL overrides win regardless of cameraMode. The render-parity
+    // harness relies on `?camPose=...` pinning the camera deterministically,
+    // and a persisted "orbit" mode must not silently ignore it.
     const { camMatchId, camPose } = readQueryCameraOverrides();
+
+    if (mode === "orbit" && camMatchId === null && camPose === null) return;
+
     if (camMatchId !== null) {
       const a = actors.get(camMatchId);
       (window as unknown as { __camMatchDebug?: unknown }).__camMatchDebug = {

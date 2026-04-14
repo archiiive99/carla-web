@@ -170,6 +170,11 @@ export function WorldCanvas({ showApproxEnvironment }: WorldCanvasProps) {
         gl={{
           antialias: true,
           alpha: false,
+          // Let the render-parity harness read pixels out of the WebGL
+          // buffer via canvas.toDataURL. Tiny cost in normal runtime
+          // (no blit elision) but removes the need for a separate
+          // capture path. Harmless for users.
+          preserveDrawingBuffer: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 0.82,
           outputColorSpace: THREE.SRGBColorSpace,
