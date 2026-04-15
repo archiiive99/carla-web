@@ -286,7 +286,6 @@ Bridge가 스폰한 모든 액터 제거.
 
 ### `GET /api/blueprints/walkers`
 ### `GET /api/blueprints/sensors`
-### `GET /api/blueprints/props`
 모두 같은 형식.
 
 ---

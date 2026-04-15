@@ -46,9 +46,3 @@ async def list_walker_blueprints():
 async def list_sensor_blueprints():
     _require_connection()
     return {"blueprints": await asyncio.to_thread(_filter_blueprints, "sensor")}
-
-
-@router.get("/props")
-async def list_prop_blueprints():
-    _require_connection()
-    return {"blueprints": await asyncio.to_thread(_filter_blueprints, "static")}

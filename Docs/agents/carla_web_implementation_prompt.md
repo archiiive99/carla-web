@@ -236,7 +236,6 @@ POST   /api/traffic/vehicle/:id/route → Set custom route (waypoint array)
 GET    /api/blueprints/vehicles       → Available vehicle blueprints with attributes
 GET    /api/blueprints/walkers        → Available walker blueprints
 GET    /api/blueprints/sensors        → Available sensor blueprints with attribute schemas
-GET    /api/blueprints/props          → Available static props
 ```
 
 **Recording & Replay:**
