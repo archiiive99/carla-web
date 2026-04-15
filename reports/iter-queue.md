@@ -33,7 +33,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle
 [ ] iter-09  Street lights — emissive + point-light contribution at night
 [ ] iter-10  Traffic lights — emissive bulb + correct hue
-[ ] iter-12  Wet-surface response — driven by CARLA wetness param
+[~] iter-12  Wet-surface response — driven by CARLA wetness param  (opened 2026-04-15T09:14:32Z, Phase A — web-side, light)
 [x] iter-13  Scene-palette unification — three.js material constants module  (⚠️ refactor SUCCESS, web render byte-pattern unchanged; measurement regression due to CARLA NPC vehicle blocking ROI — not refactor — see iter-13/report.md §7.4)
 [x] iter-13-followon-harness-stabilize  Add NPC-clear-before-capture to compare.py  (✅ first PASS of session — PSNR ΔΔ=0.02 dB across 2 runs; reference now shows clean asphalt; closed 2026-04-15T09:00+~35min)
 [ ] iter-14  LOD pipeline — distant geometry impostors / decimated meshes
