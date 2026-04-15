@@ -25,11 +25,6 @@ class Transform(BaseModel):
     rotation: Rotation = Field(default_factory=Rotation)
 
 
-class ErrorResponse(BaseModel):
-    error: str
-    detail: str | None = None
-
-
 # --- Simulation ---
 
 
@@ -219,5 +214,3 @@ class RouteQueryRequest(BaseModel):
     destination: Vector3
 
 
-class WaypointQuery(BaseModel):
-    location: Vector3
