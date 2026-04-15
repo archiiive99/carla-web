@@ -1,12 +1,24 @@
+# NOTE: this compose setup is aspirational — the bridge needs the `carla`
+# Python wheel produced by the CARLA C++ build (PythonAPI/dist/*.whl),
+# which is not pip-installable. The Dockerfile currently only installs
+# requirements.txt, so a container built from this file will crash on
+# `import carla`. Keeping the file around with correct ports so that a
+# future image that bundles the wheel slots in cleanly.
+#
+# Port scheme mirrors start_streaming.sh (the blessed local launcher):
+#   58336 — frontend (Vite)
+#   58337 — bridge HTTP/WS
+#   58338 — CARLA RPC
 services:
   bridge:
     build: .
     ports:
-      - "8000:8000"
+      - "58337:58337"
     environment:
       - CARLA_HOST=host.docker.internal
-      - CARLA_PORT=2000
-      - CORS_ORIGINS=http://localhost:3000
+      - CARLA_PORT=58338
+      - BRIDGE_PORT=58337
+      - CORS_ORIGINS=http://localhost:58336,http://127.0.0.1:58336
       - JPEG_QUALITY=80
       - MAX_CLIENTS=10
     extra_hosts:
