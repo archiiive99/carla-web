@@ -39,7 +39,6 @@ adaptive_controller = AdaptiveRateController(sensor_manager, ws_broadcaster)
 
 
 _tick_task: asyncio.Task | None = None
-_session_task: asyncio.Task | None = None
 
 
 async def _world_tick_loop() -> None:
@@ -80,21 +79,10 @@ async def _world_tick_loop() -> None:
             logger.debug("World tick error: %s", exc)
 
 
-async def _session_loop() -> None:
-    """Background session maintenance is intentionally disabled.
-
-    The managed CARLA session is created lazily from the realtime-session
-    endpoint instead of being polled continuously. Continuous background actor
-    probing has proven unstable on this local UE5/CARLA runtime.
-    """
-    while True:
-        await asyncio.sleep(3600)
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup: connect to CARLA. Shutdown: cleanup."""
-    global _tick_task, _session_task
+    global _tick_task
     logger.info("CARLA Web Bridge starting…")
     sensor_manager.set_loop(asyncio.get_running_loop())
     if _is_test_mode():
@@ -107,7 +95,6 @@ async def lifespan(app: FastAPI):
     # Start CARLA connection in background (non-blocking)
     connect_task = asyncio.create_task(carla_manager.connect())
     _tick_task = asyncio.create_task(_world_tick_loop())
-    _session_task = asyncio.create_task(_session_loop())
 
     yield
 
@@ -118,12 +105,6 @@ async def lifespan(app: FastAPI):
         _tick_task.cancel()
         try:
             await _tick_task
-        except asyncio.CancelledError:
-            pass
-    if _session_task:
-        _session_task.cancel()
-        try:
-            await _session_task
         except asyncio.CancelledError:
             pass
     connect_task.cancel()
