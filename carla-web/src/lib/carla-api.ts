@@ -281,12 +281,10 @@ export class CarlaApi {
     return res.blueprints;
   }
 
-  async getSensorBlueprints(): Promise<Blueprint[]> {
-    const res = await request<{ blueprints: Blueprint[] }>(
-      this.url("/api/blueprints/sensors"),
-    );
-    return res.blueprints;
-  }
+  // getSensorBlueprints removed — SensorSpawnTab hardcodes the KNOWN-WORKING
+  // sensor enum (see components/controls/spawn/SensorSpawnTab.tsx:80-91)
+  // rather than dynamic discovery. The bridge endpoint /api/blueprints/sensors
+  // still exists; re-add a wrapper here if a future feature needs it.
 
   // --- Traffic ---
 
