@@ -32,9 +32,6 @@ SENSOR_FRAME_SKIP=0
 # Connection resilience
 HEARTBEAT_INTERVAL=5.0
 RECONNECT_MAX_DELAY=30.0
-
-# WebSocket
-WS_MAX_SEND_BUFFER=10485760
 ```
 
 ### Frontend Environment

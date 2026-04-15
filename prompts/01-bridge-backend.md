@@ -221,4 +221,3 @@ CARLA semantic seg: class index in R channel (BGRA)
 | `CORS_ORIGINS` | localhost:58336 | Allowed CORS origins |
 | `HEARTBEAT_INTERVAL` | 5.0 | CARLA heartbeat check interval |
 | `RECONNECT_MAX_DELAY` | 30.0 | Max reconnect backoff |
-| `WS_MAX_SEND_BUFFER` | 10MB | WebSocket send buffer |

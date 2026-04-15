@@ -34,7 +34,6 @@ ADAPTIVE_RATE_ENABLED: bool = os.getenv("ADAPTIVE_RATE_ENABLED", "false").lower(
     "1", "true", "yes"
 )
 MIN_CLIENT_FPS: float = float(os.getenv("MIN_CLIENT_FPS", "1"))
-ADAPTIVE_MIN_FPS: float = MIN_CLIENT_FPS
 ADAPTIVE_MAX_FPS: float = float(os.getenv("ADAPTIVE_MAX_FPS", "60"))
 ADAPTIVE_SAMPLE_HZ: float = float(os.getenv("ADAPTIVE_SAMPLE_HZ", "1"))
 ADAPTIVE_STATS_HISTORY: int = int(os.getenv("ADAPTIVE_STATS_HISTORY", "10"))
@@ -57,20 +56,6 @@ ADAPTIVE_DOWNGRADE_HYSTERESIS_SECONDS: float = float(
 ADAPTIVE_VIEWPORT_INACTIVE_FPS: float = float(
     os.getenv("ADAPTIVE_VIEWPORT_INACTIVE_FPS", "1")
 )
-# Compatibility aliases for the simpler controller surface used by
-# src/adaptive_rate.py. These preserve existing semantics while keeping the
-# newer env names authoritative.
-ADAPTIVE_BAD_BACKLOG: int = int(os.getenv("ADAPTIVE_BAD_BACKLOG", str(ADAPTIVE_BACKLOG_HIGH)))
-ADAPTIVE_BAD_DECODE_MS: float = float(
-    os.getenv("ADAPTIVE_BAD_DECODE_MS", str(ADAPTIVE_DECODE_LAG_HIGH_MS))
-)
-ADAPTIVE_DOWN_AFTER: int = int(
-    os.getenv("ADAPTIVE_DOWN_AFTER", str(ADAPTIVE_BACKLOG_TREND_SAMPLES))
-)
-ADAPTIVE_UP_AFTER: int = int(
-    os.getenv("ADAPTIVE_UP_AFTER", str(ADAPTIVE_HEALTHY_SAMPLE_WINDOW))
-)
-ADAPTIVE_STEP_FPS: float = float(os.getenv("ADAPTIVE_STEP_FPS", "1"))
 DEFAULT_CAMERA_WIDTH: int = int(os.getenv("DEFAULT_CAMERA_WIDTH", "1280"))
 DEFAULT_CAMERA_HEIGHT: int = int(os.getenv("DEFAULT_CAMERA_HEIGHT", "720"))
 DEFAULT_CAMERA_FOV: int = int(os.getenv("DEFAULT_CAMERA_FOV", "100"))
@@ -87,9 +72,6 @@ RECONNECT_MAX_DELAY: float = float(os.getenv("RECONNECT_MAX_DELAY", "30.0"))
 RECONNECT_STD_EXCEPTION_DELAY: float = float(os.getenv("RECONNECT_STD_EXCEPTION_DELAY", "2.0"))
 WORLD_TICK_INTERVAL: float = float(os.getenv("WORLD_TICK_INTERVAL", "0.05"))
 
-WS_MAX_SEND_BUFFER: int = int(
-    os.getenv("WS_MAX_SEND_BUFFER", str(10 * 1024 * 1024))  # 10 MB
-)
 WS_SEND_TIMEOUT: float = float(os.getenv("WS_SEND_TIMEOUT", "0.5"))
 
 # Sensor data-plane per-sensor queue sizes (see Agent A spec §2.1.3).
