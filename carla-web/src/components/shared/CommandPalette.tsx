@@ -98,13 +98,18 @@ export function CommandPalette() {
           <CommandEmpty>No results found.</CommandEmpty>
 
           <CommandGroup heading="Simulation">
-            <CommandItem onSelect={() => run(() => play(), "Play")} disabled={!isConnected}>
+            {/* Simulation-control stores (play/pause/step) catch their own
+                errors and fire a reportError toast on failure, so a second
+                `Play` success toast on .then would show even when the
+                underlying API call failed. UI state (play/pause indicator,
+                tick counter) is the primary confirmation here. */}
+            <CommandItem onSelect={() => run(() => play(), "Play", { silent: true })} disabled={!isConnected}>
               <Play className="mr-2 size-4" aria-hidden="true" /> Play
             </CommandItem>
-            <CommandItem onSelect={() => run(() => pause(), "Pause")} disabled={!isConnected}>
+            <CommandItem onSelect={() => run(() => pause(), "Pause", { silent: true })} disabled={!isConnected}>
               <Pause className="mr-2 size-4" aria-hidden="true" /> Pause
             </CommandItem>
-            <CommandItem onSelect={() => run(() => step(), "Step")} disabled={!isConnected}>
+            <CommandItem onSelect={() => run(() => step(), "Step", { silent: true })} disabled={!isConnected}>
               <SkipForward className="mr-2 size-4" aria-hidden="true" /> Step Forward
             </CommandItem>
             <CommandItem
