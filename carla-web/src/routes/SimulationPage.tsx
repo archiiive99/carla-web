@@ -40,13 +40,13 @@ export default function SimulationPage() {
     }
   }, [connectionStatus, refreshActors, refreshSensors]);
 
+  const currentMap = useSimulationStore((s) => s.currentMap);
   useEffect(() => {
-    const map = useSimulationStore.getState().currentMap;
-    const mapName = map ? map.split('/').pop() : '';
+    const mapName = currentMap ? currentMap.split('/').pop() : '';
     document.title = connectionStatus === 'connected'
       ? `CARLA Web — ${mapName || 'Connected'}`
       : 'CARLA Web — Disconnected';
-  }, [connectionStatus]);
+  }, [connectionStatus, currentMap]);
 
   useEffect(() => {
     if (connectionStatus !== "connected") return;
