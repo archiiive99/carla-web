@@ -78,14 +78,17 @@ export default function GnssView({ sensorId, className }: GnssViewProps) {
       ctx.strokeStyle = colors.accent;
       ctx.lineWidth = 1.5;
       for (let i = 1; i < trail.length; i++) {
+        const prev = trail[i - 1];
+        const curr = trail[i];
+        // Loop bounds guarantee both are defined, but
+        // noUncheckedIndexedAccess widens arr[i] to T|undefined.
+        // Local assignments let the flow-sensitive narrow hit once.
+        if (!prev || !curr) continue;
         const alpha = i / trail.length;
         ctx.globalAlpha = alpha * 0.8;
         ctx.beginPath();
-        ctx.moveTo(
-          w / 2 + trail[i - 1].x * 2,
-          h / 2 + trail[i - 1].y * 2,
-        );
-        ctx.lineTo(w / 2 + trail[i].x * 2, h / 2 + trail[i].y * 2);
+        ctx.moveTo(w / 2 + prev.x * 2, h / 2 + prev.y * 2);
+        ctx.lineTo(w / 2 + curr.x * 2, h / 2 + curr.y * 2);
         ctx.stroke();
       }
       ctx.globalAlpha = 1;
@@ -126,8 +129,8 @@ export default function GnssView({ sensorId, className }: GnssViewProps) {
       if (altRef.current) altRef.current.textContent = altValueRef.current.toFixed(2);
 
       const sourceTrail = gpsTrailRef.current;
-      if (sourceTrail.length > 0) {
-        const origin = sourceTrail[0];
+      const origin = sourceTrail[0];
+      if (origin) {
         trailRef.current = sourceTrail.map((point) => ({
           x: (point.lon - origin.lon) * 100000,
           y: (origin.lat - point.lat) * 100000,

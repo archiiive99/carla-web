@@ -12,7 +12,11 @@ interface RadarViewProps {
   className?: string;
 }
 
-const DEPTH_RINGS = [10, 20, 50, 100];
+const DEPTH_RINGS = [10, 20, 50, 100] as const;
+// Cache the max so RadarView doesn't keep looking up arr[length-1] —
+// under noUncheckedIndexedAccess that lookup is T|undefined, even
+// though this constant array is statically known non-empty.
+const MAX_DEPTH: number = DEPTH_RINGS[DEPTH_RINGS.length - 1] ?? 100;
 const AZIMUTH_LINES = 12; // every 30 degrees
 
 function radarThemeColors() {
@@ -57,7 +61,7 @@ export default function RadarView({ sensorId, className }: RadarViewProps) {
     ctx.strokeStyle = colors.grid;
     ctx.lineWidth = 0.5;
     for (const depth of DEPTH_RINGS) {
-      const r = (depth / DEPTH_RINGS[DEPTH_RINGS.length - 1]) * maxRadius;
+      const r = (depth / MAX_DEPTH) * maxRadius;
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.stroke();
@@ -102,7 +106,7 @@ export default function RadarView({ sensorId, className }: RadarViewProps) {
 
     for (const det of detections) {
       const radius = Math.min(
-        det.depth / DEPTH_RINGS[DEPTH_RINGS.length - 1],
+        det.depth / MAX_DEPTH,
         1,
       ) * maxRadius;
       const angle = det.azimuth - Math.PI / 2;

@@ -55,15 +55,23 @@ function AxisTimeSeries({
       <div className="mb-2 flex items-center justify-between">
         <span className="text-2xs text-muted-foreground">{title}</span>
         <div className="flex items-center gap-2 text-3xs text-muted-foreground">
-          {AXES.map((axis) => (
-            <span key={axis} className="flex items-center gap-1">
-              <span
-                className="size-1.5 rounded-full"
-                style={{ backgroundColor: AXIS_CHART_CONFIG[axis].color }}
-              />
-              {AXIS_CHART_CONFIG[axis].label as string}
-            </span>
-          ))}
+          {AXES.map((axis) => {
+            // AXIS_CHART_CONFIG is a ChartConfig (Record-typed); under
+            // noUncheckedIndexedAccess even the "x"|"y"|"z" lookup is
+            // T|undefined. Local binding lets the non-nullish guard
+            // narrow once per row.
+            const cfg = AXIS_CHART_CONFIG[axis];
+            if (!cfg) return null;
+            return (
+              <span key={axis} className="flex items-center gap-1">
+                <span
+                  className="size-1.5 rounded-full"
+                  style={{ backgroundColor: cfg.color }}
+                />
+                {cfg.label as string}
+              </span>
+            );
+          })}
         </div>
       </div>
       <ChartContainer config={AXIS_CHART_CONFIG} className="h-full w-full">
