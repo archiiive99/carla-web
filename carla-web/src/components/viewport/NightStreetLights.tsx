@@ -2,6 +2,7 @@ import { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useSimulationStore } from "@/stores/simulationStore";
 import { HEADLIGHT_BEAM } from "./scene-palette";
+import { BLOOM_LAYER } from "./bloom-layer";
 
 // CARLA-coords positions of street-lamp anchors near the iter-01 test
 // pose intersection (approx x=118.9, y=55.8). Hardcoded for this
@@ -82,8 +83,17 @@ export function NightStreetLights() {
              scene — without it the SpotLights just appear as bright
              cones with nothing emitting them. The CARLA static-prop
              streetlamp GLBs are dormant in the scene (exported but
-             unused), so this plays the role of the lamp head visual. */}
-          <mesh position={spec.position}>
+             unused), so this plays the role of the lamp head visual.
+             iter-09-revisit-bloom-v2: layer 1 marks this for
+             SelectiveBloom while leaving the rest of the scene render
+             on layer 0 (default) so the multi-camera composition isn't
+             intercepted. */}
+          <mesh
+            position={spec.position}
+            ref={(m) => {
+              if (m) m.layers.enable(BLOOM_LAYER);
+            }}
+          >
             <sphereGeometry args={[0.18, 12, 12]} />
             <meshStandardMaterial
               color={HEADLIGHT_BEAM}

@@ -7,6 +7,11 @@ import { RoadNetwork } from "./RoadNetwork";
 import { CityEnvironment } from "./CityEnvironment";
 import { EgoHeadlights } from "./EgoHeadlights";
 import { NightStreetLights } from "./NightStreetLights";
+// iter-09-revisit-bloom-v2 reverted; SelectiveBloom + Bloom both broke
+// scene composition. Imports kept commented so the deeper-investigation
+// path (per-viewport effects / single-camera) starts pre-wired:
+// import { EffectComposer, SelectiveBloom } from "@react-three/postprocessing";
+// import { BLOOM_LAYER } from "./bloom-layer";
 import {
   GroundPlane,
   WeatherFog,
@@ -209,15 +214,17 @@ export function WorldCanvas({ showApproxEnvironment }: WorldCanvasProps) {
         <ViewportControllers />
         <SceneCompositor />
 
-        {/* iter-09-revisit-bloom: UnrealBloomPass attempt reverted —
-           the EffectComposer wrapping ate the scene at night (entire
-           frame went black; day pose rendered wrong camera state). Root
-           cause likely the interaction with this canvas's existing
-           tone mapping (ACESFilmic+0.82) + preserveDrawingBuffer +
-           multi-camera ViewportControllers. Needs deeper integration
-           investigation in iter-09-revisit-bloom-v2 (separate
-           render-target setup, possibly post-processing on a clone of
-           the main camera output rather than the scene composition). */}
+        {/* iter-09-revisit-bloom-v2: SelectiveBloom approach also
+           reverted — same scene-blackout symptom as v1. Root cause is
+           ARCHITECTURAL: EffectComposer-as-Canvas-child wraps the entire
+           render and is incompatible with WorldCanvas's multi-camera
+           composition (ViewportControllers + SceneCompositor render
+           into multiple textures across viewports). Real bloom
+           integration needs either (a) custom render loop without
+           EffectComposer, or (b) per-viewport SelectiveBloom (substantial
+           refactor of the multi-viewport renderer), or (c) downgrade
+           to single-camera architecture (architectural revert). All
+           three are outside iter-09's scope. */}
       </Canvas>
     </div>
   );
