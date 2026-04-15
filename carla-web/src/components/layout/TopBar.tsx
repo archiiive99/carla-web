@@ -32,7 +32,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { formatMapName } from "@/lib/utils";
+import { formatMapName, reportError } from "@/lib/utils";
 import { ConnectionBadge } from "./ConnectionBadge";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 
@@ -147,7 +147,9 @@ export function TopBar() {
                   className={autopilotOn ? "bg-info text-info-foreground ring-2 ring-info/30 hover:bg-info/90" : ""}
                   onClick={() => {
                     const next = !autopilotOn;
-                    setAutopilot(egoVehicleId, next).catch(() => {});
+                    setAutopilot(egoVehicleId, next).catch((e) =>
+                      reportError("Autopilot", e),
+                    );
                   }}
                   aria-label={autopilotOn ? "Disable autopilot" : "Enable autopilot"}
                   aria-pressed={autopilotOn}

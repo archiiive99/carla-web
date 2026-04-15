@@ -38,6 +38,9 @@ export function TrafficManagerPanel() {
   const handleGlobalSpeed = useCallback((value: number | readonly number[]) => {
     const v = Array.isArray(value) ? value[0] : value;
     setGlobalSpeedPct(v);
+    // Slider drag produces many value changes per second; silent-swallow is
+    // intentional here (matches VehicleDetails slider behavior) so a
+    // transient bridge hiccup doesn't spam toasts while the user drags.
     carlaApi.setGlobalSpeed(v).catch(() => {});
   }, []);
 
