@@ -63,8 +63,3 @@ export interface HealthResponse {
   default_camera_id?: number | null;
   session_ready?: boolean;
 }
-
-export interface BridgeInfoResponse extends HealthResponse {
-  bridge_version: string;
-  carla_version?: string | null;
-}

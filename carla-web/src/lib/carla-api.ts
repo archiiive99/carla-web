@@ -17,7 +17,6 @@ import type {
   SpawnWalkerRequest,
   SpawnSensorRequest,
   ReplayConfig,
-  BridgeInfoResponse,
   HealthResponse,
 } from "@/types/api";
 import { getDefaultBridgeUrl, normalizeBridgeUrl } from "@/lib/bridge-url";
@@ -93,7 +92,7 @@ export class CarlaApi {
     return request<HealthResponse>(this.url("/health"));
   }
 
-  async getRealtimeSession(): Promise<Pick<BridgeInfoResponse, "default_vehicle_id" | "default_camera_id" | "session_ready">> {
+  async getRealtimeSession(): Promise<Pick<HealthResponse, "default_vehicle_id" | "default_camera_id" | "session_ready">> {
     return request(this.url("/api/realtime/session"));
   }
 
