@@ -65,7 +65,7 @@ export default function RadarView({ sensorId, className }: RadarViewProps) {
       // Label
       ctx.fillStyle = colors.muted;
       ctx.font = "10px monospace";
-      ctx.fillText(`${depth}m`, cx + r + 2, cy - 2);
+      ctx.fillText(`${depth}m`, cx + r + 4, cy - 4);
     }
 
     // Azimuth lines

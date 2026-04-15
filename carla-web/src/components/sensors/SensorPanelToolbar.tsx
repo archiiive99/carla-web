@@ -48,7 +48,7 @@ export function SensorPanelToolbar({
         value={gridSize}
         onValueChange={(v) => onGridSizeChange(v as SensorPanelGridSize)}
       >
-        <SelectTrigger size="xs" className="w-16" aria-label="Sensor grid layout">
+        <SelectTrigger size="xs" className="w-20" aria-label="Sensor grid layout">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

@@ -118,7 +118,7 @@ export function RecordingControls() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="recording-filename" className="text-xs">Filename</Label>
-              <Badge variant={recording ? "destructive" : "secondary"} className="h-4 px-1.5 text-2xs">
+              <Badge className={cn("h-5 px-2 text-2xs", recording ? "bg-warning text-warning-foreground" : "bg-secondary text-secondary-foreground")}>
                 {recording ? "Recording..." : "Idle"}
               </Badge>
             </div>

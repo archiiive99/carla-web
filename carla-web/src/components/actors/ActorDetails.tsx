@@ -83,7 +83,7 @@ export function ActorDetails() {
     // so the user knows why the detail view went blank.
     const wasSelected = selectedActorId !== null;
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+      <div className="flex h-full min-h-[200px] flex-col items-center justify-center gap-3 p-8 text-center">
         <Crosshair className="size-10 text-muted-foreground" aria-hidden="true" />
         <div className="space-y-1">
           <p className="text-sm font-medium text-muted-foreground">

@@ -83,7 +83,7 @@ function WeatherSlider({
     <div className="space-y-1">
       <div className="flex items-center justify-between">
         <Label className="text-xs">{param.label}</Label>
-        <span className="font-mono text-xs tabular-nums text-muted-foreground">
+        <span className="inline-block min-w-12 text-right font-mono text-xs tabular-nums text-muted-foreground">
           {value.toFixed(param.step < 1 ? 1 : 0)}
           {param.unit}
         </span>
@@ -139,7 +139,7 @@ export function WeatherControls() {
 
             {/* Quick presets — shared with the CommandPalette weather group
                 via `weather-quick-presets.ts` so both surfaces agree. */}
-            <div className="flex flex-wrap gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5">
               {WEATHER_QUICK_PRESETS.map(({ preset, label, icon: Icon }) => (
                 <Button
                   key={preset}
@@ -189,7 +189,7 @@ export function WeatherControls() {
               <CollapsibleTrigger className="flex w-full items-center justify-between text-xs text-muted-foreground hover:text-foreground">
                 Advanced Parameters
                 <ChevronDown
-                  className={`size-3.5 transition-transform ${advancedOpen ? "rotate-180" : ""}`}
+                  className={`size-3.5 transition-transform duration-200 ease-out ${advancedOpen ? "rotate-180" : ""}`}
                   aria-hidden="true"
                 />
               </CollapsibleTrigger>

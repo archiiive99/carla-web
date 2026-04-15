@@ -57,7 +57,7 @@ export function BottomPanel() {
                 <Badge
                   variant="secondary"
                   aria-hidden="true"
-                  className="ml-1 h-4 px-1 text-2xs tabular-nums"
+                  className="ml-1 h-5 px-1.5 text-2xs tabular-nums"
                 >
                   {sensorCount}
                 </Badge>
@@ -102,7 +102,7 @@ export function BottomPanel() {
                 <Badge
                   variant="secondary"
                   aria-hidden="true"
-                  className="ml-1 h-4 px-1 text-2xs tabular-nums"
+                  className="ml-1 h-5 px-1.5 text-2xs tabular-nums"
                 >
                   {events.length > 99 ? "99+" : events.length}
                 </Badge>

@@ -71,7 +71,7 @@ export function ActorGroupSection({
       <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
         <ChevronRight
           className={cn(
-            "size-3.5 transition-transform duration-200",
+            "size-3.5 transition-transform duration-200 ease-out",
             open && "rotate-90",
           )}
           aria-hidden="true"
@@ -95,8 +95,8 @@ export function ActorGroupSection({
                   size="sm"
                   onClick={() => onSelect(selectedId === actor.id ? null : actor.id)}
                   className={cn(
-                    "h-auto w-full justify-start gap-2 px-2 py-1.5 text-sm",
-                    selectedId === actor.id && "bg-muted text-foreground",
+                    "h-auto w-full justify-start gap-2 px-2 py-1.5 text-sm border-l-2 border-l-transparent",
+                    selectedId === actor.id && "bg-muted text-foreground border-l-primary",
                   )}
                 >
                   <ActorItemIcon actor={actor} />
@@ -120,7 +120,7 @@ export function ActorGroupSection({
             ))}
           </ul>
         ) : (
-          <div className="flex flex-col items-center gap-1 px-6 py-3 text-center">
+          <div className="mx-2 my-1 flex flex-col items-center gap-1 rounded-md bg-muted/30 px-6 py-3 text-center">
             {def.icon}
             <p className="text-xs text-muted-foreground">No {def.label.toLowerCase()}</p>
           </div>

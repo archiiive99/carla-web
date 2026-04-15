@@ -52,7 +52,7 @@ function AxisTimeSeries({
 }) {
   return (
     <div className="flex-1">
-      <div className="mb-1 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <span className="text-2xs text-muted-foreground">{title}</span>
         <div className="flex items-center gap-2 text-3xs text-muted-foreground">
           {AXES.map((axis) => (

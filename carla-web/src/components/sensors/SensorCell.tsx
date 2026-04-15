@@ -32,7 +32,7 @@ export function SensorCell({ cell, onMaximize, onRemove }: SensorCellProps) {
   // reduced opacity and lift to full opacity on hover/focus. Low alpha
   // keeps the cell content primary without hiding the controls.
   const controls = (
-    <div className="absolute right-1 top-1 z-10 flex gap-0.5 opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+    <div className="absolute right-1 top-1 z-10 flex gap-0.5 opacity-60 transition-opacity duration-150 ease-out group-hover:opacity-100 focus-within:opacity-100">
       <Button
         variant="ghost"
         size="icon-xs"
@@ -107,7 +107,7 @@ function SubscriptionDot({ sensorId }: { sensorId: number }) {
   return (
     <div
       className={cn(
-        "pointer-events-none absolute bottom-1.5 left-1.5 z-10 size-2 rounded-full border border-background/80 shadow-sm",
+        "pointer-events-none absolute bottom-1.5 left-1.5 z-10 size-2.5 rounded-full border border-background/80 shadow-sm",
         subscribed ? "bg-success" : "bg-muted-foreground/50",
       )}
       title={subscribed ? "Subscribed to sensor feed" : "Not subscribed"}

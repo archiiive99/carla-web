@@ -92,14 +92,13 @@ export function TopBar() {
         <ConnectionBadge status={connectionStatus} />
       </div>
 
-      <div className="flex min-w-0 shrink flex-nowrap items-center gap-3 whitespace-nowrap">
-        <span ref={simTimeRef} className="font-mono text-xs tabular-nums text-muted-foreground">
-          00:00:00.000
-        </span>
-        <Separator orientation="vertical" className="h-4" />
-        <span ref={tickRef} className="font-mono text-xs tabular-nums text-muted-foreground">
-          T0
-        </span>
+      <div className="flex min-w-0 shrink flex-nowrap items-center gap-2 whitespace-nowrap">
+        <Badge variant="secondary" className="gap-1 px-2 font-mono tabular-nums" aria-label="Simulation time">
+          <span ref={simTimeRef}>00:00:00.000</span>
+        </Badge>
+        <Badge variant="secondary" className="px-2 font-mono tabular-nums" aria-label="Current tick">
+          <span ref={tickRef}>T0</span>
+        </Badge>
         <Separator orientation="vertical" className="h-4" />
         <Tooltip>
           <TooltipTrigger
@@ -129,9 +128,9 @@ export function TopBar() {
           </Tooltip>
         )}
         <Separator orientation="vertical" className="h-4" />
-        <span ref={fpsRef} className="font-mono text-xs tabular-nums text-muted-foreground">
-          0 FPS
-        </span>
+        <Badge variant="secondary" className="px-2 font-mono tabular-nums" aria-label="Browser frames per second">
+          <span ref={fpsRef}>0 FPS</span>
+        </Badge>
       </div>
 
       <div className="flex shrink-0 flex-nowrap items-center gap-2 whitespace-nowrap">

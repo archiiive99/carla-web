@@ -64,12 +64,12 @@ export default function SensorCameraView({
       <div className="pointer-events-none absolute left-1.5 top-1.5 z-10 flex gap-1">
         <Badge
           variant="secondary"
-          className="h-4 bg-background/70 px-1.5 text-2xs backdrop-blur-sm"
+          className="h-5 bg-background/70 px-2 text-2xs backdrop-blur-sm"
         >
           {headerLabel}
         </Badge>
         {!preset && (
-          <Badge variant="secondary" className="h-4 bg-background/70 px-1.5 text-2xs backdrop-blur-sm">
+          <Badge variant="secondary" className="h-5 bg-background/70 px-2 text-2xs backdrop-blur-sm">
             #{sensorId}
           </Badge>
         )}

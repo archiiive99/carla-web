@@ -39,9 +39,9 @@ export function ConnectionOverlay() {
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm">
-      <Card className="w-96 shadow-xl">
-        <CardContent className="p-8 text-center">
-          <WifiOff className="mx-auto mb-6 size-16 animate-pulse text-muted-foreground" aria-hidden="true" />
+      <Card className="max-w-md shadow-xl">
+        <CardContent className="p-6 text-center">
+          <WifiOff className="mx-auto mb-6 size-14 animate-pulse text-muted-foreground" aria-hidden="true" />
           <h2 className="mb-2 text-xl font-semibold">
             {connectionStatus === "connecting"
               ? "Bridge up — waiting for CARLA"

@@ -98,7 +98,7 @@ export function EventLog({ events, onClear, className }: EventLogProps) {
       {/* Toolbar */}
       <div className="flex items-center gap-2 border-b px-3 py-2">
         <div
-          className="flex flex-1 items-center gap-1.5"
+          className="flex flex-1 flex-wrap items-center gap-1.5"
           role="group"
           aria-label="Filter events by type"
         >
@@ -132,7 +132,7 @@ export function EventLog({ events, onClear, className }: EventLogProps) {
               aria-label="Auto-scroll event log to latest"
             />
             <Label htmlFor="auto-scroll" className="cursor-pointer text-xs text-muted-foreground peer-disabled:opacity-50">
-              Auto
+              Follow latest
             </Label>
           </div>
           <Button
@@ -169,7 +169,7 @@ export function EventLog({ events, onClear, className }: EventLogProps) {
             {filteredEvents.map((event) => (
               <div
                 key={event.id}
-                className="flex items-center gap-2 rounded-md px-2 py-1 text-xs hover:bg-muted"
+                className="flex items-center gap-3 rounded-md px-2 py-1.5 text-xs hover:bg-muted"
               >
                 <span className="font-mono tabular-nums text-2xs text-muted-foreground">
                   {new Date(event.timestamp * 1000).toLocaleTimeString()}

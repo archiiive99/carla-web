@@ -113,7 +113,7 @@ export function SimulationControls() {
             <Button
               variant="outline"
               size="sm"
-              className="w-16 gap-1 text-xs"
+              className="w-20 gap-1 text-xs"
               disabled={!isConnected}
               aria-label={`Simulation speed ${SPEED_STEPS[speedIdx]}x — click to change`}
             >

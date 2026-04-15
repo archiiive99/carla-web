@@ -22,7 +22,7 @@ export function ActorHeader({ actor }: ActorHeaderProps) {
       </div>
       {actor.role_name === BRIDGE_EGO_ROLE && (
         <Badge
-          className="h-4 shrink-0 gap-1 bg-warning/10 px-1.5 text-2xs text-warning"
+          className="h-5 shrink-0 gap-1.5 bg-warning/10 px-1.5 text-2xs text-warning"
           title="Bridge-managed ego vehicle"
           aria-label="Bridge-managed ego vehicle"
         >

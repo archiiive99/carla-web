@@ -91,20 +91,20 @@ export function ShortcutsDialog({
           </Button>
         }
       />
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-sm">Keyboard Shortcuts</DialogTitle>
         </DialogHeader>
-        <div className="max-h-[70vh] space-y-1.5 overflow-y-auto pr-1 text-xs">
+        <div className="max-h-[70vh] space-y-2 overflow-y-auto pr-1 text-xs">
           {SECTIONS.map((section, i) => (
             <div key={section.title}>
-              <p className="text-2xs font-medium uppercase text-muted-foreground">
+              <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {section.title}
               </p>
               {section.rows.map((row) => (
                 <div
                   key={row.label}
-                  className="flex items-center justify-between"
+                  className="flex items-center justify-between py-1"
                 >
                   <span>{row.label}</span>
                   {row.keys}

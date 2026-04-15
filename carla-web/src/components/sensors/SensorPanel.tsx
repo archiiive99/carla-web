@@ -226,7 +226,7 @@ export function SensorPanel({ className }: { className?: string }) {
     if (body === null) return null;
     return (
       <div className={cn("flex h-full flex-col", className)}>
-        <div className="flex items-center justify-between border-b px-2 py-1.5">
+        <div className="flex items-center justify-between border-b px-3 py-2">
           <span className="text-xs font-medium">{label}</span>
           <Button
             variant="ghost"

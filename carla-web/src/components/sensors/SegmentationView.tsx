@@ -111,12 +111,12 @@ export default function SegmentationView({
           </div>
         )}
         {showLegend && (
-          <div className="absolute bottom-2 left-2 rounded-md bg-background/80 p-2 backdrop-blur-sm">
+          <div className="absolute bottom-3 left-3 rounded-md bg-background/80 p-2 backdrop-blur-sm">
             <div className="grid grid-cols-2 gap-x-3 gap-y-1">
               {LEGEND_ITEMS.map((item) => (
                 <div key={item.label} className="flex items-center gap-1.5">
                   <div
-                    className="size-2.5 rounded-sm"
+                    className="size-3 rounded-full"
                     style={{ backgroundColor: item.color }}
                   />
                   <span className="text-2xs">{item.label}</span>

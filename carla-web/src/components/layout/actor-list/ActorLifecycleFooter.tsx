@@ -77,7 +77,7 @@ export function ActorLifecycleFooter() {
         <Button
           variant="outline"
           size="sm"
-          className="flex-1 gap-1 text-xs"
+          className="flex-1 gap-1 text-xs hover:border-success/40 hover:bg-success/5 hover:text-foreground"
           disabled={!isConnected}
           title={isConnected ? "Spawn a Tesla Model 3 at a random spawn point" : "Connect to CARLA first"}
           onClick={quickSpawnVehicle}
@@ -87,7 +87,7 @@ export function ActorLifecycleFooter() {
         <Button
           variant="outline"
           size="sm"
-          className="flex-1 gap-1 text-xs"
+          className="flex-1 gap-1 text-xs hover:border-success/40 hover:bg-success/5 hover:text-foreground"
           disabled={!isConnected}
           title={isConnected ? "Spawn a pedestrian at a random spawn point" : "Connect to CARLA first"}
           onClick={quickSpawnWalker}
@@ -97,7 +97,7 @@ export function ActorLifecycleFooter() {
         <Button
           variant="outline"
           size="sm"
-          className="flex-1 gap-1 text-xs"
+          className="flex-1 gap-1 text-xs hover:border-success/40 hover:bg-success/5 hover:text-foreground"
           disabled={!isConnected}
           title={isConnected ? "Spawn 10 autopilot vehicles" : "Connect to CARLA first"}
           onClick={quickSpawnTenVehicles}

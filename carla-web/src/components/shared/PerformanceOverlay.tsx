@@ -42,7 +42,7 @@ export function PerformanceOverlay() {
   }, []);
 
   return (
-    <Card className="pointer-events-none absolute right-2 top-12 z-30 w-44 border-border/60 bg-overlay-bg/70 text-overlay-fg shadow-xl backdrop-blur-sm" aria-label="Performance overlay" role="status">
+    <Card className="pointer-events-none absolute right-3 top-16 z-30 w-52 border-border/60 bg-overlay-bg/70 text-overlay-fg shadow-xl backdrop-blur-sm" aria-label="Performance overlay" role="status">
       <CardHeader className="px-3 py-2">
         <CardTitle className="text-xs font-medium">Performance</CardTitle>
       </CardHeader>
