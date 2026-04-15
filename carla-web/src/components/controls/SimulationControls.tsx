@@ -138,6 +138,10 @@ export function SimulationControls() {
                 const idx = Array.isArray(v) ? v[0] : v;
                 setSpeedIdx(idx);
                 const multiplier = SPEED_STEPS[idx];
+                // Slider drags fire onValueChange per step; silent-swallow
+                // follows the same pattern as VehicleDetails / TrafficManager
+                // so a transient bridge hiccup doesn't spam speed-change
+                // toasts while the user is dragging.
                 carlaApi.setSettings({
                   sync_mode: true,
                   fixed_delta: 0.05 / multiplier,

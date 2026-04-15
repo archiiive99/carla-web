@@ -6,6 +6,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Maximize, Minimize } from "lucide-react";
+import { reportError } from "@/lib/utils";
 
 const OVERLAY_ICON_BTN =
   "border border-border/60 bg-overlay-bg/70 text-overlay-fg hover:bg-overlay-bg/85";
@@ -33,8 +34,12 @@ export function FullscreenToggle() {
             className={OVERLAY_ICON_BTN}
             onClick={() =>
               isFullscreen
-                ? document.exitFullscreen().catch(() => {})
-                : document.documentElement.requestFullscreen().catch(() => {})
+                ? document.exitFullscreen().catch((e) =>
+                    reportError("Exit fullscreen", e),
+                  )
+                : document.documentElement
+                    .requestFullscreen()
+                    .catch((e) => reportError("Enter fullscreen", e))
             }
             aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
