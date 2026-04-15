@@ -41,10 +41,18 @@ import { FacadeNightDriver } from "./city-environment/facade-night-driver"
 export function CityEnvironment() {
   const [env, setEnv] = useState<MapEnv | null>(null)
   const currentMap = useSimulationStore((s) => s.currentMap)
+  // Same React-19 idiom used by MiniMap's topology reset:
+  // clear the cached env the moment currentMap flips (pure reset,
+  // belongs in render; React bails out on unchanged setters) and
+  // keep the impure fetch in useEffect.
+  const [lastMap, setLastMap] = useState(currentMap)
+  if (lastMap !== currentMap) {
+    setLastMap(currentMap)
+    setEnv(null)
+  }
 
   useEffect(() => {
     let cancelled = false
-    setEnv(null)
     async function load() {
       try {
         const data = await carlaApi.getMapEnvironment()
