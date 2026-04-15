@@ -113,6 +113,41 @@ export function Buildings({ objects }: { objects: EnvObj[] }) {
     () => buildProceduralBuildingGroup(proceduralBuildings),
     [proceduralBuildings],
   )
+  const lastProcCullPos = useRef(new THREE.Vector3(Infinity, Infinity, Infinity))
+
+  // iter-14-revisit-runtime-procedural-bldg: per-camera-move cull for
+  // every InstancedMesh in the procedural-building group. Each mesh
+  // exposes its source buildings + original matrices via userData so
+  // we can restore in-range entries and zero-scale out-of-range.
+  useFrame(({ camera }) => {
+    if (!meshes) return
+    if (camera.position.distanceTo(lastProcCullPos.current) < RUNTIME_CULL_SENSITIVITY) return
+    lastProcCullPos.current.copy(camera.position)
+    const r2 = RUNTIME_CULL_RADIUS_SQ
+    const dummy = new THREE.Object3D()
+    const mat = new THREE.Matrix4()
+    const zero = new THREE.Matrix4().makeScale(0, 0, 0)
+    meshes.traverse((child) => {
+      if (!(child instanceof THREE.InstancedMesh)) return
+      const srcBuildings: EnvObj[] | undefined = child.userData.cullSourceBuildings
+      const originals: Float32Array | undefined = child.userData.originalMatrices
+      if (!srcBuildings || !originals) return
+      for (let i = 0; i < srcBuildings.length; i++) {
+        const obj = srcBuildings[i]
+        const pos = c2t(obj.b.x, obj.b.y, obj.b.z)
+        const dx = pos.x - camera.position.x
+        const dy = pos.y - camera.position.y
+        const dz = pos.z - camera.position.z
+        if ((dx * dx + dy * dy + dz * dz) <= r2) {
+          mat.fromArray(originals, i * 16)
+          child.setMatrixAt(i, mat)
+        } else {
+          child.setMatrixAt(i, zero)
+        }
+      }
+      child.instanceMatrix.needsUpdate = true
+    })
+  })
 
   return (
     <>

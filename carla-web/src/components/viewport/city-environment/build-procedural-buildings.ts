@@ -43,7 +43,26 @@ function buildMainBodyMesh(
   if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
   mesh.castShadow = true
   mesh.receiveShadow = true
+  // iter-14-revisit-runtime-procedural-bldg: stash the source
+  // buildings + original matrices on userData so an external
+  // useFrame can re-evaluate per-instance visibility against the live
+  // camera and zero-scale out-of-range entries.
+  mesh.userData.cullSourceBuildings = buildings
+  mesh.userData.originalMatrices = captureOriginalMatrices(mesh, buildings.length)
   return mesh
+}
+
+/** Capture each instance's matrix into a flat Float32Array (16 floats
+ *  per instance) so a runtime cull can restore the in-range pose
+ *  without recomputing from EnvObj data. */
+function captureOriginalMatrices(mesh: THREE.InstancedMesh, count: number): Float32Array {
+  const out = new Float32Array(16 * count)
+  const m = new THREE.Matrix4()
+  for (let i = 0; i < count; i++) {
+    mesh.getMatrixAt(i, m)
+    out.set(m.elements, i * 16)
+  }
+  return out
 }
 
 /** Build the darker ground-floor wrap for one texture-variant bucket.
@@ -81,6 +100,8 @@ function buildGroundFloorMesh(
   if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
   mesh.castShadow = true
   mesh.receiveShadow = true
+  mesh.userData.cullSourceBuildings = buildings
+  mesh.userData.originalMatrices = captureOriginalMatrices(mesh, buildings.length)
   return mesh
 }
 
@@ -120,6 +141,8 @@ function buildSetbackMesh(
   if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
   mesh.castShadow = true
   mesh.receiveShadow = true
+  mesh.userData.cullSourceBuildings = buildings
+  mesh.userData.originalMatrices = captureOriginalMatrices(mesh, buildings.length)
   return mesh
 }
 
@@ -162,6 +185,8 @@ function buildRoofMesh(buildings: EnvObj[]): THREE.InstancedMesh {
     mesh.setMatrixAt(i, dummy.matrix)
   }
 
+  mesh.userData.cullSourceBuildings = buildings
+  mesh.userData.originalMatrices = captureOriginalMatrices(mesh, buildings.length)
   mesh.instanceMatrix.needsUpdate = true
   mesh.castShadow = true
   mesh.receiveShadow = true
