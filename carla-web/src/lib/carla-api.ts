@@ -170,6 +170,17 @@ export class CarlaApi {
     });
   }
 
+  /** Load or unload a CARLA map layer (Buildings / Decals / Foliage /
+   *  Ground / ParkedVehicles / Particles / Props / StreetLights / Walls / All).
+   *  Layer names are sent lowercase + snake_case to match the bridge's
+   *  carla.MapLayer mapping. */
+  async setMapLayer(layer: string, action: "load" | "unload"): Promise<void> {
+    await request(this.url(`/api/world/map-layers`), {
+      method: "POST",
+      body: JSON.stringify({ layer: layer.toLowerCase(), action }),
+    });
+  }
+
   async getSpawnPoints(): Promise<CarlaTransform[]> {
     const res = await request<{ spawn_points: CarlaTransform[] }>(
       this.url("/api/world/spawn-points"),

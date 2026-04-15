@@ -22,13 +22,19 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Map, Check } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { useSimulationStore, useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
 
-const MAP_LAYERS = [
-  "Buildings", "Decals", "Foliage", "Ground",
-  "ParkedVehicles", "Particles", "Props", "StreetLights", "Walls",
+const MAP_LAYERS: Array<{ label: string; key: string }> = [
+  { label: "Buildings", key: "buildings" },
+  { label: "Decals", key: "decals" },
+  { label: "Foliage", key: "foliage" },
+  { label: "Ground", key: "ground" },
+  { label: "Parked Vehicles", key: "parked_vehicles" },
+  { label: "Particles", key: "particles" },
+  { label: "Props", key: "props" },
+  { label: "Street Lights", key: "street_lights" },
+  { label: "Walls", key: "walls" },
 ];
 
 // Keep MapControls backwards-compatible with its existing internal usage;
@@ -46,6 +52,29 @@ export function MapControls() {
   const [selectedMap, setSelectedMap] = useState("");
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  // Default: assume all layers are loaded (CARLA map default).
+  // We don't read current layer state from the bridge because CARLA's Python
+  // client exposes load/unload but not a read-back; the UI state is local.
+  const [enabledLayers, setEnabledLayers] = useState<Record<string, boolean>>(
+    () => Object.fromEntries(MAP_LAYERS.map((l) => [l.key, true])),
+  );
+  const [layerBusy, setLayerBusy] = useState<string | null>(null);
+
+  const toggleLayer = useCallback(async (key: string) => {
+    const current = enabledLayers[key];
+    const next = !current;
+    setEnabledLayers((prev) => ({ ...prev, [key]: next }));
+    setLayerBusy(key);
+    try {
+      await carlaApi.setMapLayer(key, next ? "load" : "unload");
+    } catch (e) {
+      // Revert on failure; toast via reportError path.
+      setEnabledLayers((prev) => ({ ...prev, [key]: current }));
+      reportError("Map layer", e);
+    } finally {
+      setLayerBusy(null);
+    }
+  }, [enabledLayers]);
 
   useEffect(() => {
     if (isConnected) {
@@ -139,26 +168,37 @@ export function MapControls() {
 
           <Separator />
 
-          {/* Map Layers — CARLA supports per-layer load/unload via
-              world.load_map_layer, but the bridge doesn't expose it yet, so
-              the checkboxes are labeled "not wired" and disabled to avoid
-              pretending a toggle takes effect (mandate: honest stubs). */}
-          <div className="space-y-2 opacity-60">
+          {/* Map Layers — wired to POST /api/world/map-layers. CARLA exposes
+              load_map_layer / unload_map_layer but no read-back, so the UI
+              state is local-only (we don't poll the actual layer state). */}
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Label className="text-xs">Map Layers</Label>
-              <Badge variant="outline" className="h-4 px-1.5 text-2xs uppercase tracking-wide text-muted-foreground">
-                not wired
-              </Badge>
+              <span className="text-3xs text-muted-foreground">
+                toggle world geometry
+              </span>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {MAP_LAYERS.map((layer) => (
-                <div key={layer} className="flex items-center gap-2">
-                  <Checkbox id={`layer-${layer}`} defaultChecked disabled />
-                  <Label htmlFor={`layer-${layer}`} className="cursor-not-allowed text-xs">
-                    {layer}
-                  </Label>
-                </div>
-              ))}
+              {MAP_LAYERS.map((layer) => {
+                const checked = enabledLayers[layer.key] ?? true;
+                const busy = layerBusy === layer.key;
+                return (
+                  <div key={layer.key} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`layer-${layer.key}`}
+                      checked={checked}
+                      onCheckedChange={() => toggleLayer(layer.key)}
+                      disabled={!isConnected || busy}
+                    />
+                    <Label
+                      htmlFor={`layer-${layer.key}`}
+                      className="cursor-pointer text-xs"
+                    >
+                      {layer.label}
+                    </Label>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
