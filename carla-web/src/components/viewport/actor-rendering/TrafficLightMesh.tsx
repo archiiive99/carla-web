@@ -4,6 +4,13 @@ import * as THREE from "three";
 import type { CarlaActor } from "@/types/carla";
 import { TRAFFIC_LIGHT_MODEL } from "../CarlaAssetLoader";
 import { ErrorBoundaryFallback, carlaToThree } from "./shared";
+import {
+  TRAFFIC_RED,
+  TRAFFIC_YELLOW,
+  TRAFFIC_GREEN,
+  TRAFFIC_OFF,
+  TRAFFIC_HOUSING,
+} from "../scene-palette";
 
 /** Inner component that loads the glTF traffic-light model. */
 function GltfTrafficLight() {
@@ -23,13 +30,13 @@ function GltfTrafficLight() {
 function trafficLightBulbColor(state: string | null | undefined): string {
   switch (state) {
     case "Red":
-      return "#ef4444";
+      return TRAFFIC_RED;
     case "Yellow":
-      return "#eab308";
+      return TRAFFIC_YELLOW;
     case "Green":
-      return "#22c55e";
+      return TRAFFIC_GREEN;
     default:
-      return "#4b5563"; // Off / Unknown
+      return TRAFFIC_OFF;
   }
 }
 
@@ -39,7 +46,7 @@ function BoxTrafficLightFallback({ color }: { color: string }) {
     <>
       <mesh position={[0, 2.5, 0]}>
         <boxGeometry args={[0.2, 1, 0.2]} />
-        <meshStandardMaterial color="#374151" />
+        <meshStandardMaterial color={TRAFFIC_HOUSING} />
       </mesh>
       <mesh position={[0, 3.15, 0]}>
         <sphereGeometry args={[0.15, 8, 8]} />

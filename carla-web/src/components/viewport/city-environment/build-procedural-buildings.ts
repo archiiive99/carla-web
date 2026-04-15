@@ -2,6 +2,7 @@ import * as THREE from "three"
 import { EnvObj, c2t, yawRad } from "./shared"
 import { getBuildingBaseColor } from "./building-palette"
 import { createFacadeMaterial } from "./facade-material"
+import { PROCEDURAL_WALL } from "../scene-palette"
 
 interface MainBodyOpts {
   textureGroupSeedOffset: number
@@ -126,7 +127,7 @@ function buildSetbackMesh(
 function buildRoofMesh(buildings: EnvObj[]): THREE.InstancedMesh {
   const roofGeo = new THREE.BoxGeometry(1, 1, 1)
   const roofMat = new THREE.MeshStandardMaterial({
-    color: "#4a4a4a",
+    color: PROCEDURAL_WALL,
     roughness: 0.95,
     metalness: 0.0,
   })

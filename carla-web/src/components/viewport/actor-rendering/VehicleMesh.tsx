@@ -5,6 +5,7 @@ import type { CarlaActor } from "@/types/carla";
 import { resolveVehicleModel } from "../CarlaAssetLoader";
 import { ErrorBoundaryFallback, carlaToThree } from "./shared";
 import { vehiclePlaceholderFootprint } from "./vehicle-class";
+import { VEHICLE_DEFAULT, VEHICLE_BRAKE, VEHICLE_REVERSE } from "../scene-palette";
 
 /** Inner component that loads and renders a glTF vehicle model. The imported
  *  material is preserved as-is so the browser approximation does not invent
@@ -116,7 +117,7 @@ export const VehicleMesh = memo(function VehicleMesh({
                 ]}
               />
               <meshBasicMaterial
-                color="#9ca3af"
+                color={VEHICLE_DEFAULT}
                 wireframe
                 transparent
                 opacity={0.45}
@@ -135,7 +136,7 @@ export const VehicleMesh = memo(function VehicleMesh({
                 ]}
               />
               <meshBasicMaterial
-                color="#9ca3af"
+                color={VEHICLE_DEFAULT}
                 wireframe
                 transparent
                 opacity={0.45}
@@ -146,7 +147,7 @@ export const VehicleMesh = memo(function VehicleMesh({
             <ringGeometry
               args={[placeholderFp.ringRadius, placeholderFp.ringRadius + 0.15, 24]}
             />
-            <meshBasicMaterial color="#9ca3af" transparent opacity={0.3} />
+            <meshBasicMaterial color={VEHICLE_DEFAULT} transparent opacity={0.3} />
           </mesh>
         </group>
       )}
@@ -154,13 +155,13 @@ export const VehicleMesh = memo(function VehicleMesh({
       {isSelected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
           <ringGeometry args={[3.2, 3.5, 32]} />
-          <meshBasicMaterial color="#f59e0b" transparent opacity={0.6} />
+          <meshBasicMaterial color={VEHICLE_BRAKE} transparent opacity={0.6} />
         </mesh>
       )}
       {isEgo && !isSelected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
           <ringGeometry args={[3.2, 3.4, 32]} />
-          <meshBasicMaterial color="#22c55e" transparent opacity={0.45} />
+          <meshBasicMaterial color={VEHICLE_REVERSE} transparent opacity={0.45} />
         </mesh>
       )}
     </group>

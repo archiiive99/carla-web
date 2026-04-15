@@ -5,6 +5,7 @@ import { useActorStore } from "@/stores/actorStore";
 import { useSimulationStore } from "@/stores/simulationStore";
 import { resolveEgoId, carlaToThree } from "./actor-rendering/shared";
 import { vehiclePlaceholderFootprint } from "./actor-rendering/vehicle-class";
+import { HEADLIGHT_BEAM } from "./scene-palette";
 
 /** Night-only pair of SpotLights that track the ego vehicle's front,
  *  approximating headlights that CARLA's Native UE stream would render
@@ -78,7 +79,7 @@ export function EgoHeadlights() {
       <primitive object={rightTargetRef.current} />
       <spotLight
         ref={leftRef}
-        color="#fff4d0"
+        color={HEADLIGHT_BEAM}
         intensity={4}
         distance={40}
         angle={0.45}
@@ -89,7 +90,7 @@ export function EgoHeadlights() {
       />
       <spotLight
         ref={rightRef}
-        color="#fff4d0"
+        color={HEADLIGHT_BEAM}
         intensity={4}
         distance={40}
         angle={0.45}

@@ -4,6 +4,7 @@ import { carlaApi } from "@/lib/carla-api";
 import type { CarlaTransform } from "@/types/carla";
 import { RoadMesh } from "./RoadMesh";
 import { useSimulationStore } from "@/stores/simulationStore";
+import { DEBUG_LANE_DOT } from "./scene-palette";
 
 function carlaToThree(loc: { x: number; y: number; z: number }): [number, number, number] {
   return [loc.x, loc.z + 0.1, -loc.y];
@@ -25,7 +26,7 @@ function SpawnPointMarkers({ points }: { points: CarlaTransform[] }) {
 
   return (
     <points geometry={geometry}>
-      <pointsMaterial color="#eab308" size={3} sizeAttenuation transparent opacity={0.5} />
+      <pointsMaterial color={DEBUG_LANE_DOT} size={3} sizeAttenuation transparent opacity={0.5} />
     </points>
   );
 }

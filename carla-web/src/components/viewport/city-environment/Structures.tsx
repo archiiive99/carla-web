@@ -8,6 +8,7 @@ import {
   WALL_TOWN_MODEL,
 } from "../CarlaAssetLoader"
 import { EnvObj, buildInstanced } from "./shared"
+import { WALL_DEFAULT, WALL_WARM, WALL_LIGHT, SIGN_PLATE } from "../scene-palette"
 import { GltfInstanced } from "./gltf-instanced"
 
 // Vertical / linear / scattered structural props. Each renders a glTF
@@ -20,7 +21,7 @@ import { GltfInstanced } from "./gltf-instanced"
 function ProceduralPoles({ objects }: { objects: EnvObj[] }) {
   const mesh = useMemo(() => {
     const geo = new THREE.CylinderGeometry(0.06, 0.06, 1, 5)
-    const mat = new THREE.MeshStandardMaterial({ color: "#71717a", roughness: 0.7 })
+    const mat = new THREE.MeshStandardMaterial({ color: WALL_DEFAULT, roughness: 0.7 })
     return buildInstanced(objects, geo, mat, { castShadow: true })
   }, [objects])
   return <primitive object={mesh} />
@@ -40,7 +41,7 @@ export function Poles({ objects }: { objects: EnvObj[] }) {
 function ProceduralWalls({ objects }: { objects: EnvObj[] }) {
   const mesh = useMemo(() => {
     const geo = new THREE.BoxGeometry(1, 1, 1)
-    const mat = new THREE.MeshStandardMaterial({ color: "#78716c", roughness: 0.9 })
+    const mat = new THREE.MeshStandardMaterial({ color: WALL_WARM, roughness: 0.9 })
     return buildInstanced(objects, geo, mat, { castShadow: true, receiveShadow: true })
   }, [objects])
   return <primitive object={mesh} />
@@ -68,7 +69,7 @@ function ProceduralFences({ objects }: { objects: EnvObj[] }) {
     // Opaque metallic grey — real fences aren't translucent. The old 0.7
     // alpha read as frosted glass panels instead of fencing.
     const mat = new THREE.MeshStandardMaterial({
-      color: "#a8a29e",
+      color: WALL_LIGHT,
       roughness: 0.55,
       metalness: 0.3,
     })
@@ -91,7 +92,7 @@ export function Fences({ objects }: { objects: EnvObj[] }) {
 function ProceduralRocks({ objects }: { objects: EnvObj[] }) {
   const mesh = useMemo(() => {
     const geo = new THREE.DodecahedronGeometry(1, 0)
-    const mat = new THREE.MeshStandardMaterial({ color: "#78716c", roughness: 0.95 })
+    const mat = new THREE.MeshStandardMaterial({ color: WALL_WARM, roughness: 0.95 })
     return buildInstanced(objects, geo, mat, { castShadow: true })
   }, [objects])
   return <primitive object={mesh} />
@@ -111,7 +112,7 @@ export function Rocks({ objects }: { objects: EnvObj[] }) {
 function ProceduralGuardRails({ objects }: { objects: EnvObj[] }) {
   const mesh = useMemo(() => {
     const geo = new THREE.BoxGeometry(1, 0.6, 0.08)
-    const mat = new THREE.MeshStandardMaterial({ color: "#9ca3af", roughness: 0.5, metalness: 0.4 })
+    const mat = new THREE.MeshStandardMaterial({ color: SIGN_PLATE, roughness: 0.5, metalness: 0.4 })
     return buildInstanced(objects, geo, mat, { castShadow: true })
   }, [objects])
   return <primitive object={mesh} />

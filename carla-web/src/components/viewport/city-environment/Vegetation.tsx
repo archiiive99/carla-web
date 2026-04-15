@@ -4,6 +4,7 @@ import { useGLTF } from "@react-three/drei"
 import { VEGETATION_MODELS } from "../CarlaAssetLoader"
 import { computeVegetationPlacement } from "../vegetation-placement"
 import { EnvObj, c2t } from "./shared"
+import { TREE_TRUNK } from "../scene-palette"
 
 /** Extract every vegetation mesh part (trunk / leaves / planter) plus the
  *  whole model bounds. Using only the first mesh renders detached leaf
@@ -132,7 +133,7 @@ function ProceduralVegetation({ objects }: { objects: EnvObj[] }) {
 
     const trunkGeo = new THREE.CylinderGeometry(0.08, 0.15, 1, 6)
     const trunkMat = new THREE.MeshStandardMaterial({
-      color: "#3d2b1f",
+      color: TREE_TRUNK,
       roughness: 0.95,
       metalness: 0.0,
     })

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useSimulationStore } from "@/stores/simulationStore"
 import { MapEnv, SafeRender, c2t, yawRad } from "./city-environment/shared"
+import { MISSING_ASSET } from "./scene-palette"
 import { Buildings } from "./city-environment/Buildings"
 import { Vegetation } from "./city-environment/Vegetation"
 import { TrafficLights, TrafficSigns } from "./city-environment/Signals"
@@ -82,7 +83,7 @@ export function CityEnvironment() {
                   Math.abs(b.b.ey) * 2,
                 ]}
               />
-              <meshBasicMaterial color="#ff00ff" wireframe />
+              <meshBasicMaterial color={MISSING_ASSET} wireframe />
             </mesh>
           )
         })}

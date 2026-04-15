@@ -1,6 +1,7 @@
 import { memo } from "react";
 import type { CarlaActor } from "@/types/carla";
 import { carlaToThree } from "./shared";
+import { WALKER_BODY, WALKER_LIMB, WALKER_WARNING } from "../scene-palette";
 
 export const WalkerMesh = memo(function WalkerMesh({
   actor,
@@ -36,7 +37,7 @@ export const WalkerMesh = memo(function WalkerMesh({
       <mesh position={[0, 0.85, 0]} castShadow receiveShadow>
         <capsuleGeometry args={[0.22, 0.9, 6, 12]} />
         <meshStandardMaterial
-          color="#f97316"
+          color={WALKER_BODY}
           emissive="#9a3412"
           emissiveIntensity={0.12}
           roughness={0.8}
@@ -44,12 +45,12 @@ export const WalkerMesh = memo(function WalkerMesh({
       </mesh>
       <mesh position={[0, 1.55, 0]} castShadow receiveShadow>
         <sphereGeometry args={[0.14, 8, 8]} />
-        <meshStandardMaterial color="#fb923c" roughness={0.75} />
+        <meshStandardMaterial color={WALKER_LIMB} roughness={0.75} />
       </mesh>
       {isSelected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
           <ringGeometry args={[1.0, 1.2, 24]} />
-          <meshBasicMaterial color="#f59e0b" transparent opacity={0.6} />
+          <meshBasicMaterial color={WALKER_WARNING} transparent opacity={0.6} />
         </mesh>
       )}
     </group>

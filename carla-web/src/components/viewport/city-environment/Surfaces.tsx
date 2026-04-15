@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import * as THREE from "three"
 import { EnvObj, buildInstanced } from "./shared"
+import { SURFACE_NEUTRAL } from "../scene-palette"
 
 // Surfaces that still render in the browser approximation. Roads and
 // sidewalks used to live here as axis-aligned box instances, but they
@@ -18,7 +19,7 @@ export function WaterSurfaces({ objects }: { objects: EnvObj[] }) {
     // actually covers. Real water is a dielectric (metalness 0), and its
     // "blue" comes from sky reflection via IBL rather than a painted tint.
     const mat = new THREE.MeshStandardMaterial({
-      color: "#3a4552",
+      color: SURFACE_NEUTRAL,
       roughness: 0.2,
       metalness: 0,
       transparent: true,

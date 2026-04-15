@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { useSimulationStore } from "@/stores/simulationStore";
 import { useActorStore } from "@/stores/actorStore";
 import { BRIDGE_EGO_ROLE } from "@/constants";
+import { GROUND_REFERENCE, NIGHT_SKY_GLOW } from "./scene-palette";
 
 /** Shared reference ground plane — a diagrammatic low-contrast checker at
  *  50 m spacing, so roads/curbs read against it without the plane pretending
@@ -14,7 +15,7 @@ import { BRIDGE_EGO_ROLE } from "@/constants";
 export function GroundPlane() {
   const material = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({
-      color: "#4a4d52",
+      color: GROUND_REFERENCE,
       roughness: 0.98,
       metalness: 0,
     });
@@ -203,7 +204,7 @@ export function WeatherLighting({
         <directionalLight
           position={[sunX * 0.3, 180, sunZ * 0.3]}
           intensity={0.05 + nightFactor * 0.08}
-          color="#6a7a9c"
+          color={NIGHT_SKY_GLOW}
           castShadow={false}
         />
       )}
