@@ -86,21 +86,19 @@ function GltfBuildingBatch({ gltfBuildings }: { gltfBuildings: { obj: EnvObj; pa
  *      the React boundary. */
 export function Buildings({ objects }: { objects: EnvObj[] }) {
   const { gltfBuildings, proceduralBuildings } = useMemo(() => {
-    // iter-14-revisit-buildings: distance cull. Buildings render
-    // one-component-per-mesh (not InstancedMesh), so the cull keeps
-    // React render cost in check too — far buildings don't even mount
-    // their Suspense + GltfBuilding boundary. Same 300m radius and
-    // iter-01 reference point as the other LOD opt-ins.
-    const REF_X = 118.9, REF_Y = 55.8, REF_Z = 1.8, MAX_R2 = 300 * 300
-    const filtered = objects.filter((obj) => {
-      const dx = obj.b.x - REF_X
-      const dy = obj.b.y - REF_Y
-      const dz = obj.b.z - REF_Z
-      return (dx * dx + dy * dy + dz * dz) <= MAX_R2
-    })
+    // iter-14-revisit-runtime-no-entry-filter: dropped the iter-01-
+    // anchored entry filter. With per-building runtime cull (added
+    // iter-14-revisit-runtime-bldg-only) handling visibility, the
+    // entry filter was a memory-vs-coverage trade-off that limited
+    // interactive use to within iter-01 ±300m. Lifting it means all
+    // gltf buildings mount (~130 useGLTF calls + useFrame closures);
+    // the per-building runtime cull keeps the visible set bounded by
+    // distance-to-live-camera. Procedural buildings still un-filtered
+    // here too (their internal InstancedMesh is one mesh; the cost
+    // doesn't scale with mounted-React-component count).
     const gltf: { obj: EnvObj; path: string }[] = []
     const procedural: EnvObj[] = []
-    for (const obj of filtered) {
+    for (const obj of objects) {
       const path = getBuildingModelPath(obj.name)
       if (path) {
         gltf.push({ obj, path })
