@@ -32,7 +32,8 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-07  Vegetation — extracted trees / bushes / grass instances
 [ ] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle
 [ ] iter-09  Street lights — emissive + point-light contribution at night
-[ ] iter-10  Traffic lights — emissive bulb + correct hue
+[x] iter-10  Traffic lights — emissive bulb + correct hue  (✅-on-arrival — basic feature shipped via indicator-sphere; GLTF-mesh recolor queued as iter-10-revisit-glb-bulb; closed 2026-04-15T09:23+~15min)
+[ ] iter-10-revisit-glb-bulb  Traverse GLTF, recolor authored bulb mesh by name (~50 min, web-only)
 [x] iter-12  Wet-surface response — driven by CARLA wetness param  (✅-on-arrival — binding shipped in iter-01; verified end-to-end via new --weather-wetness flag; PSNR moves +0.51 dB dry→wet vs 0.02 dB noise floor; closed 2026-04-15T09:14+~30min)
 [x] iter-13  Scene-palette unification — three.js material constants module  (⚠️ refactor SUCCESS, web render byte-pattern unchanged; measurement regression due to CARLA NPC vehicle blocking ROI — not refactor — see iter-13/report.md §7.4)
 [x] iter-13-followon-harness-stabilize  Add NPC-clear-before-capture to compare.py  (✅ first PASS of session — PSNR ΔΔ=0.02 dB across 2 runs; reference now shows clean asphalt; closed 2026-04-15T09:00+~35min)

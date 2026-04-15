@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 4 rows ✅, 4 rows ⚠️, 13 rows queued.
+**Summary:** 5 rows ✅, 4 rows ⚠️, 13 rows queued. **§6.5 raised** — see `SESSION-RAISE.md` (last 6 iterations all non-pixel; remaining queue dominated by UE-editor-blocked asset-extraction rows).
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -15,7 +15,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 13-followon | Harness NPC-clear-before-capture | **✅** | 11.04 | 0.220 | 35.89 | ~35 min | 79ba51961 |
 | 05-revisit-roi-sky | Harness sky-ROI mode | **✅** | 9.93 | 0.124 | 36.33 | ~35 min | eaade6079 |
 | 12 | Wet-surface response (✅-on-arrival) | **✅** | 11.54 (wet) / 11.03 (dry) | 0.228/0.213 | 35.20/35.89 | ~30 min | 8e29b8db3 |
-| 04 | Lane markings (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~20 min | (this commit) |
+| 04 | Lane markings (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~20 min | 0622c17bd |
+| 10 | Traffic lights (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~15 min | (this commit) |
 
 ## Notes
 
