@@ -227,11 +227,6 @@ class SensorManager:
             subs.discard(client_id)
         self._rate_controller.clear_subscription(client_id, sensor_id)
 
-    def unsubscribe_client(self, client_id: str) -> None:
-        for subs in self._subscriptions.values():
-            subs.discard(client_id)
-        self._rate_controller.clear_client(client_id)
-
     # --- adaptive-rate control surface (D1/D2) -------------------------------
 
     @property
@@ -266,12 +261,6 @@ class SensorManager:
 
     def get_subscriber_rate(self, sensor_id: int, client_id: str) -> float | None:
         return self._rate_controller.get_target_fps(client_id, sensor_id)
-
-    def get_subscriber_ceiling(self, sensor_id: int, client_id: str) -> float:
-        state = self._rate_controller.get_state(client_id, sensor_id)
-        if state is None:
-            return self._native_fps.get(sensor_id) or ADAPTIVE_MAX_FPS
-        return state.effective_fps
 
     def get_native_fps(self, sensor_id: int) -> float:
         return self._native_fps.get(sensor_id) or ADAPTIVE_MAX_FPS

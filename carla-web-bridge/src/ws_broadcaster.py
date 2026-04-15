@@ -48,9 +48,6 @@ class WebSocketBroadcaster:
     def client_count(self) -> int:
         return len(self._clients)
 
-    def get_client_ids(self) -> list[str]:
-        return list(self._clients.keys())
-
     def get_clients(self) -> dict[str, ClientConnection]:
         """Snapshot of live connections, keyed by client_id (read-only use)."""
         return dict(self._clients)

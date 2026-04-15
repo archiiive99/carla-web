@@ -65,11 +65,6 @@ class CarlaClientManager:
             self._world = self._client.get_world()
             return self._world
 
-    def get_world_snapshot(self) -> carla.WorldSnapshot:
-        with self._rpc_lock:
-            world = self.refresh_world()
-            return world.get_snapshot()
-
     def get_actor(self, actor_id: int) -> carla.Actor | None:
         with self._rpc_lock:
             world = self.refresh_world()
