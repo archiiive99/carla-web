@@ -28,7 +28,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-11  Post-process calibration — tonemap, exposure, bloom   (closes warm/cool color balance)
 [ ] iter-02  Building façades — windows, materials, silhouettes
 [ ] iter-03  Vehicle silhouettes — extracted GLBs for every blueprint
-[ ] iter-04  Lane markings — texture authoring or decal pipeline
+[x] iter-04  Lane markings — texture authoring or decal pipeline  (✅-on-arrival — full procedural shader chunk shipped in iter-01: white/yellow stripes, stop lines, zebra crosswalks, arrows, wear; closed 2026-04-15T09:21+~20min)
 [ ] iter-07  Vegetation — extracted trees / bushes / grass instances
 [ ] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle
 [ ] iter-09  Street lights — emissive + point-light contribution at night
