@@ -92,7 +92,7 @@ export default function SimulationPage() {
           Skip to main content
         </a>
         <TopBar />
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden p-2">
           <ResizableLayout />
         </div>
         <StatusBar />

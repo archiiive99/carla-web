@@ -85,14 +85,14 @@ export function TopBar() {
   }, []);
 
   return (
-    <header className="flex h-12 shrink-0 flex-nowrap items-center justify-between gap-2 overflow-hidden border-b px-3">
-      <div className="flex min-w-0 shrink flex-nowrap items-center gap-2.5 overflow-hidden whitespace-nowrap">
+    <header className="flex h-14 shrink-0 flex-nowrap items-center justify-between gap-3 border-b px-4">
+      <div className="flex min-w-0 shrink flex-nowrap items-center gap-3 whitespace-nowrap">
         <span className="text-sm font-semibold tracking-tight">CARLA Web</span>
         <Separator orientation="vertical" className="h-4" />
         <ConnectionBadge status={connectionStatus} />
       </div>
 
-      <div className="flex min-w-0 shrink flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap">
+      <div className="flex min-w-0 shrink flex-nowrap items-center gap-3 whitespace-nowrap">
         <span ref={simTimeRef} className="font-mono text-xs tabular-nums text-muted-foreground">
           00:00:00.000
         </span>
@@ -101,10 +101,19 @@ export function TopBar() {
           T0
         </span>
         <Separator orientation="vertical" className="h-4" />
-        <Badge variant="secondary" className="max-w-44 gap-1 overflow-hidden text-xs" aria-label={currentMap ? `Current map ${formatMapName(currentMap)}` : "No map loaded"}>
-          <Map className="size-3" aria-hidden="true" />
-          <span className="truncate">{currentMap ? formatMapName(currentMap) : "No map"}</span>
-        </Badge>
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Badge variant="secondary" className="max-w-44 gap-1 overflow-hidden text-xs" aria-label={currentMap ? `Current map ${formatMapName(currentMap)}` : "No map loaded"}>
+                <Map className="size-3" aria-hidden="true" />
+                <span className="truncate">{currentMap ? formatMapName(currentMap) : "No map"}</span>
+              </Badge>
+            }
+          />
+          <TooltipContent side="bottom">
+            {currentMap ? formatMapName(currentMap) : "No map loaded"}
+          </TooltipContent>
+        </Tooltip>
         {sensorCount > 0 && (
           <Tooltip>
             <TooltipTrigger
@@ -134,7 +143,7 @@ export function TopBar() {
               render={
                 <Button
                   variant={autopilotOn ? "default" : "outline"}
-                  size="icon-sm"
+                  size="icon"
                   disabled={connectionStatus !== "connected"}
                   className={autopilotOn ? "bg-info text-info-foreground hover:bg-info/90" : ""}
                   onClick={() => {
@@ -172,7 +181,7 @@ export function TopBar() {
             render={
               <Button
                 variant={leftPanelOpen ? "ghost" : "secondary"}
-                size="icon-sm"
+                size="icon"
                 aria-label={leftPanelOpen ? "Hide actor panel" : "Show actor panel"}
                 onClick={toggleLeftPanel}
               >
@@ -189,7 +198,7 @@ export function TopBar() {
             render={
               <Button
                 variant={rightPanelOpen ? "ghost" : "secondary"}
-                size="icon-sm"
+                size="icon"
                 aria-label={rightPanelOpen ? "Hide properties panel" : "Show properties panel"}
                 onClick={toggleRightPanel}
               >
@@ -206,7 +215,7 @@ export function TopBar() {
             render={
               <Button
                 variant={bottomPanelOpen ? "ghost" : "secondary"}
-                size="icon-sm"
+                size="icon"
                 aria-label={bottomPanelOpen ? "Hide bottom panel" : "Show bottom panel"}
                 onClick={toggleBottomPanel}
               >
@@ -231,7 +240,7 @@ export function TopBar() {
             render={
               <Button
                 variant="ghost"
-                size="icon-sm"
+                size="icon"
                 aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               >
@@ -250,7 +259,7 @@ export function TopBar() {
               <Link
                 to="/settings"
                 aria-label="Open settings"
-                className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <Settings className="size-3.5" aria-hidden="true" />
               </Link>

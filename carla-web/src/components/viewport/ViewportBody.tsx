@@ -19,8 +19,8 @@ function PaneFallback({ label }: { label: string }) {
  *  camera cells render, from the main viewport's camera. */
 export function ViewportBody() {
   return (
-    <div className="h-full w-full p-2 pt-20">
-      <div className="pointer-events-auto h-full overflow-hidden rounded-md border border-border/60 bg-background shadow-sm">
+    <div className="h-full w-full pt-20">
+      <div className="pointer-events-auto h-full overflow-hidden rounded-xl border border-border/60 bg-transparent shadow-sm">
         <Suspense fallback={<PaneFallback label="world scene" />}>
           <WorldScene />
         </Suspense>

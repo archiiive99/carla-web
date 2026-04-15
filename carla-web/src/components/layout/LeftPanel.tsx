@@ -114,7 +114,7 @@ export function LeftPanel() {
   const filtered = visibleCount !== totalCount;
 
   return (
-    <aside aria-label="Actors list" className="flex h-full min-h-0 flex-col bg-sidebar text-sidebar-foreground">
+    <aside aria-label="Actors list" className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border/60 bg-sidebar text-sidebar-foreground shadow-sm">
       <div className="flex items-center justify-between px-3 py-2">
         <div className="flex items-center gap-2">
           <h2 className="text-sm font-semibold">Actors</h2>

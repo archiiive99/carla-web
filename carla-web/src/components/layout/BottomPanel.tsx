@@ -36,7 +36,7 @@ export function BottomPanel() {
   return (
     <section
       aria-label="Sensor and telemetry panels"
-      className="flex h-full flex-col overflow-hidden"
+      className="flex h-full flex-col overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm"
     >
       <Tabs value={bottomPanelTab} onValueChange={(value) => setBottomTab(value as typeof bottomPanelTab)} className="flex h-full flex-col gap-0">
         <div className="flex shrink-0 items-center overflow-x-auto border-b px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
