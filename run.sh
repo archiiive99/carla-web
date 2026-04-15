@@ -110,7 +110,9 @@ if ! $SKIP_CARLA; then
         log "  CARLA (Docker) starting on port $CARLA_RPC_PORT"
     else
         CARLA_PACKAGE="$CARLA_DIR/Build/Package"
-        UE_EDITOR="${CARLA_UNREAL_ENGINE_PATH:-/home/song99/UnrealEngine5_carla}/Engine/Binaries/Linux/UnrealEditor"
+        # Honour CARLA_UNREAL_ENGINE_PATH, else the sibling clone from setup.sh.
+        _UE5_ROOT="${CARLA_UNREAL_ENGINE_PATH:-$(cd "$CARLA_DIR/.." && pwd)/UnrealEngine5_carla}"
+        UE_EDITOR="$_UE5_ROOT/Engine/Binaries/Linux/UnrealEditor"
         UPROJECT="$CARLA_DIR/Unreal/CarlaUnreal/CarlaUnreal.uproject"
 
         CARLA_FLAGS="-RenderOffScreen -nosound -unattended -ResX=$RES_X -ResY=$RES_Y"

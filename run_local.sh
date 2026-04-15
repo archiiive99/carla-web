@@ -13,7 +13,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BRIDGE_DIR="$SCRIPT_DIR/carla-web-bridge"
 FRONTEND_DIR="$SCRIPT_DIR/carla-web"
-UE5_DIR="${CARLA_UNREAL_ENGINE_PATH:-/home/song99/UnrealEngine5_carla}"
+# Honour CARLA_UNREAL_ENGINE_PATH, else the sibling clone from setup.sh.
+UE5_DIR="${CARLA_UNREAL_ENGINE_PATH:-$(cd "$SCRIPT_DIR/.." && pwd)/UnrealEngine5_carla}"
 UPROJECT_PATH="$SCRIPT_DIR/Unreal/CarlaUnreal/CarlaUnreal.uproject"
 ENGINE_PROJECT_LINK="$UE5_DIR/CarlaUnreal"
 

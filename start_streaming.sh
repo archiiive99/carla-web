@@ -28,8 +28,10 @@ SIGNALING_STREAMER_PORT=8888
 NO_CARLA=false
 PIXEL_STREAMING=false
 
-ROOT="/data1/song99/carla"
-UE5="/home/song99/UnrealEngine5_carla"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Honour CARLA_UNREAL_ENGINE_PATH (set by setup.sh or the user's shell),
+# otherwise fall back to the sibling clone location setup.sh creates.
+UE5="${CARLA_UNREAL_ENGINE_PATH:-$(cd "$ROOT/.." && pwd)/UnrealEngine5_carla}"
 BRIDGE="$ROOT/carla-web-bridge"
 FRONTEND="$ROOT/carla-web"
 SIGNALING_SERVER="$UE5/Engine/Plugins/Media/PixelStreaming2/Resources/WebServers/SignallingWebServer"

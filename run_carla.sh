@@ -8,8 +8,9 @@
 #   ./run_carla.sh --status     # 상태 확인
 #   ./run_carla.sh --gpu 3      # GPU 지정
 
-UE5_DIR="${CARLA_UNREAL_ENGINE_PATH:-/home/song99/UnrealEngine5_carla}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Honour CARLA_UNREAL_ENGINE_PATH, else the sibling clone from setup.sh.
+UE5_DIR="${CARLA_UNREAL_ENGINE_PATH:-$(cd "$SCRIPT_DIR/.." && pwd)/UnrealEngine5_carla}"
 UPROJECT_PATH="$SCRIPT_DIR/Unreal/CarlaUnreal/CarlaUnreal.uproject"
 ENGINE_PROJECT_LINK="$UE5_DIR/CarlaUnreal"
 CARLA_PORT=58338
