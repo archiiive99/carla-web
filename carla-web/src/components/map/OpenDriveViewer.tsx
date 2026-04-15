@@ -135,7 +135,7 @@ export function OpenDriveViewer({ className }: OpenDriveViewerProps) {
     ctx.font = "9px monospace";
     ctx.textAlign = "left";
     ctx.fillText(`${topology.length} segments`, 8, 14);
-  }, [topology, showJunctions]);
+  }, [topology, showJunctions, loading]);
 
   useAnimationFrame(draw);
 
