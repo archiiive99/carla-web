@@ -544,22 +544,30 @@ class SensorManager:
                 logger.error("Sensor %d worker error: %s", sensor_id, exc)
 
     async def _sensor_worker_once(self, packet: SensorPacket) -> None:
-        payload = await asyncio.to_thread(self._encode_packet, packet)
-        if not payload:
-            return
+        # Compute the active-subscriber set BEFORE paying encode cost:
+        # clients can unsubscribe between packet-build time (CARLA callback
+        # thread) and worker-run time (main loop). If none of the packet's
+        # original subscribers still want this sensor, or all fail the
+        # per-client rate gate, skip the encode entirely — camera encode
+        # is the dominant CPU cost on the hot path.
         native_fps = self._native_fps.get(packet.sensor_id)
+        current_subs = self._subscriptions.get(packet.sensor_id, set())
         active_subscribers = {
             client_id
             for client_id in packet.subscribers
-            if client_id in self._subscriptions.get(packet.sensor_id, set())
+            if client_id in current_subs
             and self._rate_controller.should_send(
                 client_id,
                 packet.sensor_id,
                 native_fps,
             )
         }
-        if active_subscribers:
-            await self._broadcaster.broadcast_raw(payload, active_subscribers)
+        if not active_subscribers:
+            return
+        payload = await asyncio.to_thread(self._encode_packet, packet)
+        if not payload:
+            return
+        await self._broadcaster.broadcast_raw(payload, active_subscribers)
 
     # --- data callback -------------------------------------------------------
 
