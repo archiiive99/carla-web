@@ -1,4 +1,4 @@
-import { memo, useMemo, Suspense } from "react";
+import { memo, useMemo, useEffect, Suspense } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { CarlaActor } from "@/types/carla";
@@ -12,18 +12,49 @@ import {
   TRAFFIC_HOUSING,
 } from "../scene-palette";
 
-/** Inner component that loads the glTF traffic-light model. */
-function GltfTrafficLight() {
+/** Inner component that loads the glTF traffic-light model.
+ *
+ *  iter-10-revisit-glb-bulb: the GLB ships its bulb primitive with the
+ *  unset UE5 editor default `WorldGridMaterial`. We detect that
+ *  primitive on clone and swap its material for a state-driven
+ *  MeshStandardMaterial so the bulb itself glows with the current
+ *  traffic-light state instead of just the indicator sphere above the
+ *  housing. */
+function GltfTrafficLight({ bulbColor }: { bulbColor: string }) {
   const { scene } = useGLTF(TRAFFIC_LIGHT_MODEL);
   const cloned = useMemo(() => {
     const c = scene.clone(true);
     c.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.castShadow = true;
+        const mat = child.material as THREE.Material | undefined;
+        if (mat && mat.name === "WorldGridMaterial") {
+          const bulbMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            emissive: new THREE.Color(bulbColor),
+            emissiveIntensity: 1.5,
+            roughness: 0.4,
+            metalness: 0,
+          });
+          child.material = bulbMat;
+          child.userData.bulbMatRef = bulbMat;
+        }
       }
     });
     return c;
-  }, [scene]);
+  }, [scene, bulbColor]);
+  // When state changes (bulbColor updates), find the cached material on
+  // the cloned mesh tree and update its emissive in place — avoids a
+  // full re-clone of the scene each color change.
+  useEffect(() => {
+    cloned.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.userData.bulbMatRef) {
+        const mat = child.userData.bulbMatRef as THREE.MeshStandardMaterial;
+        mat.emissive.set(bulbColor);
+        mat.needsUpdate = false;
+      }
+    });
+  }, [bulbColor, cloned]);
   return <primitive object={cloned} />;
 }
 
@@ -64,7 +95,7 @@ export const TrafficLightMesh = memo(function TrafficLightMesh({ actor }: { acto
     <group position={[pos.x, pos.y, pos.z]} rotation={[0, yaw, 0]}>
       <Suspense fallback={<BoxTrafficLightFallback color={bulbColor} />}>
         <ErrorBoundaryFallback onError={() => {}}>
-          <GltfTrafficLight />
+          <GltfTrafficLight bulbColor={bulbColor} />
         </ErrorBoundaryFallback>
       </Suspense>
       {/* Tiny state indicator bulb above the light — always visible regardless
