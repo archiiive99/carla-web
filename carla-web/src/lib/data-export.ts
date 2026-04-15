@@ -34,15 +34,19 @@ function savePointCloudAsPly(
     "end_header",
   ].join("\n");
 
+  // `positions` / `colors` are Float32Arrays; the i*3 / i*3+1 / i*3+2
+  // triplet is guaranteed valid when pointCount matches the buffer size.
+  // The `?? 0` fallbacks satisfy noUncheckedIndexedAccess without adding
+  // runtime cost (JIT folds the nullish-coalesce into a single branch).
   const lines: string[] = [header];
   for (let i = 0; i < pointCount; i++) {
-    const x = positions[i * 3].toFixed(6);
-    const y = positions[i * 3 + 1].toFixed(6);
-    const z = positions[i * 3 + 2].toFixed(6);
+    const x = (positions[i * 3] ?? 0).toFixed(6);
+    const y = (positions[i * 3 + 1] ?? 0).toFixed(6);
+    const z = (positions[i * 3 + 2] ?? 0).toFixed(6);
     if (colors) {
-      const r = Math.round(colors[i * 3] * 255);
-      const g = Math.round(colors[i * 3 + 1] * 255);
-      const b = Math.round(colors[i * 3 + 2] * 255);
+      const r = Math.round((colors[i * 3] ?? 0) * 255);
+      const g = Math.round((colors[i * 3 + 1] ?? 0) * 255);
+      const b = Math.round((colors[i * 3 + 2] ?? 0) * 255);
       lines.push(`${x} ${y} ${z} ${r} ${g} ${b}`);
     } else {
       lines.push(`${x} ${y} ${z}`);

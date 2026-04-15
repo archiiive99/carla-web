@@ -38,9 +38,13 @@ function processLidar(channel: number, payload: ArrayBuffer) {
   let outIdx = 0;
   for (let i = 0; i < pointData.length / floatsPerPoint && outIdx < pointCount; i += stride) {
     const base = i * floatsPerPoint;
-    const x = pointData[base];
-    const y = pointData[base + 1];
-    const z = pointData[base + 2];
+    // Loop bound guarantees base+2 is in-bounds, but
+    // noUncheckedIndexedAccess widens the Float32Array lookup to
+    // `number | undefined`. `?? 0` is a no-op at runtime (values
+    // are always defined here) and satisfies the stricter shape.
+    const x = pointData[base] ?? 0;
+    const y = pointData[base + 1] ?? 0;
+    const z = pointData[base + 2] ?? 0;
 
     positions[outIdx * 3] = x;
     positions[outIdx * 3 + 1] = z; // swap Y/Z for WebGL (Y-up)
