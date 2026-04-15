@@ -17,7 +17,6 @@ from src.models.schemas import (
 from src.utils.serialization import (
     carla_transform_to_dict,
     dict_to_carla_transform,
-    serialize_actor,
     serialize_weather,
 )
 

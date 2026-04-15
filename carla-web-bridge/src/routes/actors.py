@@ -9,7 +9,6 @@ from fastapi import APIRouter, HTTPException
 from src.carla_client import carla_manager
 from src.control_helpers import apply_vehicle_control
 from src.models.schemas import (
-    ActorInfo,
     AutopilotRequest,
     LightStateRequest,
     SpawnSensorRequest,
@@ -19,9 +18,6 @@ from src.models.schemas import (
     VehicleControl,
 )
 from src.utils.serialization import (
-    carla_transform_to_dict,
-    carla_vector_to_dict,
-    classify_actor,
     dict_to_carla_transform,
     serialize_actor,
 )
