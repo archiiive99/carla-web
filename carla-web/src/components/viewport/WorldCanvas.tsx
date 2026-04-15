@@ -208,6 +208,16 @@ export function WorldCanvas({ showApproxEnvironment }: WorldCanvasProps) {
 
         <ViewportControllers />
         <SceneCompositor />
+
+        {/* iter-09-revisit-bloom: UnrealBloomPass attempt reverted —
+           the EffectComposer wrapping ate the scene at night (entire
+           frame went black; day pose rendered wrong camera state). Root
+           cause likely the interaction with this canvas's existing
+           tone mapping (ACESFilmic+0.82) + preserveDrawingBuffer +
+           multi-camera ViewportControllers. Needs deeper integration
+           investigation in iter-09-revisit-bloom-v2 (separate
+           render-target setup, possibly post-processing on a clone of
+           the main camera output rather than the scene composition). */}
       </Canvas>
     </div>
   );

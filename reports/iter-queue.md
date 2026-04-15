@@ -33,7 +33,8 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle
 [x] iter-09  Street lights — emissive + point-light contribution at night  (✅ — 4 hardcoded SpotLights near iter-01 intersection, gated isNight; new street_clear_night pose; PSNR 40.23 ✅ ΔE 0.59 ✅ SSIM 0.68 ❌; closed 2026-04-15T09:39+~55min)
 [x] iter-09-revisit-emissive  Recolor lamp-head GLB meshes for night-glow  (✅ — pivoted to emissive-sphere pattern after finding STATIC_STREETLIGHT_MODELS dormant in scene; spheres visible above road in night render; PSNR/SSIM stable vs iter-09 within noise; closed 2026-04-15T09:45+~30min)
-[~] iter-09-revisit-bloom  UnrealBloomPass for lamp halo  (opened 2026-04-15T09:49:29Z, Phase A)
+[x] iter-09-revisit-bloom  UnrealBloomPass for lamp halo  (⚠️ §6.3 — drei EffectComposer broke scene render (night→pure black, day→wrong camera). Reverted cleanly; queued iter-09-revisit-bloom-v2 for deeper integration; closed 2026-04-15T09:49+~50min)
+[ ] iter-09-revisit-bloom-v2  Deeper bloom integration (selective-bloom layer mask OR per-viewport mount, ~1.5h)
 [ ] iter-09-revisit-extracted-positions  Real lamp coords from Town01 static-prop dump (long iteration, needs UE5 commandlet or XODR parser)
 [x] iter-10  Traffic lights — emissive bulb + correct hue  (✅-on-arrival — basic feature shipped via indicator-sphere; GLTF-mesh recolor queued as iter-10-revisit-glb-bulb; closed 2026-04-15T09:23+~15min)
 [x] iter-10-revisit-glb-bulb  Traverse GLTF, recolor authored bulb mesh by name  (✅ — bulb primitive (WorldGridMaterial) detected + replaced with state-driven emissive material; visual confirmation distant TL shows current state color; closed 2026-04-15T09:25+~35min)
