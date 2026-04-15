@@ -51,10 +51,6 @@ def build_subscribe_text(sensor_id: int) -> str:
     return json.dumps({"action": "subscribe", "sensor_id": int(sensor_id)})
 
 
-def build_unsubscribe_text(sensor_id: int) -> str:
-    return json.dumps({"action": "unsubscribe", "sensor_id": int(sensor_id)})
-
-
 def build_subscribe_binary(sensor_id: int) -> bytes:
     """Binary subscribe using the production encoder + Channel.SUBSCRIBE."""
     payload = json.dumps({"sensor_id": int(sensor_id)}).encode()
