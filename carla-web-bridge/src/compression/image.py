@@ -23,7 +23,6 @@ Color-pipeline notes (audited 2026-04-14 under the Agent C fidelity task):
 from __future__ import annotations
 
 import logging
-import os
 
 import numpy as np
 from src.config import (
@@ -35,16 +34,18 @@ from src.config import (
 
 logger = logging.getLogger(__name__)
 
+# src.config already resolves all four flags from os.getenv at import time,
+# with the same normalisation (strip+lower for strings, "1/true/yes" parsing
+# for bools, int coercion for subsampling). Reading os.environ a second time
+# here was pure duplication and could diverge if the environment mutated
+# between the two module loads.
 _turbojpeg = None
 _turbojpeg_available = False
-_jpeg_backend = os.getenv("JPEG_BACKEND", JPEG_BACKEND).strip().lower() or JPEG_BACKEND
-_auto_expose_enabled = os.getenv("JPEG_AUTO_EXPOSE", "1" if JPEG_AUTO_EXPOSE else "0").strip().lower() in {"1", "true", "yes"}
-_embed_srgb_icc = os.getenv("JPEG_EMBED_SRGB_ICC", "1" if JPEG_EMBED_SRGB_ICC else "0").strip().lower() in {"1", "true", "yes"}
+_jpeg_backend: str = JPEG_BACKEND
+_auto_expose_enabled: bool = JPEG_AUTO_EXPOSE
+_embed_srgb_icc: bool = JPEG_EMBED_SRGB_ICC
 # Pillow subsampling: 0=4:4:4, 1=4:2:2, 2=4:2:0. -1 means "Pillow default".
-try:
-    _jpeg_subsampling: int = int(os.getenv("JPEG_SUBSAMPLING", str(JPEG_SUBSAMPLING)))
-except ValueError:
-    _jpeg_subsampling = JPEG_SUBSAMPLING
+_jpeg_subsampling: int = JPEG_SUBSAMPLING
 
 _turbojpeg_subsample = None
 
