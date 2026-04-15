@@ -133,6 +133,10 @@ export function GltfInstanced({
     const dummy = new THREE.Object3D()
     for (let i = 0; i < objects.length; i++) {
       const obj = objects[i]
+      // c2t converts CARLA-coord obj.b.{x,y,z} → Three.js position so
+      // distance is computed in the SAME coordinate system as
+      // camera.position. (Earlier bug: was comparing CARLA-coord obj
+      // directly to Three-coord camera, mixing X/Y/Z axes.)
       const pos = c2t(obj.b.x, obj.b.y, obj.b.z)
       const dx = pos.x - camera.position.x
       const dy = pos.y - camera.position.y

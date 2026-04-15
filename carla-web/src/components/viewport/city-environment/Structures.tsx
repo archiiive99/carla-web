@@ -36,7 +36,7 @@ export function Poles({ objects }: { objects: EnvObj[] }) {
         objects={objects}
         scale={{ mode: "pole" }}
         maxDistance={300}
-        referencePoint={[118.9, 55.8, 1.8]}
+        runtimeCull
       />
     </Suspense>
   )
@@ -102,7 +102,7 @@ export function Fences({ objects }: { objects: EnvObj[] }) {
         objects={objects}
         scale={{ mode: "fit-bbox" }}
         maxDistance={300}
-        referencePoint={[118.9, 55.8, 1.8]}
+        runtimeCull
       />
     </Suspense>
   )
@@ -128,7 +128,7 @@ export function Rocks({ objects }: { objects: EnvObj[] }) {
         objects={objects}
         scale={{ mode: "fit-bbox" }}
         maxDistance={300}
-        referencePoint={[118.9, 55.8, 1.8]}
+        runtimeCull
       />
     </Suspense>
   )
@@ -154,7 +154,7 @@ export function GuardRails({ objects }: { objects: EnvObj[] }) {
         objects={objects}
         scale={{ mode: "fit-bbox" }}
         maxDistance={300}
-        referencePoint={[118.9, 55.8, 1.8]}
+        runtimeCull
       />
     </Suspense>
   )

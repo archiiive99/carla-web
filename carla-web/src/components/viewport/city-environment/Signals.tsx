@@ -48,7 +48,7 @@ export function TrafficLights({ objects }: { objects: EnvObj[] }) {
         objects={objects}
         scale={{ mode: "identity" }}
         maxDistance={200}
-        referencePoint={[118.9, 55.8, 1.8]}
+        runtimeCull
       />
     </Suspense>
   )
@@ -91,7 +91,7 @@ export function TrafficSigns({ objects }: { objects: EnvObj[] }) {
         objects={objects}
         scale={{ mode: "identity" }}
         maxDistance={200}
-        referencePoint={[118.9, 55.8, 1.8]}
+        runtimeCull
       />
     </Suspense>
   )
