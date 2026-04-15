@@ -29,7 +29,6 @@ function latencyTierToken(tier: LatencyTier): string {
 
 export function StatusBar() {
   const latencyRef = useRef<HTMLSpanElement>(null);
-  const latencyRoundedRef = useRef<number>(0);
   const bandwidthRef = useRef<HTMLSpanElement>(null);
   const tickRateRef = useRef<HTMLSpanElement>(null);
   const tickCountRef = useRef<HTMLSpanElement>(null);
@@ -59,7 +58,6 @@ export function StatusBar() {
   useEffect(() => {
     const unsub = usePerformanceStore.subscribe((state) => {
       const roundedLatency = Math.round(state.latency);
-      latencyRoundedRef.current = roundedLatency;
       if (latencyRef.current) {
         latencyRef.current.textContent = `${roundedLatency}ms`;
       }
@@ -115,7 +113,7 @@ export function StatusBar() {
       <div className="flex min-w-0 shrink items-center gap-3 whitespace-nowrap">
         <span
           className={`flex items-center gap-1 ${latencyTierToken(tier)}`}
-          aria-label={`Latency ${latencyRoundedRef.current}ms, ${tier} latency`}
+          aria-label={`${tier} latency`}
         >
           <span className="text-muted-foreground">Latency:</span>
           {tier === "low" && <SignalHigh className="size-3" aria-hidden="true" />}
