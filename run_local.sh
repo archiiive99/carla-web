@@ -82,7 +82,9 @@ echo "[2/3] Starting bridge..."
 cd "$BRIDGE_DIR"
 [ -d ".venv" ] || python3 -m venv .venv
 source .venv/bin/activate
-pip install -q -r requirements.txt 2>/dev/null
+# Dev launcher — pull in test deps too (requirements-dev.txt includes
+# requirements.txt transitively).
+pip install -q -r requirements-dev.txt 2>/dev/null
 export CARLA_HOST=localhost CARLA_PORT BRIDGE_PORT CORS_ORIGINS="http://localhost:$FRONTEND_PORT,http://127.0.0.1:$FRONTEND_PORT"
 uvicorn src.main:app --host 0.0.0.0 --port "$BRIDGE_PORT" --reload --reload-dir src > /tmp/bridge.log 2>&1 &
 PIDS+=($!)

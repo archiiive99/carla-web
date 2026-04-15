@@ -1,0 +1,7 @@
+-r requirements.txt
+
+# Test-only deps. Split out from requirements.txt so the production Docker
+# image doesn't pull pytest into the runtime environment. Install via:
+#   pip install -r requirements-dev.txt
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
