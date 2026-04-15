@@ -231,14 +231,16 @@ async def destroy_actor(actor_id: int):
     if actor.type_id.startswith("sensor."):
         await sensor_manager.destroy_sensor(actor_id)
     else:
-        def _destroy():
+        # Side-effect only; the final response dict is composed outside
+        # (previously built inside too, but that return was discarded by
+        # `await asyncio.to_thread(_destroy)`).
+        def _destroy() -> None:
             try:
                 current_actor = carla_manager.world.get_actor(actor_id)
                 if current_actor is None:
                     raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
                 current_actor.destroy()
                 carla_manager.untrack_actor(actor_id)
-                return {"status": "destroyed", "id": actor_id}
             except HTTPException:
                 raise
             except RuntimeError as e:
