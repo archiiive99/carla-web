@@ -10,7 +10,11 @@ export interface SimulationStatus {
   elapsed_time: number;
   map: string;
   sync_mode: boolean;
-  fixed_delta: number;
+  // Matches the bridge schema (models/schemas.py): float | None.
+  // Can legitimately be null if CARLA runs in async mode without a
+  // fixed step. No frontend code reads this today, but typing it
+  // accurately keeps future consumers from assuming `number`.
+  fixed_delta: number | null;
   server_version: string;
 }
 
