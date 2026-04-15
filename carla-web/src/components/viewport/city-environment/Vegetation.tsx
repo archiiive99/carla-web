@@ -1,10 +1,18 @@
-import { Suspense, useMemo } from "react"
+import { Suspense, useMemo, useRef } from "react"
 import * as THREE from "three"
 import { useGLTF } from "@react-three/drei"
+import { useFrame } from "@react-three/fiber"
 import { VEGETATION_MODELS } from "../CarlaAssetLoader"
 import { computeVegetationPlacement } from "../vegetation-placement"
 import { EnvObj, c2t } from "./shared"
 import { TREE_TRUNK } from "../scene-palette"
+
+// iter-14-revisit-runtime-veg-bldg: shared cull radius + sensitivity
+// for the Vegetation runtime cull. Same 300m anchor as the
+// GltfInstanced opt-ins. Sensitivity (camera-move-meters before
+// re-evaluation) keeps the cost amortized across user pans.
+const RUNTIME_CULL_RADIUS = 300
+const RUNTIME_CULL_SENSITIVITY = 5
 
 /** Extract every vegetation mesh part (trunk / leaves / planter) plus the
  *  whole model bounds. Using only the first mesh renders detached leaf
@@ -51,9 +59,19 @@ function GltfVegetation({ objects }: { objects: EnvObj[] }) {
     import("three-stdlib").GLTF & import("@react-three/fiber").ObjectMap
   )[]
 
+  // iter-14-revisit-runtime-veg-bldg: refs to all built InstancedMeshes
+  // + their per-instance transforms, so useFrame can re-evaluate
+  // visibility against the live camera each tick.
+  const meshDataRef = useRef<Array<{
+    mesh: THREE.InstancedMesh
+    transforms: ReturnType<typeof computeVegetationPlacement>[]
+  }>>([])
+  const lastCullPos = useRef(new THREE.Vector3(Infinity, Infinity, Infinity))
+
   const group = useMemo(() => {
     const g = new THREE.Group()
     const models = loaded.map((l) => l.scene)
+    meshDataRef.current = []
 
     const variants = models
       .map((s) => extractVegetationModel(s))
@@ -64,26 +82,16 @@ function GltfVegetation({ objects }: { objects: EnvObj[] }) {
 
     if (variants.length === 0) return g
 
-    // iter-14-revisit-vegetation-buildings: build-time distance cull
-    // anchored at iter-01 measurement pose. Mirror of the GltfInstanced
-    // maxDistance pattern; same 300m radius. Vegetation has its own
-    // bespoke instancing path (per-model-variant bucketing) so the cull
-    // happens here on the input array rather than via a shared helper.
-    const REF_X = 118.9, REF_Y = 55.8, REF_Z = 1.8, MAX_R2 = 300 * 300
-    const culledObjects = objects.filter((obj) => {
-      const dx = obj.b.x - REF_X
-      const dy = obj.b.y - REF_Y
-      const dz = obj.b.z - REF_Z
-      return (dx * dx + dy * dy + dz * dz) <= MAX_R2
-    })
-
+    // iter-14-revisit-runtime-veg-bldg: build buckets at FULL objects
+    // count (no static pre-filter). Runtime useFrame zero-scales
+    // out-of-range instances each tick.
     const buckets: EnvObj[][] = variants.map(() => [])
     let s = 54321
     const rand = () => {
       s = (s * 16807 + 0) % 2147483647
       return (s & 0x7fffffff) / 0x7fffffff
     }
-    for (const obj of culledObjects) {
+    for (const obj of objects) {
       const idx = Math.floor(rand() * variants.length)
       buckets[idx].push(obj)
     }
@@ -128,12 +136,43 @@ function GltfVegetation({ objects }: { objects: EnvObj[] }) {
         mesh.castShadow = true
         mesh.receiveShadow = true
         g.add(mesh)
+        meshDataRef.current.push({ mesh, transforms })
       }
     }
 
     return g
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [objects, loaded])
+
+  useFrame(({ camera }) => {
+    if (camera.position.distanceTo(lastCullPos.current) < RUNTIME_CULL_SENSITIVITY) return
+    lastCullPos.current.copy(camera.position)
+    const r2 = RUNTIME_CULL_RADIUS * RUNTIME_CULL_RADIUS
+    const dummy = new THREE.Object3D()
+    for (const data of meshDataRef.current) {
+      for (let i = 0; i < data.transforms.length; i++) {
+        const t = data.transforms[i]
+        // Transforms already in three.js coords (computeVegetationPlacement
+        // applies c2t internally); compare directly to camera.position.
+        const dx = t.position.x - camera.position.x
+        const dy = t.position.y - camera.position.y
+        const dz = t.position.z - camera.position.z
+        const inRange = (dx * dx + dy * dy + dz * dz) <= r2
+        if (inRange) {
+          dummy.position.set(t.position.x, t.position.y, t.position.z)
+          dummy.rotation.set(0, t.rotationY, 0)
+          dummy.scale.set(t.scale.x, t.scale.y, t.scale.z)
+        } else {
+          dummy.position.set(0, 0, 0)
+          dummy.rotation.set(0, 0, 0)
+          dummy.scale.set(0, 0, 0)
+        }
+        dummy.updateMatrix()
+        data.mesh.setMatrixAt(i, dummy.matrix)
+      }
+      data.mesh.instanceMatrix.needsUpdate = true
+    }
+  })
 
   return <primitive object={group} />
 }
