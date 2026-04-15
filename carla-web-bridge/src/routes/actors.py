@@ -86,7 +86,7 @@ async def destroy_all_actors():
         try:
             world = carla_manager.world
             destroyed = 0
-            for actor_id in list(carla_manager._spawned_actor_ids):
+            for actor_id in list(carla_manager.tracked_actor_ids):
                 actor = world.get_actor(actor_id)
                 if actor:
                     if actor.type_id.startswith("sensor."):
