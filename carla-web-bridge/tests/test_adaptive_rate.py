@@ -21,8 +21,15 @@ class _FakeCarla:
 class _FakeSensor:
     def __init__(self, sensor_tick: str = "0.05") -> None:
         self.attributes = {"sensor_tick": sensor_tick, "fov": "100", "image_size_x": "1280"}
+        self.listening = False
+        self.stop_calls = 0
 
-    def listen(self, _cb): ...
+    def listen(self, _cb):
+        self.listening = True
+
+    def stop(self) -> None:
+        self.listening = False
+        self.stop_calls += 1
 
 
 class _Conn:
@@ -281,6 +288,31 @@ class TestSensorManagerAdaptiveIntegration(unittest.TestCase):
             self.assertEqual(recipients, [{"fast"}, {"fast"}, {"fast", "slow"}])
 
         asyncio.run(go())
+
+    def test_listener_stops_when_last_subscriber_unsubscribes(self):
+        sm, _, sid = _make_manager(native_fps=20.0)
+        sensor = sm._sensors[sid]  # noqa: SLF001 — direct test access
+        # subscribe → listener armed
+        sm.subscribe(sid, "c1")
+        self.assertTrue(sensor.listening, "subscribe() must install the CARLA callback")
+        # second subscriber doesn't re-arm a listener (already listening)
+        sm.subscribe(sid, "c2")
+        # drop one — still has c1, listener must stay
+        sm.unsubscribe(sid, "c2")
+        self.assertTrue(
+            sensor.listening,
+            "unsubscribe must NOT stop the listener while other subscribers remain",
+        )
+        # drop last — listener stops so CARLA pauses frame production
+        sm.unsubscribe(sid, "c1")
+        self.assertFalse(
+            sensor.listening,
+            "unsubscribe of last subscriber must call sensor.stop() to pause the listener",
+        )
+        self.assertEqual(sensor.stop_calls, 1)
+        # re-subscribe re-arms
+        sm.subscribe(sid, "c1")
+        self.assertTrue(sensor.listening)
 
 
 if __name__ == "__main__":
