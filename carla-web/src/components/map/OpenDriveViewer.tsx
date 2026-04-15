@@ -177,7 +177,7 @@ export function OpenDriveViewer({ className }: OpenDriveViewerProps) {
       <CardHeader className="flex-row items-center justify-between space-y-0 px-3 py-2">
         <div className="flex items-center gap-2">
           <CardTitle className="text-xs font-medium">Road Network</CardTitle>
-          <Badge variant="secondary" className="h-4 px-1.5 text-2xs tabular-nums">
+          <Badge variant="secondary" className="h-5 px-2 text-2xs tabular-nums">
             {topology.length} seg
           </Badge>
         </div>

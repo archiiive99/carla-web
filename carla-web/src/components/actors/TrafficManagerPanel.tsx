@@ -57,7 +57,7 @@ export function TrafficManagerPanel() {
           </Button>
         }
       />
-      <SheetContent side="right" className="w-[480px] p-0 sm:max-w-[480px]">
+      <SheetContent side="right" className="w-full p-0 sm:max-w-lg">
         <SheetHeader className="p-4 pb-2">
           <SheetTitle className="text-sm">Traffic Manager</SheetTitle>
           <SheetDescription className="text-xs">
@@ -128,12 +128,12 @@ export function TrafficManagerPanel() {
                       const actor = actors.get(id);
                       return (
                         <TableRow key={id}>
-                          <TableCell className="py-1 font-mono tabular-nums text-xs">#{id}</TableCell>
-                          <TableCell className="py-1 text-xs">
+                          <TableCell className="py-2 font-mono tabular-nums text-xs">#{id}</TableCell>
+                          <TableCell className="py-2 text-xs">
                             {actor?.type_id.split(".").pop() ?? "—"}
                           </TableCell>
-                          <TableCell className="py-1 text-xs">0%</TableCell>
-                          <TableCell className="py-1">
+                          <TableCell className="py-2 text-xs">0%</TableCell>
+                          <TableCell className="py-2">
                             <Switch defaultChecked disabled aria-label={`Auto lane change for actor #${id}`} />
                           </TableCell>
                         </TableRow>
