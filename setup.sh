@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
-cd "$(dirname "$0")"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
 
 echo "=== CARLA Setup (UE5 build) ==="
 
@@ -30,7 +31,7 @@ else
 fi
 
 # 3. Build CARLA
-cd /home/song99/carla
+cd "$SCRIPT_DIR"
 echo "[3] Building CARLA..."
 cmake -G Ninja -S . -B Build \
     --toolchain=$PWD/CMake/Toolchain.cmake \
@@ -48,13 +49,13 @@ cmake --build Build --target package
 
 # 4. Install carla in bridge venv
 echo "[6] Installing carla in bridge venv..."
-cd /home/song99/carla/carla-web-bridge
+cd "$SCRIPT_DIR/carla-web-bridge"
 python3 -m venv .venv 2>/dev/null || true
 source .venv/bin/activate
 pip install -q -r requirements.txt
-pip install /home/song99/carla/PythonAPI/dist/carla-*.whl
+pip install "$SCRIPT_DIR"/PythonAPI/dist/carla-*.whl
 deactivate
 
 echo ""
 echo "=== DONE ==="
-echo "Run: ./run_production.sh"
+echo "Run: ./start_streaming.sh"

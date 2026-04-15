@@ -9,10 +9,10 @@
 #   4. React Frontend (Vite + React + shadcn/ui)
 #
 # Usage:
-#   ./run_production.sh                  # Full stack with Pixel Streaming
-#   ./run_production.sh --no-pixel       # Without Pixel Streaming (camera fallback)
-#   ./run_production.sh --docker         # Use Docker for CARLA server
-#   ./run_production.sh --skip-carla     # Skip CARLA server (already running externally)
+#   ./run.sh                  # Full stack with Pixel Streaming
+#   ./run.sh --no-pixel       # Without Pixel Streaming (camera fallback)
+#   ./run.sh --docker         # Use Docker for CARLA server
+#   ./run.sh --skip-carla     # Skip CARLA server (already running externally)
 #
 set -euo pipefail
 
