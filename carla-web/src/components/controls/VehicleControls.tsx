@@ -138,7 +138,14 @@ export function VehicleControls({ actorId, enabled }: VehicleControlsProps) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        // startSendingIfNeeded() bails if the ref is truthy; without
+        // nulling we'd survive the effect's re-run (actorId change, etc.)
+        // holding a stale interval id, and the next keydown would never
+        // re-arm the 20Hz tick.
+        intervalRef.current = null;
+      }
       keys.clear();
     };
   }, [enabled, sendControl, actorId]);
