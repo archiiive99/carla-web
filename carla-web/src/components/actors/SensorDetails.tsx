@@ -39,13 +39,9 @@ export function SensorDetails({ actorId, typeId }: SensorDetailsProps) {
   }, [actorId, isSubscribed, subscribe, unsubscribe]);
 
   const openInSensorPanel = useCallback(() => {
-    // Make the panel visible first so the user can actually see what their
-    // click did. BottomPanel might be collapsed (⚠ hidden from view) or
-    // parked on a different tab (Map / Roads / Telemetry / Events) —
-    // force-open + switch to Sensors tab, then dispatch the grid-add event.
-    const ui = useUIStore.getState();
-    if (!ui.bottomPanelOpen) ui.setBottomPanelOpen(true);
-    if (ui.bottomPanelTab !== "sensors") ui.setBottomTab("sensors");
+    // setBottomTab already flips bottomPanelOpen=true internally, so a
+    // single call covers both "panel collapsed" and "wrong tab active".
+    useUIStore.getState().setBottomTab("sensors");
     window.dispatchEvent(
       new CustomEvent("sensor-panel:open", {
         detail: { sensorId: actorId, typeId },

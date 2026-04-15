@@ -86,15 +86,18 @@ export default function SettingsPage() {
   const handleResetLayout = useCallback(() => {
     // Layout keys are versioned (carla-layout-h-v<N>, carla-layout-v-v<N>);
     // remove every key that starts with "carla-layout" to cover current and
-    // any stale versions. Do NOT touch APP_SETTINGS_KEY — the button label says
-    // "Reset Layout" and the user's bridge/signaling URLs and perf prefs
-    // should survive a layout reset.
+    // any stale versions. Do NOT touch APP_SETTINGS_KEY — the user's bridge
+    // URL and perf prefs should survive a layout reset.
     for (const key of Object.keys(localStorage)) {
       if (key.startsWith("carla-layout")) {
         localStorage.removeItem(key);
       }
     }
-    toast.success("Layout reset. Reload the page to apply.");
+    // ResizableLayout reads defaultLayout from localStorage once at mount, so
+    // the reset doesn't visibly apply until the component remounts. Forcing a
+    // reload is the simplest way to make the button actually do what it says.
+    toast.success("Layout reset. Reloading…");
+    setTimeout(() => window.location.reload(), 400);
   }, []);
 
   return (
