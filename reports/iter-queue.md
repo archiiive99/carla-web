@@ -31,7 +31,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-03-revisit-coverage  Extend VEHICLE_MODELS to all CARLA blueprints (~30 min, web-only)
 [ ] iter-03-revisit-attribute-color  Tint GLB material from actor.attributes['color'] (~30 min, web-only)
 [x] iter-04  Lane markings — texture authoring or decal pipeline  (✅-on-arrival — full procedural shader chunk shipped in iter-01: white/yellow stripes, stop lines, zebra crosswalks, arrows, wear; closed 2026-04-15T09:21+~20min)
-[ ] iter-07  Vegetation — extracted trees / bushes / grass instances
+[x] iter-07  Vegetation — extracted trees / bushes / grass instances  (✅-on-arrival — 12 GLB variants + bucketed InstancedMesh + procedural fallback shipped; LOD applied iter-14-revisit-vegetation-buildings; closed 2026-04-15T10:25+~10min)
 [ ] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle
 [x] iter-09  Street lights — emissive + point-light contribution at night  (✅ — 4 hardcoded SpotLights near iter-01 intersection, gated isNight; new street_clear_night pose; PSNR 40.23 ✅ ΔE 0.59 ✅ SSIM 0.68 ❌; closed 2026-04-15T09:39+~55min)
 [x] iter-09-revisit-emissive  Recolor lamp-head GLB meshes for night-glow  (✅ — pivoted to emissive-sphere pattern after finding STATIC_STREETLIGHT_MODELS dormant in scene; spheres visible above road in night render; PSNR/SSIM stable vs iter-09 within noise; closed 2026-04-15T09:45+~30min)

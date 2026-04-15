@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 15 rows ✅, 5 rows ⚠️, 14 rows queued. §6.5 raise still active.
+**Summary:** 16 rows ✅, 5 rows ⚠️, 13 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -27,7 +27,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 14-revisit-other-categories | LOD opt-in × 6 more sites | **✅** | 11.03 | 0.2127 | 35.89 | ~25 min | 9bf9dafa2 |
 | 14-revisit-vegetation-buildings | Vegetation LOD opt-in (Buildings deferred) | **✅** | 11.03 | 0.2127 | 35.88 | ~20 min | bb94c95d1 |
 | 14-revisit-perf-measurement | --measure-fps-ms harness flag | **✅** | 11.03 | 0.2128 | 35.89 | ~25 min | 89a6bc8f4 |
-| 14-revisit-buildings | LOD entry-filter on Buildings | **✅** | 11.03 | 0.2127 | 35.89 | ~15 min | (this commit) |
+| 14-revisit-buildings | LOD entry-filter on Buildings | **✅** | 11.03 | 0.2127 | 35.89 | ~15 min | e63bb3266 |
+| 07 | Vegetation (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.2127 | 35.88 | ~10 min | (this commit) |
 
 ## Notes
 
