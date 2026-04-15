@@ -18,7 +18,7 @@ interface UIState {
   // Full CityEnvironment geometry (buildings, vegetation, signage). On by
   // default so the main viewport and every sensor-cell camera render the
   // same scene contents. Kept toggle-able for performance debugging.
-  showApproxEnvironment: boolean;
+  showCityEnvironment: boolean;
 
   toggleLeftPanel: () => void;
   toggleRightPanel: () => void;
@@ -32,7 +32,7 @@ interface UIState {
   togglePerformanceOverlay: () => void;
   setShowShortcutsDialog: (open: boolean) => void;
   setMaximizedSensor: (id: number | null) => void;
-  toggleApproxEnvironment: () => void;
+  toggleCityEnvironment: () => void;
 }
 
 // 37. Persist UI state to localStorage
@@ -70,7 +70,7 @@ function saveUiState(state: Partial<UIState>) {
       theme: state.theme,
       cameraMode: state.cameraMode,
       showPerformanceOverlay: state.showPerformanceOverlay,
-      showApproxEnvironment: state.showApproxEnvironment,
+      showCityEnvironment: state.showCityEnvironment,
     }));
   } catch { /* ignore */ }
 }
@@ -94,7 +94,7 @@ export const useUIStore = create<UIState>((set, get) => ({
   showPerformanceOverlay: persisted.showPerformanceOverlay ?? false,
   showShortcutsDialog: false,
   maximizedSensorId: null,
-  showApproxEnvironment: persisted.showApproxEnvironment ?? true,
+  showCityEnvironment: persisted.showCityEnvironment ?? true,
 
   toggleLeftPanel: () =>
     set((s) => {
@@ -165,9 +165,9 @@ export const useUIStore = create<UIState>((set, get) => ({
 
   setMaximizedSensor: (id) => set({ maximizedSensorId: id }),
 
-  toggleApproxEnvironment: () =>
+  toggleCityEnvironment: () =>
     set((s) => {
-      const next = { showApproxEnvironment: !s.showApproxEnvironment };
+      const next = { showCityEnvironment: !s.showCityEnvironment };
       saveUiState({ ...s, ...next });
       return next;
     }),

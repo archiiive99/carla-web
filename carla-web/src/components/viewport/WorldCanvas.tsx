@@ -147,7 +147,7 @@ function SceneCompositor() {
 }
 
 interface WorldCanvasProps {
-  showApproxEnvironment: boolean;
+  showCityEnvironment: boolean;
 }
 
 /** Single root Canvas. Mounted once at the app layout level; covers the
@@ -159,7 +159,7 @@ interface WorldCanvasProps {
  *  Shadow camera tracks the ego vehicle (WeatherLighting useFrame) with
  *  ±350m bounds so sensor-cell cameras viewing the ego from long baselines
  *  still receive correct shadows. */
-export function WorldCanvas({ showApproxEnvironment }: WorldCanvasProps) {
+export function WorldCanvas({ showCityEnvironment }: WorldCanvasProps) {
   return (
     <div
       className="pointer-events-none fixed inset-0 z-0"
@@ -190,7 +190,7 @@ export function WorldCanvas({ showApproxEnvironment }: WorldCanvasProps) {
         <WeatherFog />
         <NightStreetLights />
         <GroundPlane />
-        {showApproxEnvironment && (
+        {showCityEnvironment && (
           <SceneErrorBoundary>
             <Suspense fallback={null}>
               <CityEnvironment />

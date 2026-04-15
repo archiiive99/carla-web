@@ -104,6 +104,6 @@ export default function SimulationPage() {
 }
 
 function WorldCanvasMount() {
-  const showApproxEnvironment = useUIStore((s) => s.showApproxEnvironment);
-  return <WorldCanvas showApproxEnvironment={showApproxEnvironment} />;
+  const showCityEnvironment = useUIStore((s) => s.showCityEnvironment);
+  return <WorldCanvas showCityEnvironment={showCityEnvironment} />;
 }
