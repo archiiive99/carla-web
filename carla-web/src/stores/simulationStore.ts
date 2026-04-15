@@ -21,7 +21,6 @@ interface SimulationState {
   syncMode: boolean;
   currentTick: number;
   elapsedTime: number;
-  fixedDeltaSeconds: number;
   currentMap: string;
   serverVersion: string;
   weather: CarlaWeatherParams;
@@ -64,7 +63,6 @@ export const useSimulationStore = create<SimulationState>((set) => ({
   syncMode: false,
   currentTick: 0,
   elapsedTime: 0,
-  fixedDeltaSeconds: 0,
   currentMap: "",
   serverVersion: "",
   weather: DEFAULT_WEATHER,
@@ -97,7 +95,6 @@ export const useSimulationStore = create<SimulationState>((set) => ({
         syncMode: status.sync_mode,
         currentTick: status.tick,
         elapsedTime: status.elapsed_time,
-        fixedDeltaSeconds: status.fixed_delta,
         currentMap: status.map,
         serverVersion: status.server_version,
       });

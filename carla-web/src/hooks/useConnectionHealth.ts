@@ -39,7 +39,6 @@ export function useConnectionHealth() {
               syncMode: status.sync_mode,
               currentTick: status.tick,
               elapsedTime: status.elapsed_time,
-              fixedDeltaSeconds: status.fixed_delta ?? 0,
               currentMap: status.map,
               serverVersion: status.server_version,
             });
