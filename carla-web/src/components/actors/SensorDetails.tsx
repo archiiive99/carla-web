@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Eye, EyeOff, ExternalLink, Link as LinkIcon } from "lucide-react";
+import { Eye, EyeOff, ExternalLink, Link as LinkIcon, Loader2 } from "lucide-react";
 import { useSensorStore } from "@/stores/sensorStore";
 import { useActorStore } from "@/stores/actorStore";
 import { getSensorDisplayName } from "@/lib/sensor-registry";
@@ -16,6 +16,7 @@ interface SensorDetailsProps {
 
 export function SensorDetails({ actorId, typeId }: SensorDetailsProps) {
   const subscriptions = useSensorStore((s) => s.subscriptions);
+  const pendingSubscriptions = useSensorStore((s) => s.pendingSubscriptions);
   const subscribe = useSensorStore((s) => s.subscribe);
   const unsubscribe = useSensorStore((s) => s.unsubscribe);
   const actors = useActorStore((s) => s.actors);
@@ -25,6 +26,7 @@ export function SensorDetails({ actorId, typeId }: SensorDetailsProps) {
   const parent = parentId != null ? actors.get(parentId) : undefined;
 
   const isSubscribed = subscriptions.has(actorId);
+  const isPending = pendingSubscriptions.has(actorId);
 
   const toggleSubscription = useCallback(() => {
     if (isSubscribed) {
@@ -102,8 +104,14 @@ export function SensorDetails({ actorId, typeId }: SensorDetailsProps) {
           size="sm"
           className="w-full gap-1.5 text-xs"
           onClick={toggleSubscription}
+          disabled={isPending}
+          aria-busy={isPending}
         >
-          {isSubscribed ? (
+          {isPending ? (
+            <>
+              <Loader2 className="size-3 animate-spin" aria-hidden="true" /> Subscribing…
+            </>
+          ) : isSubscribed ? (
             <>
               <EyeOff className="size-3" aria-hidden="true" /> Unsubscribe
             </>

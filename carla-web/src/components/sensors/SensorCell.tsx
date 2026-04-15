@@ -104,15 +104,16 @@ export function SensorCell({ cell, onMaximize, onRemove }: SensorCellProps) {
 
 function SubscriptionDot({ sensorId }: { sensorId: number }) {
   const subscribed = useSensorStore((s) => s.subscriptions.has(sensorId));
+  const pending = useSensorStore((s) => s.pendingSubscriptions.has(sensorId));
   return (
     <div
       className={cn(
         "pointer-events-none absolute bottom-1.5 left-1.5 z-10 size-2.5 rounded-full border border-background/80 shadow-sm",
-        subscribed ? "bg-success" : "bg-muted-foreground/50",
+        pending ? "animate-pulse bg-warning" : subscribed ? "bg-success" : "bg-muted-foreground/50",
       )}
-      title={subscribed ? "Subscribed to sensor feed" : "Not subscribed"}
+      title={pending ? "Subscribing…" : subscribed ? "Subscribed to sensor feed" : "Not subscribed"}
       role="status"
-      aria-label={subscribed ? "Subscribed to sensor feed" : "Not subscribed to sensor feed"}
+      aria-label={pending ? "Subscribing to sensor feed" : subscribed ? "Subscribed to sensor feed" : "Not subscribed to sensor feed"}
     />
   );
 }

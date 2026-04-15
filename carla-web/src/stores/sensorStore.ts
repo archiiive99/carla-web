@@ -8,6 +8,7 @@ import { getGlobalWsWorker } from "@/lib/worker-ref";
 interface SensorState {
   sensors: Map<number, SensorConfig>;
   subscriptions: Set<number>;
+  pendingSubscriptions: Set<number>;
 
   subscribe: (sensorId: number) => void;
   unsubscribe: (sensorId: number) => void;
@@ -19,6 +20,7 @@ interface SensorState {
 export const useSensorStore = create<SensorState>((set) => ({
   sensors: new Map(),
   subscriptions: new Set(),
+  pendingSubscriptions: new Set(),
 
   subscribe: (sensorId) => {
     // Retry at 0/500/1500ms to cover the race where the ws-receiver worker
@@ -33,8 +35,20 @@ export const useSensorStore = create<SensorState>((set) => ({
     set((state) => {
       const subs = new Set(state.subscriptions);
       subs.add(sensorId);
-      return { subscriptions: subs };
+      const pending = new Set(state.pendingSubscriptions);
+      pending.add(sensorId);
+      return { subscriptions: subs, pendingSubscriptions: pending };
     });
+    // Clear pending after the last retry lands. 2s is past the 1500ms
+    // third retry + a small grace for the bridge to start pushing frames.
+    setTimeout(() => {
+      set((state) => {
+        if (!state.pendingSubscriptions.has(sensorId)) return state;
+        const pending = new Set(state.pendingSubscriptions);
+        pending.delete(sensorId);
+        return { pendingSubscriptions: pending };
+      });
+    }, 2000);
   },
 
   unsubscribe: (sensorId) => {
@@ -43,7 +57,9 @@ export const useSensorStore = create<SensorState>((set) => ({
     set((state) => {
       const subs = new Set(state.subscriptions);
       subs.delete(sensorId);
-      return { subscriptions: subs };
+      const pending = new Set(state.pendingSubscriptions);
+      pending.delete(sensorId);
+      return { subscriptions: subs, pendingSubscriptions: pending };
     });
   },
 
