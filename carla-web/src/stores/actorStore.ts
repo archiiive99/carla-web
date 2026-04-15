@@ -82,7 +82,15 @@ export const useActorStore = create<ActorState>((set, get) => ({
   selectActor: (id) => set({ selectedActorId: id }),
 
   updateActorTransforms: (batch) => {
+    // Fires ~20× per second from the WS world_tick broadcaster. Short-
+    // circuit empty batches (bridge with no tracked actors) before
+    // allocating a new Map — zustand treats any new object reference as
+    // a change and re-runs every subscriber's selector, so a silent
+    // no-op would still trigger the whole actor-list / minimap / actor
+    // renderer tree.
+    if (batch.length === 0) return;
     set((state) => {
+      let changed = false;
       const actors = new Map(state.actors);
       for (const t of batch) {
         const existing = actors.get(t.id);
@@ -95,9 +103,14 @@ export const useActorStore = create<ActorState>((set, get) => ({
             },
             velocity: t.velocity,
           });
+          changed = true;
         }
       }
-      return { actors };
+      // Same short-circuit for a batch whose actors are all unknown to
+      // the store (can happen right after a map reload, before
+      // refreshActors has repopulated). No point emitting a phantom
+      // Map swap that looks identical to every subscriber.
+      return changed ? { actors } : state;
     });
   },
 
