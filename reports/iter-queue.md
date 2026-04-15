@@ -19,7 +19,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 ```
 [x] iter-01  Road surface PBR + parity harness MVP                (⚠️ measured FAIL >±10% — §6.3 raised in 369009cc6, see report)
 [x] iter-05  Sky + sun direction parity (Hosek-Wilkie or HDR)     (⚠️ §6.1 raise — closed 2026-04-15T07:50:51Z+~80min; Path A applied + tsc-clean, measurement blocked by BP_CarlaWeather wiring defect; see iter-05/report.md)
-[ ] iter-engine-weather-bp  BP_CarlaWeather → SkyAtmosphere wiring fix   (newly inserted before iter-06; blocks ALL future render-parity measurement)
+[~] iter-engine-weather-bp  BP_CarlaWeather → SkyAtmosphere wiring fix   (opened 2026-04-15T08:06:04Z, Phase A; C++ path 2 chosen)
 [ ] iter-05-revisit-roi-sky  Add sky-ROI mode to compare.py harness     (≤30min once iter-engine-weather-bp lands)
 [ ] iter-05-revisit-pathB  Hosek-Wilkie shader if Path A still misses    (queued, only if needed)
 [ ] iter-05-revisit-pathC  HDR cubemap per TOD/cloud bucket              (queued, only if Path A+B miss)
