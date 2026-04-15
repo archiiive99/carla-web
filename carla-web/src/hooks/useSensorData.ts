@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useWorkers } from "@/contexts/workers";
-import { EVENT_LOG_MAX_ITEMS, GNSS_TRAIL_MAX_POINTS } from "@/constants";
+import {
+  EVENT_LOG_MAX_ITEMS,
+  GNSS_TRAIL_MAX_POINTS,
+  IMU_BUFFER_MAX_SAMPLES,
+} from "@/constants";
 
 /**
  * Subscribe to binary `sensor_event` messages from the ws-receiver worker,
@@ -158,7 +162,7 @@ export function useImuSensorData(sensorId: number) {
       gyroRef.current = gyro;
       compassRef.current = v.getFloat32(40, true);
       bufferRef.current.push({ accel, gyro, t: ts });
-      if (bufferRef.current.length > 200) bufferRef.current.shift();
+      if (bufferRef.current.length > IMU_BUFFER_MAX_SAMPLES) bufferRef.current.shift();
     },
     () => {
       accelRef.current = { x: 0, y: 0, z: 0 };
