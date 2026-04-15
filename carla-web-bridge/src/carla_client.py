@@ -70,12 +70,6 @@ class CarlaClientManager:
             world = self.refresh_world()
             return world.get_actor(actor_id)
 
-    def get_server_version(self) -> str:
-        if self._client is None:
-            raise RuntimeError("Not connected to CARLA server")
-        with self._rpc_lock:
-            return self._client.get_server_version()
-
     async def connect(self) -> None:
         self._should_run = True
         delay = 1.0
