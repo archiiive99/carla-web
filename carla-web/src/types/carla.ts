@@ -62,7 +62,7 @@ export interface VehicleControl {
   reverse: boolean;
 }
 
-export interface VehicleControlState extends VehicleControl {
+interface VehicleControlState extends VehicleControl {
   gear: number;
 }
 
