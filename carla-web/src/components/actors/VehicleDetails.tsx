@@ -33,6 +33,16 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
   const isEgo = egoVehicleId === actorId;
   const [control, setControl] = useState({ throttle: 0, steer: 0, brake: 0 });
   const [lightState, setLightState] = useState(0);
+  // Reset local light state when switching to a different vehicle — the
+  // bridge doesn't expose light read-back, so without this the new actor
+  // inherits the previous actor's toggles. Using the React-19 idiom
+  // "adjust state during render" (Dan Abramov, "You Might Not Need an
+  // Effect") instead of a useEffect that sets state synchronously.
+  const [lastActorId, setLastActorId] = useState(actorId);
+  if (lastActorId !== actorId) {
+    setLastActorId(actorId);
+    setLightState(0);
+  }
 
   const toggleLightBit = useCallback(
     (bit: number) => {
@@ -47,13 +57,6 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
     [actorId],
   );
 
-  // Reset local light state when switching to a different vehicle — the bridge
-  // currently doesn't expose the read-back, so this keeps the UI from carrying
-  // the previous actor's toggles over.
-  useEffect(() => {
-    setLightState(0);
-  }, [actorId]);
-
   useEffect(() => {
     let cancelled = false;
     const poll = async () => {
@@ -66,7 +69,11 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
             brake: actor.control.brake ?? 0,
           });
         }
-      } catch {}
+      } catch {
+        // actor may have been destroyed between ticks, or the bridge briefly
+        // dropped the connection — a single missed poll just leaves the UI
+        // with the last-known control values until the next 500ms tick.
+      }
     };
     poll();
     const interval = setInterval(poll, 500);
