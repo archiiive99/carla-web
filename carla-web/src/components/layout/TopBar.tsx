@@ -144,12 +144,13 @@ export function TopBar() {
                   variant={autopilotOn ? "default" : "outline"}
                   size="icon"
                   disabled={connectionStatus !== "connected"}
-                  className={autopilotOn ? "bg-info text-info-foreground hover:bg-info/90" : ""}
+                  className={autopilotOn ? "bg-info text-info-foreground ring-2 ring-info/30 hover:bg-info/90" : ""}
                   onClick={() => {
                     const next = !autopilotOn;
                     setAutopilot(egoVehicleId, next).catch(() => {});
                   }}
                   aria-label={autopilotOn ? "Disable autopilot" : "Enable autopilot"}
+                  aria-pressed={autopilotOn}
                 >
                   {autopilotOn ? <Bot className="size-3.5" aria-hidden="true" /> : <User className="size-3.5" aria-hidden="true" />}
                 </Button>

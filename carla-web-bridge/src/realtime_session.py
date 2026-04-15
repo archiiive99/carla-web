@@ -174,7 +174,10 @@ class RealtimeSessionManager:
             "default_camera_id": self._camera_id,
             "session_armed": self._armed,
             "camera_arm_ready": self._camera_arm_ready(),
-            "session_ready": self._vehicle_id is not None and self._camera_id is not None,
+            # Post single-source migration: camera is rendered client-side,
+            # default_camera_id stays None. Session readiness now depends
+            # only on a live managed vehicle.
+            "session_ready": self._vehicle_id is not None,
             "state": self._state.name,
         }
 
