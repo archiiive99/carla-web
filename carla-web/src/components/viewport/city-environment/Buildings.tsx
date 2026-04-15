@@ -58,9 +58,21 @@ function GltfBuildingBatch({ gltfBuildings }: { gltfBuildings: { obj: EnvObj; pa
  *      the React boundary. */
 export function Buildings({ objects }: { objects: EnvObj[] }) {
   const { gltfBuildings, proceduralBuildings } = useMemo(() => {
+    // iter-14-revisit-buildings: distance cull. Buildings render
+    // one-component-per-mesh (not InstancedMesh), so the cull keeps
+    // React render cost in check too — far buildings don't even mount
+    // their Suspense + GltfBuilding boundary. Same 300m radius and
+    // iter-01 reference point as the other LOD opt-ins.
+    const REF_X = 118.9, REF_Y = 55.8, REF_Z = 1.8, MAX_R2 = 300 * 300
+    const filtered = objects.filter((obj) => {
+      const dx = obj.b.x - REF_X
+      const dy = obj.b.y - REF_Y
+      const dz = obj.b.z - REF_Z
+      return (dx * dx + dy * dy + dz * dz) <= MAX_R2
+    })
     const gltf: { obj: EnvObj; path: string }[] = []
     const procedural: EnvObj[] = []
-    for (const obj of objects) {
+    for (const obj of filtered) {
       const path = getBuildingModelPath(obj.name)
       if (path) {
         gltf.push({ obj, path })

@@ -47,7 +47,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-14-revisit-runtime-lod  Per-frame camera-tracked cull (~1.5h)
 [x] iter-14-revisit-other-categories  Opt-in maxDistance for Poles/Fences/Rocks/GuardRails/TrafficLights/TrafficSigns  (✅ — 6 sites opted in; PSNR/SSIM/ΔE byte-identical to baseline; closed 2026-04-15T10:08+~25min)
 [x] iter-14-revisit-vegetation-buildings  Audit + opt-in Vegetation/Buildings  (✅ — Vegetation opted in via bespoke InstancedMesh path; Buildings deferred (one-mesh-per-building, needs different pattern); PSNR/SSIM/ΔE within noise; closed 2026-04-15T10:11+~20min)
-[ ] iter-14-revisit-buildings  LOD per-building React conditional render (~30 min)
+[x] iter-14-revisit-buildings  LOD per-building React conditional render  (✅ — single-filter at Buildings entry useMemo; byte-identical PSNR/SSIM/ΔE; closed 2026-04-15T10:19+~15min)
 [x] iter-14-revisit-perf-measurement  Playwright FPS probe in compare.py  (✅ — --measure-fps-ms flag added; FPS=0.5 under SwiftShader software-WebGL (not user-perceived); infra deliverable; closed 2026-04-15T10:15+~25min)
 [x] iter-13-revisit-pose-coverage  Add chase/birdseye/intersection poses to compare.py POSES  (✅ — 3 new poses each produce numeric output + visually sensible framing; closed 2026-04-15T09:31+~35min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
