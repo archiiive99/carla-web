@@ -63,8 +63,6 @@ async def list_actors():
         missing_ids = set()
         if realtime_session.default_vehicle_id is not None:
             missing_ids.add(realtime_session.default_vehicle_id)
-        if realtime_session.default_camera_id is not None:
-            missing_ids.add(realtime_session.default_camera_id)
         missing_ids.update(carla_manager.tracked_actor_ids)
         for actor_id in missing_ids - seen_ids:
             try:
