@@ -174,37 +174,3 @@ def encode_world_tick(frame: int, timestamp: float, actors: list[Any]) -> bytes:
             v.x, v.y, v.z,
         )
     return buf
-
-
-def encode_world_tick_from_snapshot(snapshot: Any) -> bytes:
-    """Encode world tick data from a CARLA world snapshot.
-
-    Using actor snapshots avoids walking live Actor handles for every client tick,
-    which is significantly cheaper and avoids extra CARLA RPC churn.
-    """
-    timestamp = float(getattr(snapshot, "elapsed_seconds", 0.0))
-    if not timestamp:
-        ts_obj = getattr(snapshot, "timestamp", None)
-        timestamp = float(getattr(ts_obj, "elapsed_seconds", 0.0))
-
-    actors = list(snapshot)
-    buf = bytearray(struct.pack("<IdI", int(snapshot.frame), timestamp, len(actors)))
-    for actor in actors:
-        transform = actor.get_transform()
-        velocity = actor.get_velocity()
-        buf.extend(
-            struct.pack(
-                "<I9f",
-                int(actor.id),
-                float(transform.location.x),
-                float(transform.location.y),
-                float(transform.location.z),
-                float(transform.rotation.pitch),
-                float(transform.rotation.yaw),
-                float(transform.rotation.roll),
-                float(velocity.x),
-                float(velocity.y),
-                float(velocity.z),
-            )
-        )
-    return bytes(buf)
