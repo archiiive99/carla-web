@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 20 rows ✅, 6 rows ⚠️, 13 rows queued. §6.5 raise still active.
+**Summary:** 21 rows ✅, 6 rows ⚠️, 13 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -33,7 +33,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09-revisit-bloom-v2 | SelectiveBloom layer-mask attempt + revert | ⚠️ §6.3 | 40.24 (post-revert) | 0.68 | 0.60 | ~50 min | a46b796d9 |
 | 14-revisit-runtime-lod | Per-frame camera-tracked cull (Walls opt-in) | **✅** | 11.03 | 0.2127 | 35.89 | ~40 min | ab7894789 |
 | 14-revisit-runtime-all | Opt 6 more sites into runtimeCull + coord bug fix | **✅** | 11.03 | 0.2128 | 35.88 | ~30 min | 6fe8e9a60 |
-| 14-revisit-runtime-veg-bldg | Vegetation runtime cull (Buildings deferred) | **✅** | 11.03 | 0.2126 | 35.90 | ~30 min | (this commit) |
+| 14-revisit-runtime-veg-bldg | Vegetation runtime cull (Buildings deferred) | **✅** | 11.03 | 0.2126 | 35.90 | ~30 min | 380d7577e |
+| 14-revisit-runtime-bldg-only | Per-GltfBuilding runtime cull (two-layer LOD) | **✅** | 11.04 | 0.2129 | 35.87 | ~30 min | (this commit) |
 
 ## Notes
 

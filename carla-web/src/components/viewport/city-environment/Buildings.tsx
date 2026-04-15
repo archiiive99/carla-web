@@ -1,13 +1,29 @@
-import { Suspense, useMemo } from "react"
+import { Suspense, useMemo, useRef } from "react"
 import * as THREE from "three"
 import { useGLTF } from "@react-three/drei"
+import { useFrame } from "@react-three/fiber"
 import { getBuildingModelPath } from "../CarlaAssetLoader"
 import { EnvObj, SafeRender, c2t, yawRad } from "./shared"
 import { buildProceduralBuildingGroup } from "./build-procedural-buildings"
 
-/** Renders a single building that matched a glTF model via getBuildingModelPath. */
+// iter-14-revisit-runtime-bldg-only: per-building runtime cull
+// constants. Same 300m / 5m anchor-and-sensitivity used by the
+// GltfInstanced + Vegetation runtime opt-ins.
+const RUNTIME_CULL_RADIUS = 300
+const RUNTIME_CULL_RADIUS_SQ = RUNTIME_CULL_RADIUS * RUNTIME_CULL_RADIUS
+const RUNTIME_CULL_SENSITIVITY = 5
+
+/** Renders a single building that matched a glTF model via getBuildingModelPath.
+ *
+ *  iter-14-revisit-runtime-bldg-only: each rendered GltfBuilding holds a
+ *  useFrame that toggles its primitive's `visible` based on distance to
+ *  the live camera. Throttled by camera-move-≥5m. With ~130 buildings
+ *  loaded this is ~130 useFrame closures, each doing one distance
+ *  compare per camera-move-eval — cheap. */
 function GltfBuilding({ path, obj }: { path: string; obj: EnvObj }) {
   const { scene } = useGLTF(path)
+  const primRef = useRef<THREE.Object3D | null>(null)
+  const lastCullPos = useRef(new THREE.Vector3(Infinity, Infinity, Infinity))
   const cloned = useMemo(() => {
     const c = scene.clone(true)
     c.traverse((child) => {
@@ -20,8 +36,20 @@ function GltfBuilding({ path, obj }: { path: string; obj: EnvObj }) {
   }, [scene])
 
   const pos = c2t(obj.b.x, obj.b.y, obj.b.z)
+
+  useFrame(({ camera }) => {
+    if (!primRef.current) return
+    if (camera.position.distanceTo(lastCullPos.current) < RUNTIME_CULL_SENSITIVITY) return
+    lastCullPos.current.copy(camera.position)
+    const dx = pos.x - camera.position.x
+    const dy = pos.y - camera.position.y
+    const dz = pos.z - camera.position.z
+    primRef.current.visible = (dx * dx + dy * dy + dz * dz) <= RUNTIME_CULL_RADIUS_SQ
+  })
+
   return (
     <primitive
+      ref={primRef}
       object={cloned}
       position={[pos.x, pos.y, pos.z]}
       rotation={[0, yawRad(obj.b.yaw), 0]}
