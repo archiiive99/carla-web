@@ -95,11 +95,9 @@ def serialize_actor(actor: Any) -> ActorInfo:
             except Exception:
                 vehicle_wheel_count = None
     except Exception:
-        role_name = None
-        vehicle_color = None
-        vehicle_driver_id = None
-        vehicle_generation = None
-        vehicle_wheel_count = None
+        # Fields are already initialized to None above — the outer try just
+        # guards the attribute dict lookup itself, not the final assignments.
+        pass
     tl_state: str | None = None
     if actor.type_id.startswith("traffic.traffic_light"):
         try:
