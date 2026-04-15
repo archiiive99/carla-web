@@ -36,17 +36,31 @@ function applyScale(
 
 /** Generic single-mesh-glTF instancer for prop categories. The caller picks
  *  the bbox→mesh scale convention (`fit-bbox` / `pole` / `identity`) since
- *  CARLA's prop categories don't share a single transform rule. */
+ *  CARLA's prop categories don't share a single transform rule.
+ *
+ *  iter-14: optional `maxDistance` param performs build-time distance
+ *  culling — any instance whose CARLA world position is more than
+ *  `maxDistance` meters from `referencePoint` (default world origin) is
+ *  skipped. The InstancedMesh count drops, the GPU draws fewer
+ *  instances per frame. Tradeoff: the culling is static (computed
+ *  once per scene mount), so a moving camera doesn't repopulate
+ *  instances that come back into range. Acceptable for one-camera
+ *  parity work; iter-14-revisit-runtime-lod would add per-frame
+ *  visibility updates. */
 export function GltfInstanced({
   path,
   objects,
   scale,
   receiveShadow = false,
+  maxDistance = Infinity,
+  referencePoint = [0, 0, 0],
 }: {
   path: string
   objects: EnvObj[]
   scale: GltfScale
   receiveShadow?: boolean
+  maxDistance?: number
+  referencePoint?: [number, number, number]
 }) {
   const { scene } = useGLTF(path)
   const group = useMemo(() => {
@@ -54,15 +68,28 @@ export function GltfInstanced({
     const extracted = extractGeoAndMat(scene)
     if (!extracted) return g
 
+    // iter-14: build-time distance cull — filter once, then use the
+    // post-cull length as the InstancedMesh count.
+    const [refX, refY, refZ] = referencePoint
+    const r2 = maxDistance * maxDistance
+    const kept: EnvObj[] = (maxDistance === Infinity)
+      ? objects
+      : objects.filter((obj) => {
+          const dx = obj.b.x - refX
+          const dy = obj.b.y - refY
+          const dz = obj.b.z - refZ
+          return (dx * dx + dy * dy + dz * dz) <= r2
+        })
+
     const mesh = new THREE.InstancedMesh(
       extracted.geometry,
       extracted.material,
-      objects.length,
+      kept.length,
     )
     const dummy = new THREE.Object3D()
 
-    for (let i = 0; i < objects.length; i++) {
-      const obj = objects[i]
+    for (let i = 0; i < kept.length; i++) {
+      const obj = kept[i]
       const pos = c2t(obj.b.x, obj.b.y, obj.b.z)
       dummy.position.set(pos.x, pos.y, pos.z)
       dummy.rotation.set(0, yawRad(obj.b.yaw), 0)
@@ -76,6 +103,6 @@ export function GltfInstanced({
     if (receiveShadow) mesh.receiveShadow = true
     g.add(mesh)
     return g
-  }, [objects, scene, scale.mode, receiveShadow])
+  }, [objects, scene, scale.mode, receiveShadow, maxDistance, referencePoint])
   return <primitive object={group} />
 }

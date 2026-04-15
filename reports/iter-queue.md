@@ -43,7 +43,10 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-12  Wet-surface response — driven by CARLA wetness param  (✅-on-arrival — binding shipped in iter-01; verified end-to-end via new --weather-wetness flag; PSNR moves +0.51 dB dry→wet vs 0.02 dB noise floor; closed 2026-04-15T09:14+~30min)
 [x] iter-13  Scene-palette unification — three.js material constants module  (⚠️ refactor SUCCESS, web render byte-pattern unchanged; measurement regression due to CARLA NPC vehicle blocking ROI — not refactor — see iter-13/report.md §7.4)
 [x] iter-13-followon-harness-stabilize  Add NPC-clear-before-capture to compare.py  (✅ first PASS of session — PSNR ΔΔ=0.02 dB across 2 runs; reference now shows clean asphalt; closed 2026-04-15T09:00+~35min)
-[ ] iter-14  LOD pipeline — distant geometry impostors / decimated meshes
+[x] iter-14  LOD pipeline — distant geometry impostors / decimated meshes  (✅ — build-time maxDistance + referencePoint added to GltfInstanced; Walls opted in at 300m from iter-01 pose; PSNR stable within noise; closed 2026-04-15T10:01+~35min)
+[ ] iter-14-revisit-runtime-lod  Per-frame camera-tracked cull (~1.5h)
+[ ] iter-14-revisit-other-categories  Opt-in maxDistance for Poles/Fences/Rocks/Vegetation (~30 min)
+[ ] iter-14-revisit-perf-measurement  Playwright FPS probe in compare.py (~30 min)
 [x] iter-13-revisit-pose-coverage  Add chase/birdseye/intersection poses to compare.py POSES  (✅ — 3 new poses each produce numeric output + visually sensible framing; closed 2026-04-15T09:31+~35min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```

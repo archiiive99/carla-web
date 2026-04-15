@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 10 rows ✅, 5 rows ⚠️, 14 rows queued. §6.5 raise still active.
+**Summary:** 11 rows ✅, 5 rows ⚠️, 16 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -22,7 +22,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09 | Street lights (night pose, 4 SpotLights) | **✅** | **40.23** | 0.68 | **0.59** | ~55 min | 1de00d49e |
 | 09-revisit-emissive | Lamp-head emissive spheres | **✅** | **40.25** | 0.68 | **0.59** | ~30 min | 1515a22f3 |
 | 09-revisit-bloom | UnrealBloomPass attempt + revert | ⚠️ §6.3 | 40.25 (post-revert) | 0.68 | 0.59 | ~50 min | 1fc41ad34 |
-| 03 | Vehicle silhouettes (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~10 min | (this commit) |
+| 03 | Vehicle silhouettes (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~10 min | bffaf9b5e |
+| 14 | LOD pipeline (build-time cull, Walls opt-in) | **✅** | 11.03/40.24 | 0.213/0.680 | 35.89/0.60 | ~35 min | (this commit) |
 
 ## Notes
 
