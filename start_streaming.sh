@@ -99,9 +99,39 @@ echo "        CARLA Web Streaming"
 echo "=============================================="
 echo ""
 
-# Build the CARLA command line flags
-CARLA_ARGS="-game -RenderOffScreen -nosound -unattended -ResX=640 -ResY=480 -benchmark -fps=20 -carla-rpc-port=$CARLA_PORT"
-CARLA_ARGS+=" -ExecCmds='r.RayTracing=0,r.RHIThread.Enable 0,r.RHICmdBypass 1'"
+# Build the CARLA command line flags.
+#
+# Quality-first configuration (iteration 01 parity harness reference):
+#   -game                  : standalone runtime, not the editor UI
+#   -RenderOffScreen       : headless (no window); uses offscreen render target
+#   -nosound -unattended   : no audio, no interactive prompts
+#   -ResX=1920 -ResY=1080  : main viewport resolution; sensor.camera.rgb uses
+#                            its own image_size_* attributes, but some post-
+#                            process paths still reference the viewport
+#   -sg.*Quality=4         : UE5 scalability groups at Epic (max). Without
+#                            these, the engine defaults to runtime-detected
+#                            quality which on a headless -RenderOffScreen
+#                            process lands at Low and produces the
+#                            underexposed / flat-lit frames that blocked the
+#                            render-parity harness in iteration 01.
+#   -carla-rpc-port        : CARLA Python API port
+#
+# Removed from the previous config because they suppressed render quality:
+#   -benchmark -fps=20  : forced deterministic-time mode that skipped auto-
+#                         exposure convergence
+#   -ExecCmds='r.RayTracing=0,r.RHIThread.Enable 0,r.RHICmdBypass 1'
+#                       : disabled the render thread and forced immediate-
+#                         mode RHI dispatch, starving the post-process stack
+CARLA_ARGS="-game -RenderOffScreen -nosound -unattended"
+CARLA_ARGS+=" -ResX=1920 -ResY=1080"
+CARLA_ARGS+=" -carla-rpc-port=$CARLA_PORT"
+CARLA_ARGS+=" -sg.AntiAliasingQuality=4"
+CARLA_ARGS+=" -sg.PostProcessQuality=4"
+CARLA_ARGS+=" -sg.ShadowQuality=4"
+CARLA_ARGS+=" -sg.TextureQuality=4"
+CARLA_ARGS+=" -sg.EffectsQuality=4"
+CARLA_ARGS+=" -sg.FoliageQuality=4"
+CARLA_ARGS+=" -sg.ShadingQuality=4"
 
 if [ "$PIXEL_STREAMING" = true ]; then
   # PixelStreaming2 flags: UE5 connects to signaling server's streamer_port
