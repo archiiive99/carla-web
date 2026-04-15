@@ -34,7 +34,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-09  Street lights — emissive + point-light contribution at night
 [ ] iter-10  Traffic lights — emissive bulb + correct hue
 [ ] iter-12  Wet-surface response — driven by CARLA wetness param
-[ ] iter-13  Scene-palette unification — three.js material constants module  (BUMPED to next — UE-independent, doesn't depend on the blocked weather chain)
+[~] iter-13  Scene-palette unification — three.js material constants module  (opened 2026-04-15T08:51:45Z, Phase A; bumped ahead of iter-02 — UE-independent)
 [ ] iter-14  LOD pipeline — distant geometry impostors / decimated meshes
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
