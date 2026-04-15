@@ -79,6 +79,24 @@ interface WeatherLightingOptions {
   skipEnvironment?: boolean;
 }
 
+// Standard piecewise polynomial mapping Kelvin → linear RGB. Drives the
+// directional sun color so a 60° altitude reads warm-white instead of pure
+// white, matching UE5's SkyAtmosphere sun-disc color shift.
+function kelvinToColor(kelvin: number): THREE.Color {
+  const t = Math.max(1000, Math.min(40000, kelvin)) / 100;
+  let r: number, g: number, b: number;
+  if (t <= 66) {
+    r = 1;
+    g = Math.min(1, Math.max(0, (99.4708 * Math.log(t) - 161.1196) / 255));
+    b = t <= 19 ? 0 : Math.min(1, Math.max(0, (138.5177 * Math.log(t - 10) - 305.0448) / 255));
+  } else {
+    r = Math.min(1, Math.max(0, (329.6987 * Math.pow(t - 60, -0.1332)) / 255));
+    g = Math.min(1, Math.max(0, (288.122 * Math.pow(t - 60, -0.0755)) / 255));
+    b = 1;
+  }
+  return new THREE.Color(r, g, b);
+}
+
 /** Weather-driven lighting rig used by every browser-approximation canvas.
  *  Cloudiness drives direct-sun attenuation, fill-hemisphere boost, ambient
  *  lift, and Rayleigh desaturation so overcast scenes actually soften the
@@ -142,8 +160,20 @@ export function WeatherLighting({
   const nightFactor = Math.max(0, Math.min(1, -sunAlt / (Math.PI / 4)));
   const fillBoost = 0.12 + cloudFactor * 0.28 + nightFactor * 0.06;
   const ambientBase = 0.02 + cloudFactor * 0.05 + nightFactor * 0.03;
-  const turbidity = 2 + weather.cloudiness / 10;
+  // Preetham→SkyAtmosphere parity (iter-05 Path A): bumped turbidity floor
+  // dilutes Preetham's saturated mid-altitude blue toward UE5
+  // SkyAtmosphereComponent's less-saturated output. Iter-01 ROI showed
+  // R/B inversion (UE5 warm 1.46, web cool 0.55); raising turbidity narrows
+  // the sky-blue dominance so IBL captures less cool fill.
+  const turbidity = 3 + weather.cloudiness / 8;
   const rayleigh = Math.max(0.15, 0.4 - cloudFactor * 0.25);
+  // Sun color temperature shift with altitude. Horizon ≈ 5000K (warm
+  // amber), zenith ≈ 5800K (slightly warm white). Matches UE5
+  // SkyAtmosphere's sun-disc color shift; eliminates the iter-01 gap
+  // where web's pure-white directional sun produced cool-shifted bounce.
+  const altDeg = (weather.sun_altitude_angle ?? 0);
+  const sunKelvin = 5000 + Math.max(0, Math.min(60, altDeg)) * 13;
+  const sunColor = useMemo(() => kelvinToColor(sunKelvin), [sunKelvin]);
   // IBL intensity collapses along with the sun; tiny floor keeps PBR
   // materials from reading as fully unlit matte at night.
   const envIntensity = (0.18 + cloudFactor * 0.08) * (0.2 + 0.8 * daylight) +
@@ -154,6 +184,7 @@ export function WeatherLighting({
       <directionalLight
         ref={sunRef}
         position={[sunX, sunY, sunZ]}
+        color={sunColor}
         intensity={directIntensity * 1.7}
         castShadow={shadows && daylight > 0.05}
         shadow-mapSize={[2048, 2048]}
@@ -179,7 +210,11 @@ export function WeatherLighting({
       <hemisphereLight
         args={[
           isNight ? "#5a6575" : "#a5a8ae",
-          isNight ? "#1c1f26" : "#3b3d42",
+          // Warm ground-bounce hex (was cool #3b3d42) so asphalt + horizontal
+          // car panels receive the warm fill UE5 produces from its
+          // SkyAtmosphere ground-color reflectance term. Closes part of the
+          // iter-01 R/B inversion gap on the road ROI.
+          isNight ? "#1c1f26" : "#5a4f44",
           fillBoost,
         ]}
       />
