@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useSimulationStore } from "@/stores/simulationStore";
 import { useActorStore } from "@/stores/actorStore";
 import { useUIStore } from "@/stores/uiStore";
+import { reportError } from "@/lib/utils";
 
 // Keys that VehicleControls uses for driving
 const DRIVING_KEYS = new Set(["KeyW", "KeyA", "KeyS", "KeyD", "KeyR", "Space"]);
@@ -66,10 +67,17 @@ export function useKeyboardShortcuts() {
           break;
         case "KeyF":
           event.preventDefault();
+          // Matches FullscreenToggle's behavior — surface browser denials
+          // (iframe policy, missing user-gesture, etc.) so the "F did
+          // nothing" case isn't silent.
           if (document.fullscreenElement) {
-            document.exitFullscreen().catch(() => {});
+            document.exitFullscreen().catch((e) =>
+              reportError("Exit fullscreen", e),
+            );
           } else {
-            document.documentElement.requestFullscreen().catch(() => {});
+            document.documentElement
+              .requestFullscreen()
+              .catch((e) => reportError("Enter fullscreen", e));
           }
           break;
         // W is reserved for driving — weather control via UI only
