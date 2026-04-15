@@ -221,10 +221,14 @@ class WebSocketBroadcaster:
             *(self._send_one(conn, data) for conn in recipients),
             return_exceptions=True,
         )
+        # Exception (not BaseException) — we do NOT want to treat
+        # CancelledError / KeyboardInterrupt / SystemExit as "dead socket"
+        # and evict the client. Those come from shutdown / task-level
+        # cancellation and shouldn't nuke the client registry.
         stale = [
             conn.client_id
             for conn, result in zip(recipients, results)
-            if isinstance(result, BaseException)
+            if isinstance(result, Exception)
         ]
         await self._drop_clients(stale)
 
