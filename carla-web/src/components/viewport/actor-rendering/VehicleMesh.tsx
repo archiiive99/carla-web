@@ -1,4 +1,4 @@
-import { memo, useMemo, useState, Suspense } from "react";
+import { memo, useMemo, useState, useEffect, Suspense } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { CarlaActor } from "@/types/carla";
@@ -7,26 +7,69 @@ import { ErrorBoundaryFallback, carlaToThree } from "./shared";
 import { vehiclePlaceholderFootprint } from "./vehicle-class";
 import { VEHICLE_DEFAULT, VEHICLE_BRAKE, VEHICLE_REVERSE } from "../scene-palette";
 
-/** Inner component that loads and renders a glTF vehicle model. The imported
- *  material is preserved as-is so the browser approximation does not invent
- *  paint color, tint, or emissive glow. Ego identity is carried by the
- *  overlay selection ring, not by re-painting the vehicle itself. */
-function GltfVehicleModel({ path }: { path: string }) {
+/** Inner component that loads and renders a glTF vehicle model.
+ *
+ *  iter-03-revisit-attribute-color: the CARLA-extracted GLBs ship with
+ *  the UE5 editor default `WorldGridMaterial` in their paint slot
+ *  (verified via pygltflib for Car_AudiTT.glb and others). This means
+ *  every vehicle was rendering with the engine's grid-checker default
+ *  before this fix. We detect that material name and replace it with a
+ *  state-driven MeshStandardMaterial whose color comes from
+ *  `actor.vehicle_color` (broadcast from CARLA via the bridge's
+ *  WeatherState/ActorInfo schema). Falls back to VEHICLE_DEFAULT if
+ *  the actor has no color attribute. Other material slots (glass,
+ *  metal trim, etc.) are preserved as-is. */
+function GltfVehicleModel({ path, paintColor }: { path: string; paintColor: string }) {
   const { scene } = useGLTF(path);
   const cloned = useMemo(() => {
     const c = scene.clone(true);
     c.traverse((child) => {
       if (child instanceof THREE.Mesh && child.material) {
-        const mat = (child.material as THREE.MeshStandardMaterial).clone();
-        mat.envMapIntensity = Math.min(mat.envMapIntensity ?? 1, 0.35);
-        child.material = mat;
+        const mat = child.material as THREE.Material;
+        if (mat.name === "WorldGridMaterial") {
+          // Replace the UE5-leftover default with a real PBR paint.
+          const paintMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(paintColor),
+            roughness: 0.45,
+            metalness: 0.5,
+            envMapIntensity: 0.5,
+          });
+          child.material = paintMat;
+          child.userData.paintMatRef = paintMat;
+        } else {
+          // Preserve the GLB's authored material; just tone down env map.
+          const cloned_mat = (mat as THREE.MeshStandardMaterial).clone();
+          cloned_mat.envMapIntensity = Math.min(cloned_mat.envMapIntensity ?? 1, 0.35);
+          child.material = cloned_mat;
+        }
         child.castShadow = true;
         child.receiveShadow = true;
       }
     });
     return c;
-  }, [scene]);
+  }, [scene, paintColor]);
+  // When paintColor changes (e.g. actor.vehicle_color update), update
+  // the cached paint material's color in place — avoids re-cloning the
+  // whole scene tree per re-paint.
+  useEffect(() => {
+    cloned.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.userData.paintMatRef) {
+        const m = child.userData.paintMatRef as THREE.MeshStandardMaterial;
+        m.color.set(paintColor);
+      }
+    });
+  }, [paintColor, cloned]);
   return <primitive object={cloned} />;
+}
+
+// Parse CARLA's vehicle_color string ("R,G,B" 0-255 ints) into a hex
+// string consumable by THREE.Color. Returns null if not a valid value.
+function parseVehicleColor(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const parts = raw.split(",").map((s) => parseInt(s.trim(), 10));
+  if (parts.length !== 3 || parts.some((n) => isNaN(n) || n < 0 || n > 255)) return null;
+  const hex = parts.map((n) => n.toString(16).padStart(2, "0")).join("");
+  return `#${hex}`;
 }
 
 export const VehicleMesh = memo(function VehicleMesh({
@@ -87,7 +130,10 @@ export const VehicleMesh = memo(function VehicleMesh({
       {useGltf ? (
         <Suspense fallback={null}>
           <ErrorBoundaryFallback onError={() => setFailedPath(modelPath)}>
-            <GltfVehicleModel path={modelPath} />
+            <GltfVehicleModel
+              path={modelPath}
+              paintColor={parseVehicleColor(actor.vehicle_color) ?? VEHICLE_DEFAULT}
+            />
           </ErrorBoundaryFallback>
         </Suspense>
       ) : (

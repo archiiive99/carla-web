@@ -29,7 +29,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-02  Building façades — windows, materials, silhouettes
 [x] iter-03  Vehicle silhouettes — extracted GLBs for every blueprint  (✅-on-arrival — 42 blueprint→GLB mappings shipped in carla-assets/vehicle-models.ts; queued iter-03-revisit-coverage for the remaining ~60 less-common blueprints; closed 2026-04-15T09:59+~10min)
 [ ] iter-03-revisit-coverage  Extend VEHICLE_MODELS to all CARLA blueprints (~30 min, web-only)
-[ ] iter-03-revisit-attribute-color  Tint GLB material from actor.attributes['color'] (~30 min, web-only)
+[x] iter-03-revisit-attribute-color  Tint GLB material from actor.attributes['color']  (✅ — replaced UE5-default WorldGridMaterial on vehicle paint slot with state-driven MeshStandardMaterial; broadcast actor.vehicle_color drives paint; closed 2026-04-15T10:26+~30min)
 [x] iter-04  Lane markings — texture authoring or decal pipeline  (✅-on-arrival — full procedural shader chunk shipped in iter-01: white/yellow stripes, stop lines, zebra crosswalks, arrows, wear; closed 2026-04-15T09:21+~20min)
 [x] iter-07  Vegetation — extracted trees / bushes / grass instances  (✅-on-arrival — 12 GLB variants + bucketed InstancedMesh + procedural fallback shipped; LOD applied iter-14-revisit-vegetation-buildings; closed 2026-04-15T10:25+~10min)
 [ ] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle
