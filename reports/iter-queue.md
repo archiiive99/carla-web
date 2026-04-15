@@ -32,7 +32,10 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-03-revisit-attribute-color  Tint GLB material from actor.attributes['color']  (✅ — replaced UE5-default WorldGridMaterial on vehicle paint slot with state-driven MeshStandardMaterial; broadcast actor.vehicle_color drives paint; closed 2026-04-15T10:26+~30min)
 [x] iter-04  Lane markings — texture authoring or decal pipeline  (✅-on-arrival — full procedural shader chunk shipped in iter-01: white/yellow stripes, stop lines, zebra crosswalks, arrows, wear; closed 2026-04-15T09:21+~20min)
 [x] iter-07  Vegetation — extracted trees / bushes / grass instances  (✅-on-arrival — 12 GLB variants + bucketed InstancedMesh + procedural fallback shipped; LOD applied iter-14-revisit-vegetation-buildings; closed 2026-04-15T10:25+~10min)
-[ ] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle
+[x] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle  (✅ pivoted from extraction-blocked scope to articulated procedural placeholder — torso + head + 2 arms + 2 legs; closed 2026-04-15T11:10+~15min)
+[ ] iter-08-extract-glb  Real CARLA walker GLBs (blocked by UE editor)
+[ ] iter-08-walk-cycle  Animate legs/arms with velocity-driven sine swing (~30min web-only)
+[ ] iter-08-skin-tones  Vary walker body color per actor.id (~15min)
 [x] iter-09  Street lights — emissive + point-light contribution at night  (✅ — 4 hardcoded SpotLights near iter-01 intersection, gated isNight; new street_clear_night pose; PSNR 40.23 ✅ ΔE 0.59 ✅ SSIM 0.68 ❌; closed 2026-04-15T09:39+~55min)
 [x] iter-09-revisit-emissive  Recolor lamp-head GLB meshes for night-glow  (✅ — pivoted to emissive-sphere pattern after finding STATIC_STREETLIGHT_MODELS dormant in scene; spheres visible above road in night render; PSNR/SSIM stable vs iter-09 within noise; closed 2026-04-15T09:45+~30min)
 [x] iter-09-revisit-bloom  UnrealBloomPass for lamp halo  (⚠️ §6.3 — drei EffectComposer broke scene render (night→pure black, day→wrong camera). Reverted cleanly; queued iter-09-revisit-bloom-v2 for deeper integration; closed 2026-04-15T09:49+~50min)

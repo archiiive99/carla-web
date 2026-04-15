@@ -28,14 +28,17 @@ export const WalkerMesh = memo(function WalkerMesh({
         document.body.style.cursor = "auto";
       }}
     >
-      {/* Abstract stand-in for a pedestrian — no glTF model is available at
-          this tier for walkers, so this has to be clearly a placeholder.
-          Safety-visibility orange + low emissive floor so the figure is
-          readable at night without the scene being dominated by a glowing
-          orange capsule. receiveShadow + castShadow so the walker settles
-          correctly into lit scenes rather than reading as a cut-out. */}
-      <mesh position={[0, 0.85, 0]} castShadow receiveShadow>
-        <capsuleGeometry args={[0.22, 0.9, 6, 12]} />
+      {/* iter-08: anatomically-articulated procedural walker. Still
+          obviously a placeholder (no real GLB), but with separate
+          head/torso/arms/legs the silhouette reads as "person" from a
+          glance — closing the "what is this orange capsule" gap. Real
+          GLB extraction is iter-08-extract-glb (UE editor blocked).
+          Safety-visibility orange + low emissive floor preserved so
+          the figure remains readable at night. castShadow on each
+          piece so the walker settles correctly. */}
+      {/* Torso */}
+      <mesh position={[0, 1.05, 0]} castShadow receiveShadow>
+        <capsuleGeometry args={[0.18, 0.55, 6, 12]} />
         <meshStandardMaterial
           color={WALKER_BODY}
           emissive="#9a3412"
@@ -43,9 +46,30 @@ export const WalkerMesh = memo(function WalkerMesh({
           roughness={0.8}
         />
       </mesh>
-      <mesh position={[0, 1.55, 0]} castShadow receiveShadow>
-        <sphereGeometry args={[0.14, 8, 8]} />
+      {/* Head */}
+      <mesh position={[0, 1.65, 0]} castShadow receiveShadow>
+        <sphereGeometry args={[0.13, 12, 12]} />
         <meshStandardMaterial color={WALKER_LIMB} roughness={0.75} />
+      </mesh>
+      {/* Left arm */}
+      <mesh position={[-0.22, 1.05, 0]} castShadow receiveShadow>
+        <capsuleGeometry args={[0.06, 0.45, 4, 8]} />
+        <meshStandardMaterial color={WALKER_BODY} roughness={0.8} />
+      </mesh>
+      {/* Right arm */}
+      <mesh position={[0.22, 1.05, 0]} castShadow receiveShadow>
+        <capsuleGeometry args={[0.06, 0.45, 4, 8]} />
+        <meshStandardMaterial color={WALKER_BODY} roughness={0.8} />
+      </mesh>
+      {/* Left leg */}
+      <mesh position={[-0.09, 0.45, 0]} castShadow receiveShadow>
+        <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
+        <meshStandardMaterial color={WALKER_BODY} roughness={0.8} />
+      </mesh>
+      {/* Right leg */}
+      <mesh position={[0.09, 0.45, 0]} castShadow receiveShadow>
+        <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
+        <meshStandardMaterial color={WALKER_BODY} roughness={0.8} />
       </mesh>
       {isSelected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>

@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 23 rows ✅, 6 rows ⚠️, 12 rows queued. §6.5 raise still active.
+**Summary:** 24 rows ✅, 6 rows ⚠️, 14 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -36,7 +36,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 14-revisit-runtime-veg-bldg | Vegetation runtime cull (Buildings deferred) | **✅** | 11.03 | 0.2126 | 35.90 | ~30 min | 380d7577e |
 | 14-revisit-runtime-bldg-only | Per-GltfBuilding runtime cull (two-layer LOD) | **✅** | 11.04 | 0.2129 | 35.87 | ~30 min | 66935946c |
 | 14-revisit-runtime-no-entry-filter | Lift Buildings entry filter | **✅** | 11.03 | 0.2127 | 35.89 | ~10 min | 13684d868 |
-| 14-revisit-runtime-procedural-bldg | Procedural buildings runtime cull | **✅** | **12.27** | 0.2446 | **27.93** | ~45 min | (this commit) |
+| 14-revisit-runtime-procedural-bldg | Procedural buildings runtime cull | **✅** | **12.27** | 0.2446 | **27.93** | ~45 min | f4c090ca4 |
+| 08 | Walker silhouettes (articulated procedural) | **✅** | 11.04 | 0.2116 | 35.83 | ~15 min | (this commit) |
 
 ## Notes
 
