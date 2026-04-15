@@ -284,7 +284,8 @@ async def capture_web_render(
     bridge_url: str,
     pose: Pose,
     out_path: Path,
-) -> None:
+    measure_fps_ms: int = 0,
+) -> dict:
     """Drive the browser to `pose` via ?camPose and screenshot the viewport."""
     from playwright.async_api import async_playwright
 
@@ -357,6 +358,41 @@ async def capture_web_render(
         # One more settle tick so the compositor renders with the final pose.
         await page.wait_for_timeout(1_500)
 
+        # iter-14-revisit-perf-measurement: FPS sample over the next
+        # measure_fps_ms milliseconds via requestAnimationFrame counting.
+        # Default 0 = skip. Returns a dict with fps + frame_count so
+        # the caller can record perf alongside parity metrics.
+        result: dict = {}
+        if measure_fps_ms > 0:
+            fps_data = await page.evaluate(
+                f"""
+                () => new Promise((resolve) => {{
+                  const startMs = performance.now();
+                  let frames = 0;
+                  function tick() {{
+                    frames++;
+                    if (performance.now() - startMs >= {measure_fps_ms}) {{
+                      const elapsedMs = performance.now() - startMs;
+                      resolve({{
+                        frames: frames,
+                        elapsed_ms: elapsedMs,
+                        fps: frames * 1000 / elapsedMs,
+                      }});
+                    }} else {{
+                      requestAnimationFrame(tick);
+                    }}
+                  }}
+                  requestAnimationFrame(tick);
+                }})
+                """
+            )
+            print(
+                f"[harness][fps] {fps_data['frames']} frames over "
+                f"{fps_data['elapsed_ms']:.0f}ms = {fps_data['fps']:.1f} FPS",
+                file=sys.stderr,
+            )
+            result["fps"] = fps_data
+
         # Extract just the main 3D viewport rect from the fullscreen
         # WorldCanvas. The canvas itself is 100vw × 100vh behind DOM
         # chrome; the main viewport div (aria-label="3D viewport") is
@@ -401,6 +437,7 @@ async def capture_web_render(
 
         await context.close()
         await browser.close()
+        return result
 
 
 # --- Metrics --------------------------------------------------------------
@@ -559,6 +596,13 @@ def main() -> int:
              "Bridge picks this up and broadcasts it; the web RoadMesh's "
              "uWetness uniform drives lower roughness (wet asphalt).",
     )
+    parser.add_argument(
+        "--measure-fps-ms",
+        type=int,
+        default=0,
+        help="iter-14-revisit-perf-measurement — sample web FPS over this "
+             "many ms after settle. 0 = skip. Recorded in metrics JSON.",
+    )
     args = parser.parse_args()
 
     pose = POSES.get(args.pose)
@@ -583,7 +627,9 @@ def main() -> int:
     print(f"[harness] wrote {ref_path}")
 
     print(f"[harness] capturing web render at {args.bridge_url}")
-    asyncio.run(capture_web_render(args.bridge_url, pose, meas_path))
+    web_extras = asyncio.run(
+        capture_web_render(args.bridge_url, pose, meas_path, measure_fps_ms=args.measure_fps_ms)
+    )
     print(f"[harness] wrote {meas_path}")
 
     ref = np.asarray(Image.open(ref_path).convert("RGB"))
