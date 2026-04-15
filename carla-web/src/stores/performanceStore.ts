@@ -41,12 +41,24 @@ export const usePerformanceStore = create<PerformanceState>((set) => ({
         if (next.length > 60) next.shift();
         return next;
       };
+      // Only append to a metric's history when that metric was actually in
+      // the update — the three sources (rAF monitor for fps, health poll
+      // for latency, ws worker for bandwidth) fire at independent
+      // cadences, so blindly appending all three on every call would
+      // pollute the sparklines with repeated stale samples.
       return {
         ...s,
         ...metrics,
-        fpsHistory: pushCapped(s.fpsHistory, newFps),
-        latencyHistory: pushCapped(s.latencyHistory, newLatency),
-        bandwidthHistory: pushCapped(s.bandwidthHistory, newBandwidth),
+        fpsHistory:
+          metrics.fps !== undefined ? pushCapped(s.fpsHistory, newFps) : s.fpsHistory,
+        latencyHistory:
+          metrics.latency !== undefined
+            ? pushCapped(s.latencyHistory, newLatency)
+            : s.latencyHistory,
+        bandwidthHistory:
+          metrics.bandwidth !== undefined
+            ? pushCapped(s.bandwidthHistory, newBandwidth)
+            : s.bandwidthHistory,
         peakFps: Math.max(s.peakFps, newFps),
         peakBandwidth: Math.max(s.peakBandwidth, newBandwidth),
         peakLatency: Math.max(s.peakLatency, newLatency),
