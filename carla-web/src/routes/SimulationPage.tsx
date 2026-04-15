@@ -14,11 +14,9 @@ import { useSensorStore } from "@/stores/sensorStore";
 import { CommandPalette } from "@/components/shared/CommandPalette";
 import { ConnectionOverlay } from "@/components/shared/ConnectionOverlay";
 import { BRIDGE_URL_DEFAULT, BRIDGE_URL_KEY } from "@/constants";
-import { normalizeBridgeUrl } from "@/lib/bridge-url";
 import { subscribeVisible } from "@/lib/utils";
 
 export default function SimulationPage() {
-  const bridgeUrl = useSimulationStore((s) => s.bridgeUrl);
   const connectionStatus = useSimulationStore((s) => s.connectionStatus);
   const connect = useSimulationStore((s) => s.connect);
   const refreshActors = useActorStore((s) => s.refreshActors);

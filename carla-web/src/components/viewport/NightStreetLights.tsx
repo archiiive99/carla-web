@@ -20,7 +20,6 @@ const LAMP_POSITIONS_CARLA: Array<[number, number, number]> = [
   [130, 60, 6.0],
 ];
 
-const LAMP_HEIGHT = 6.0; // meters
 const SPOTLIGHT_INTENSITY = 30;
 const SPOTLIGHT_DISTANCE = 18;
 const SPOTLIGHT_ANGLE = Math.PI / 4; // 45°

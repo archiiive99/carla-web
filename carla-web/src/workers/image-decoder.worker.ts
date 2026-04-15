@@ -9,7 +9,7 @@ const CAMERA_HEADER_SIZE = 24;
 
 let port: MessagePort | null = null;
 
-async function decodeImage(channel: number, payload: ArrayBuffer) {
+async function decodeImage(_channel: number, payload: ArrayBuffer) {
   if (payload.byteLength < CAMERA_HEADER_SIZE) return;
 
   const view = new DataView(payload);

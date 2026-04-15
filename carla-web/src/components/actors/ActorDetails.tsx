@@ -25,7 +25,6 @@ import { useActorStore } from "@/stores/actorStore";
 import { ApiError, carlaApi } from "@/lib/carla-api";
 import { reportError } from "@/lib/utils";
 import { toast } from "sonner";
-import type { CarlaActor } from "@/types/carla";
 import { VehicleDetails } from "./VehicleDetails";
 import { SensorDetails } from "./SensorDetails";
 import { ActorMetadataBadges } from "./ActorMetadataBadges";

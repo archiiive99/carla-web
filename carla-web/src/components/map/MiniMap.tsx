@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useActorStore } from "@/stores/actorStore";
 import { useSimulationStore } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
-import type { CarlaActor, TopologyEdge } from "@/types/carla";
+import type { TopologyEdge } from "@/types/carla";
 import { MINIMAP_DEFAULT_ZOOM, MINIMAP_MIN_ZOOM, MINIMAP_MAX_ZOOM, BRIDGE_EGO_ROLE } from "@/constants";
 import { useAnimationFrame } from "@/hooks/useAnimationFrame";
 import { readMapColors } from "./minimap/palette";

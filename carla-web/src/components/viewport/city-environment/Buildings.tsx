@@ -124,7 +124,6 @@ export function Buildings({ objects }: { objects: EnvObj[] }) {
     if (camera.position.distanceTo(lastProcCullPos.current) < RUNTIME_CULL_SENSITIVITY) return
     lastProcCullPos.current.copy(camera.position)
     const r2 = RUNTIME_CULL_RADIUS_SQ
-    const dummy = new THREE.Object3D()
     const mat = new THREE.Matrix4()
     const zero = new THREE.Matrix4().makeScale(0, 0, 0)
     meshes.traverse((child) => {

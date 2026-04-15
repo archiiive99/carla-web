@@ -39,7 +39,7 @@ const MAP_LAYERS: Array<{ label: string; key: string }> = [
 
 // Keep MapControls backwards-compatible with its existing internal usage;
 // delegates to the shared formatter.
-import { formatMapName , errorMessage , reportError } from "@/lib/utils";
+import { formatMapName, reportError } from "@/lib/utils";
 function displayMapName(m: string): string {
   return formatMapName(m) || m;
 }

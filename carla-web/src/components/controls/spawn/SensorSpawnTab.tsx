@@ -12,7 +12,6 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useActorStore } from "@/stores/actorStore";
 import { useSensorStore } from "@/stores/sensorStore";
-import { carlaApi } from "@/lib/carla-api";
 import { reportError } from "@/lib/utils";
 import { SensorType, type CarlaTransform } from "@/types/carla";
 import { TransformInputs } from "./TransformInputs";

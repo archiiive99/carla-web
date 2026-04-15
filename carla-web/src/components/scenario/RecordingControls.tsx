@@ -16,7 +16,7 @@ import { Circle, Square, Play, Pause, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
-import { cn , errorMessage , reportError } from "@/lib/utils";
+import { cn, reportError } from "@/lib/utils";
 
 function normalizeRecordings(value: string[]): string[] {
   if (Array.isArray(value) && value.every((item) => typeof item === "string")) {
