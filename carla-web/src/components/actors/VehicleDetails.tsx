@@ -167,7 +167,7 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
       {/* Lights */}
       <div className="space-y-2">
         <Label className="text-xs">Lights</Label>
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {LIGHT_BUTTONS.map((light) => {
             const pressed = (lightState & light.bit) !== 0;
             return (
@@ -196,7 +196,7 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
             not wired
           </span>
         </div>
-        <div className="grid grid-cols-4 gap-1">
+        <div className="grid grid-cols-4 gap-1.5">
           {["FL", "FR", "RL", "RR"].map((door) => (
             <Button key={door} variant="outline" size="xs" disabled className="text-2xs">
               {door}

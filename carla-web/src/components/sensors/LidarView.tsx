@@ -56,7 +56,7 @@ export default function LidarView({ sensorId, className }: LidarViewProps) {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="relative flex-1 p-3 pt-2">
+      <CardContent className="relative flex-1 p-2">
         <ErrorBoundary>
           <Suspense
             fallback={

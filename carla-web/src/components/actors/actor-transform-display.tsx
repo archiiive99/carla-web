@@ -55,13 +55,13 @@ export function TransformDisplay({ actor }: { actor: CarlaActor }) {
   return (
     <div className="space-y-2">
       <Label className="text-xs">Position</Label>
-      <div className="grid grid-cols-3 gap-1">
+      <div className="grid grid-cols-3 gap-1.5">
         <AxisInput axis="X" label="Position X" value={loc.x.toFixed(2)} />
         <AxisInput axis="Y" label="Position Y" value={loc.y.toFixed(2)} />
         <AxisInput axis="Z" label="Position Z" value={loc.z.toFixed(2)} />
       </div>
       <Label className="text-xs">Rotation (°)</Label>
-      <div className="grid grid-cols-3 gap-1">
+      <div className="grid grid-cols-3 gap-1.5">
         <AxisInput axis="P" label="Rotation pitch" value={rot.pitch.toFixed(1)} />
         <AxisInput axis="Y" label="Rotation yaw" value={rot.yaw.toFixed(1)} />
         <AxisInput axis="R" label="Rotation roll" value={rot.roll.toFixed(1)} />
@@ -82,7 +82,7 @@ export function VelocityDisplay({ actor }: { actor: CarlaActor }) {
         </span>
         <span className="text-2xs text-muted-foreground">km/h</span>
       </div>
-      <div className="grid grid-cols-3 gap-1">
+      <div className="grid grid-cols-3 gap-1.5">
         <AxisInput axis="X" label="Velocity X" value={x.toFixed(2)} />
         <AxisInput axis="Y" label="Velocity Y" value={y.toFixed(2)} />
         <AxisInput axis="Z" label="Velocity Z" value={z.toFixed(2)} />

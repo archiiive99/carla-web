@@ -86,7 +86,7 @@ export function ShortcutsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger
         render={
-          <Button variant="ghost" size="icon-sm" aria-label="Open keyboard shortcuts">
+          <Button variant="ghost" size="icon" aria-label="Open keyboard shortcuts">
             <Kbd>?</Kbd>
           </Button>
         }

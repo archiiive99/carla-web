@@ -120,7 +120,7 @@ export function ActorGroupSection({
             ))}
           </ul>
         ) : (
-          <div className="flex flex-col items-center gap-1 px-7 py-3 text-center">
+          <div className="flex flex-col items-center gap-1 px-6 py-3 text-center">
             {def.icon}
             <p className="text-xs text-muted-foreground">No {def.label.toLowerCase()}</p>
           </div>

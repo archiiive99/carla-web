@@ -38,7 +38,7 @@ _images*
 
 # Temp
 Help.md
-ui/
+/ui/
 claw-code/
 Bench2Drive/
 .venv/

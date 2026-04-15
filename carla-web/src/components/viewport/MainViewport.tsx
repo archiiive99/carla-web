@@ -64,7 +64,7 @@ export function MainViewport({ className }: MainViewportProps) {
         <FullscreenToggle />
       </div>
 
-      <div className="pointer-events-auto absolute right-2 top-2 z-30 flex items-center gap-1 rounded-md border border-border/60 bg-background/80 p-1 shadow-sm backdrop-blur-sm">
+      <div className="pointer-events-auto absolute right-2 top-2 z-30 flex items-center gap-1 rounded-lg border border-border/60 bg-background/80 p-1 shadow-sm backdrop-blur-sm">
         {cameraModes.map(({ mode, icon: Icon, label }) => {
           const active = cameraMode === mode;
           return (

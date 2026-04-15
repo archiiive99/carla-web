@@ -139,7 +139,7 @@ export function WeatherControls() {
 
             {/* Quick presets — shared with the CommandPalette weather group
                 via `weather-quick-presets.ts` so both surfaces agree. */}
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1.5">
               {WEATHER_QUICK_PRESETS.map(({ preset, label, icon: Icon }) => (
                 <Button
                   key={preset}

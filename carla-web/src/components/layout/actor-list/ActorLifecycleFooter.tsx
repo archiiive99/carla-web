@@ -72,8 +72,8 @@ export function ActorLifecycleFooter() {
   }, []);
 
   return (
-    <div className="space-y-1.5 p-2">
-      <div className="flex gap-1">
+    <div className="space-y-2 p-3">
+      <div className="flex gap-1.5">
         <Button
           variant="outline"
           size="sm"

@@ -126,7 +126,7 @@ export default function CameraView({
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="relative flex-1 p-3 pt-2">
+      <CardContent className="relative flex-1 p-2">
         <ContextMenu>
           <ContextMenuTrigger>
             <div className="flex h-full w-full items-center justify-center bg-background">

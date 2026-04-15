@@ -111,8 +111,8 @@ export function StatusBar() {
   }, []);
 
   return (
-    <footer className="flex h-8 shrink-0 flex-nowrap items-center justify-between gap-2 overflow-hidden border-t px-3 text-xs text-muted-foreground">
-      <div className="flex min-w-0 shrink items-center gap-3 overflow-hidden whitespace-nowrap">
+    <footer className="flex h-8 shrink-0 flex-nowrap items-center justify-between gap-3 border-t px-4 text-xs text-muted-foreground">
+      <div className="flex min-w-0 shrink items-center gap-3 whitespace-nowrap">
         <span
           className={`flex items-center gap-1 ${latencyTierToken(tier)}`}
           aria-label={`Latency ${latencyRoundedRef.current}ms, ${tier} latency`}
@@ -123,14 +123,14 @@ export function StatusBar() {
           {tier === "high" && <SignalLow className="size-3" aria-hidden="true" />}
           <span ref={latencyRef} className="font-mono tabular-nums">--ms</span>
         </span>
-        <Separator orientation="vertical" className="h-3.5" />
+        <Separator orientation="vertical" className="h-4" />
         <span className="flex items-center gap-1">
           <span className="text-muted-foreground">Bandwidth:</span>
           <span ref={bandwidthRef} className="font-mono tabular-nums">
             0 KB/s
           </span>
         </span>
-        <Separator orientation="vertical" className="h-3.5" />
+        <Separator orientation="vertical" className="h-4" />
         <span className="flex items-center gap-1">
           <span className="text-muted-foreground">Tick:</span>
           <span ref={tickCountRef} className="font-mono tabular-nums">T0</span>
@@ -139,7 +139,7 @@ export function StatusBar() {
         </span>
         {(actorsByType.vehicles.length > 0 || actorsByType.walkers.length > 0) && (
           <>
-            <Separator orientation="vertical" className="h-3.5" />
+            <Separator orientation="vertical" className="h-4" />
             <span className="font-mono tabular-nums" aria-label={`${actorsByType.vehicles.length} vehicles, ${actorsByType.walkers.length} walkers, ${actorsByType.sensors.length} sensors`}>
               {actorsByType.vehicles.length}V {actorsByType.walkers.length}W {actorsByType.sensors.length}S
             </span>
@@ -164,7 +164,7 @@ export function StatusBar() {
         </span>
         {uptime && (
           <>
-            <Separator orientation="vertical" className="h-3.5" />
+            <Separator orientation="vertical" className="h-4" />
             <span className="font-mono tabular-nums" aria-label={`Session uptime ${uptime.replace(/^Up:\s*/, "")}`}>{uptime}</span>
           </>
         )}

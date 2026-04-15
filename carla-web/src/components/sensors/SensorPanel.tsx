@@ -272,7 +272,7 @@ export function SensorPanel({ className }: { className?: string }) {
       />
 
       <div
-        className="flex-1 gap-1 p-1"
+        className="flex-1 gap-2 p-2"
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${grid.cols}, 1fr)`,

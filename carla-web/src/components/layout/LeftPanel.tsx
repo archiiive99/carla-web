@@ -129,7 +129,7 @@ export function LeftPanel() {
         </div>
       </div>
 
-      <div className="px-2 pb-2">
+      <div className="px-3 pb-2">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <Input
@@ -147,7 +147,7 @@ export function LeftPanel() {
       <Separator />
 
       <div
-        className="flex gap-1 px-2 pb-1 pt-1"
+        className="flex gap-1.5 px-3 py-2"
         role="group"
         aria-label="Filter actors by type"
       >
@@ -185,7 +185,7 @@ export function LeftPanel() {
             ))}
           </div>
         ) : (
-          <div className="space-y-1 p-2">
+          <div className="space-y-1 p-3">
             {GROUP_DEFS.filter((def) => {
               if (!typeFilter) return true;
               const allowed = TYPE_FILTER_MAP[typeFilter];

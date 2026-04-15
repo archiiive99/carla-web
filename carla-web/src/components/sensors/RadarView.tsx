@@ -154,7 +154,7 @@ export default function RadarView({ sensorId, className }: RadarViewProps) {
           </span>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 p-1">
+      <CardContent className="flex-1 p-2">
         <canvas ref={canvasRef} aria-label="Radar polar plot" className="h-full w-full rounded" />
       </CardContent>
     </Card>

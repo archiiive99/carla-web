@@ -96,9 +96,9 @@ export function EventLog({ events, onClear, className }: EventLogProps) {
   return (
     <div className={cn("flex h-full flex-col", className)}>
       {/* Toolbar */}
-      <div className="flex items-center gap-2 border-b px-2 py-1">
+      <div className="flex items-center gap-2 border-b px-3 py-2">
         <div
-          className="flex flex-1 items-center gap-1"
+          className="flex flex-1 items-center gap-1.5"
           role="group"
           aria-label="Filter events by type"
         >
@@ -165,11 +165,11 @@ export function EventLog({ events, onClear, className }: EventLogProps) {
             <p className="text-2xs text-muted-foreground">Events from collisions, spawns, and weather changes will appear here.</p>
           </div>
         ) : (
-          <div className="space-y-0.5 p-1">
+          <div className="space-y-0.5 p-2">
             {filteredEvents.map((event) => (
               <div
                 key={event.id}
-                className="flex items-center gap-2 rounded px-2 py-1 text-xs hover:bg-muted"
+                className="flex items-center gap-2 rounded-md px-2 py-1 text-xs hover:bg-muted"
               >
                 <span className="font-mono tabular-nums text-2xs text-muted-foreground">
                   {new Date(event.timestamp * 1000).toLocaleTimeString()}

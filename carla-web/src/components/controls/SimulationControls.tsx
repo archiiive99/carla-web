@@ -51,7 +51,7 @@ export function SimulationControls() {
           render={
             <Button
               variant={isRunning && !isPaused ? "default" : "outline"}
-              size="icon-sm"
+              size="icon"
               disabled={!isConnected}
               onClick={handlePlay}
               aria-label={isRunning && !isPaused ? "Simulation running" : "Play simulation"}
@@ -72,7 +72,7 @@ export function SimulationControls() {
           render={
             <Button
               variant={isPaused ? "default" : "outline"}
-              size="icon-sm"
+              size="icon"
               disabled={!isConnected}
               onClick={handlePause}
               aria-label={isPaused ? "Simulation paused" : "Pause simulation"}
@@ -93,7 +93,7 @@ export function SimulationControls() {
           render={
             <Button
               variant="outline"
-              size="icon-sm"
+              size="icon"
               disabled={!isConnected || (isRunning && !syncMode)}
               onClick={handleStep}
               aria-label="Step one simulation tick"

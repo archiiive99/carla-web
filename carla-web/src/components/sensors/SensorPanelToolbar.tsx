@@ -42,7 +42,7 @@ export function SensorPanelToolbar({
   onResetGrid,
 }: SensorPanelToolbarProps) {
   return (
-    <div className="flex items-center gap-2 border-b px-2 py-1.5">
+    <div className="flex items-center gap-2 border-b px-3 py-2">
       <span className="text-xs text-muted-foreground">Layout</span>
       <Select
         value={gridSize}
@@ -72,19 +72,17 @@ export function SensorPanelToolbar({
       <Badge variant="outline" className="h-4 px-1.5 text-2xs tabular-nums">
         {subscribedSensorCount} subscribed
       </Badge>
-      <div className="ml-auto flex flex-wrap gap-1">
+      <div className="ml-auto flex flex-wrap gap-1.5">
         <Button
           variant={showSubscribedOnly ? "secondary" : "ghost"}
-          size="sm"
-          className="h-6 px-2 text-2xs"
+          size="xs"
           onClick={onToggleSubscribedOnly}
         >
           {showSubscribedOnly ? "Subscribed only" : "All sensors"}
         </Button>
         <Button
           variant="ghost"
-          size="sm"
-          className="h-6 px-2 text-2xs"
+          size="xs"
           onClick={onFocusManagedRgb}
           disabled={focusManagedRgbDisabled}
         >
@@ -92,8 +90,7 @@ export function SensorPanelToolbar({
         </Button>
         <Button
           variant="ghost"
-          size="sm"
-          className="h-6 px-2 text-2xs"
+          size="xs"
           onClick={onResetGrid}
         >
           Reset grid

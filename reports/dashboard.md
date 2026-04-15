@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 24 rows ✅, 6 rows ⚠️, 14 rows queued. §6.5 raise still active.
+**Summary:** 25 rows ✅, 6 rows ⚠️, 13 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -37,7 +37,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 14-revisit-runtime-bldg-only | Per-GltfBuilding runtime cull (two-layer LOD) | **✅** | 11.04 | 0.2129 | 35.87 | ~30 min | 66935946c |
 | 14-revisit-runtime-no-entry-filter | Lift Buildings entry filter | **✅** | 11.03 | 0.2127 | 35.89 | ~10 min | 13684d868 |
 | 14-revisit-runtime-procedural-bldg | Procedural buildings runtime cull | **✅** | **12.27** | 0.2446 | **27.93** | ~45 min | f4c090ca4 |
-| 08 | Walker silhouettes (articulated procedural) | **✅** | 11.04 | 0.2116 | 35.83 | ~15 min | (this commit) |
+| 08 | Walker silhouettes (articulated procedural) | **✅** | 11.04 | 0.2116 | 35.83 | ~15 min | 067a3e114 |
+| 08-skin-tones | Per-actor.id walker color variation | **✅** | 11.02 | 0.2118 | 35.94 | ~12 min | (this commit) |
 
 ## Notes
 
