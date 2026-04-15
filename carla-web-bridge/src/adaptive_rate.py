@@ -116,11 +116,6 @@ class RateController:
         self._samples.pop(key, None)
         self._logged_unknown_native.discard(key)
 
-    def clear_client(self, client_id: str) -> None:
-        for key in [k for k in self._state if k[0] == client_id]:
-            self.clear_subscription(*key)
-        self._last_stats_token.pop(client_id, None)
-
     def clear_sensor(self, sensor_id: int) -> None:
         for key in [k for k in self._state if k[1] == sensor_id]:
             self.clear_subscription(*key)
