@@ -7,6 +7,7 @@ import json
 import logging
 import time
 import uuid
+from collections.abc import Callable
 
 from fastapi import WebSocket, WebSocketDisconnect
 
@@ -26,7 +27,7 @@ class ClientConnection:
         self,
         ws: WebSocket,
         client_id: str,
-        on_unsubscribe: callable | None = None,
+        on_unsubscribe: Callable | None = None,
     ) -> None:
         self.ws = ws
         self.client_id = client_id
@@ -59,9 +60,9 @@ class WebSocketBroadcaster:
     async def handle_connection(
         self,
         ws: WebSocket,
-        on_subscribe: callable | None = None,
-        on_unsubscribe: callable | None = None,
-        on_set_rate: callable | None = None,
+        on_subscribe: Callable | None = None,
+        on_unsubscribe: Callable | None = None,
+        on_set_rate: Callable | None = None,
     ) -> None:
         if len(self._clients) >= MAX_CLIENTS:
             await ws.close(code=1013, reason="Max clients reached")
@@ -101,9 +102,9 @@ class WebSocketBroadcaster:
 
     async def _handle_text_message(
         self, conn: ClientConnection, text: str,
-        on_subscribe: callable | None,
-        on_unsubscribe: callable | None,
-        on_set_rate: callable | None = None,
+        on_subscribe: Callable | None,
+        on_unsubscribe: Callable | None,
+        on_set_rate: Callable | None = None,
     ) -> None:
         try:
             msg = json.loads(text)
@@ -145,9 +146,9 @@ class WebSocketBroadcaster:
 
     async def _handle_binary_message(
         self, conn: ClientConnection, data: bytes,
-        on_subscribe: callable | None,
-        on_unsubscribe: callable | None,
-        on_set_rate: callable | None = None,
+        on_subscribe: Callable | None,
+        on_unsubscribe: Callable | None,
+        on_set_rate: Callable | None = None,
     ) -> None:
         try:
             channel, payload = decode_frame(data)
