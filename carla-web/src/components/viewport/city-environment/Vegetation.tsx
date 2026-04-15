@@ -64,13 +64,26 @@ function GltfVegetation({ objects }: { objects: EnvObj[] }) {
 
     if (variants.length === 0) return g
 
+    // iter-14-revisit-vegetation-buildings: build-time distance cull
+    // anchored at iter-01 measurement pose. Mirror of the GltfInstanced
+    // maxDistance pattern; same 300m radius. Vegetation has its own
+    // bespoke instancing path (per-model-variant bucketing) so the cull
+    // happens here on the input array rather than via a shared helper.
+    const REF_X = 118.9, REF_Y = 55.8, REF_Z = 1.8, MAX_R2 = 300 * 300
+    const culledObjects = objects.filter((obj) => {
+      const dx = obj.b.x - REF_X
+      const dy = obj.b.y - REF_Y
+      const dz = obj.b.z - REF_Z
+      return (dx * dx + dy * dy + dz * dz) <= MAX_R2
+    })
+
     const buckets: EnvObj[][] = variants.map(() => [])
     let s = 54321
     const rand = () => {
       s = (s * 16807 + 0) % 2147483647
       return (s & 0x7fffffff) / 0x7fffffff
     }
-    for (const obj of objects) {
+    for (const obj of culledObjects) {
       const idx = Math.floor(rand() * variants.length)
       buckets[idx].push(obj)
     }

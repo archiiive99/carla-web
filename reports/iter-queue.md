@@ -46,7 +46,8 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-14  LOD pipeline — distant geometry impostors / decimated meshes  (✅ — build-time maxDistance + referencePoint added to GltfInstanced; Walls opted in at 300m from iter-01 pose; PSNR stable within noise; closed 2026-04-15T10:01+~35min)
 [ ] iter-14-revisit-runtime-lod  Per-frame camera-tracked cull (~1.5h)
 [x] iter-14-revisit-other-categories  Opt-in maxDistance for Poles/Fences/Rocks/GuardRails/TrafficLights/TrafficSigns  (✅ — 6 sites opted in; PSNR/SSIM/ΔE byte-identical to baseline; closed 2026-04-15T10:08+~25min)
-[ ] iter-14-revisit-vegetation-buildings  Audit + opt-in Vegetation/Buildings if they use GltfInstanced (~15 min)
+[x] iter-14-revisit-vegetation-buildings  Audit + opt-in Vegetation/Buildings  (✅ — Vegetation opted in via bespoke InstancedMesh path; Buildings deferred (one-mesh-per-building, needs different pattern); PSNR/SSIM/ΔE within noise; closed 2026-04-15T10:11+~20min)
+[ ] iter-14-revisit-buildings  LOD per-building React conditional render (~30 min)
 [ ] iter-14-revisit-perf-measurement  Playwright FPS probe in compare.py (~30 min)
 [x] iter-13-revisit-pose-coverage  Add chase/birdseye/intersection poses to compare.py POSES  (✅ — 3 new poses each produce numeric output + visually sensible framing; closed 2026-04-15T09:31+~35min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
