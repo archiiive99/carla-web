@@ -3,7 +3,10 @@
 import { getDefaultBridgeUrl } from "@/lib/bridge-url";
 
 export const BRIDGE_URL_DEFAULT = getDefaultBridgeUrl();
-export const FRONTEND_PORT = 58336;
+
+// Note: the frontend port (58336) lives in vite.config.ts + playwright.config.ts,
+// both root-level config files that can't easily `import` from src/. A duplicate
+// export here would just be an out-of-sync liability.
 
 /** localStorage key for the SettingsPage AppSettings blob. Exported so the
  *  SettingsPage writer and any future config readers share one source of
