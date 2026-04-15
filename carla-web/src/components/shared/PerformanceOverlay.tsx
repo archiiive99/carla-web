@@ -25,10 +25,13 @@ export function PerformanceOverlay() {
   const { fps, latency, bandwidth, droppedFrames } = usePerformanceStore();
   const sensorCount = useActorStore((s) => s.actorsByType.sensors.length);
 
-  // Compute server tick rate from simulation currentTick changes
+  // Compute server tick rate from simulation currentTick changes.
+  // Initial `at` is 0 and seeded inside the effect — `performance.now()`
+  // is impure and must not run during render (react-hooks rule).
   const [serverFps, setServerFps] = useState(0);
-  const lastTickRef = useRef({ tick: 0, at: performance.now() });
+  const lastTickRef = useRef({ tick: 0, at: 0 });
   useEffect(() => {
+    lastTickRef.current.at = performance.now();
     const unsub = useSimulationStore.subscribe((state) => {
       const now = performance.now();
       const dt = (now - lastTickRef.current.at) / 1000;

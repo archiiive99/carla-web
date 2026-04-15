@@ -34,7 +34,10 @@ function normalizeRecordings(value: string[]): string[] {
 export function RecordingControls() {
   const isConnected = useIsConnected();
   const [recording, setRecording] = useState(false);
-  const [filename, setFilename] = useState(`recording_${Date.now()}`);
+  // Lazy initializer — Date.now() is impure and must not run on every
+  // render (react-hooks/components-and-hooks-must-be-pure). useState's
+  // function form only calls it once on mount.
+  const [filename, setFilename] = useState(() => `recording_${Date.now()}`);
   const [replaying, setReplaying] = useState(false);
   const [recordings, setRecordings] = useState<string[]>([]);
   const [selectedRecording, setSelectedRecording] = useState("");
