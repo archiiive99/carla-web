@@ -13,7 +13,6 @@ from src.models.schemas import (
     SetWeatherRequest,
     Transform,
     WeatherParams,
-    WeatherPreset,
 )
 from src.utils.serialization import (
     carla_transform_to_dict,

@@ -69,11 +69,6 @@ class WeatherParams(BaseModel):
     dust_storm: float = 0.0
 
 
-class WeatherPreset(BaseModel):
-    name: str
-    params: WeatherParams
-
-
 class SetWeatherRequest(BaseModel):
     preset: str | None = None
     params: WeatherParams | None = None
