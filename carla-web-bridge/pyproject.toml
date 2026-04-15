@@ -6,6 +6,11 @@ requires-python = ">=3.10"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+# Required by pytest-asyncio 0.23+: implicit default ("function") was
+# deprecated in 0.22 and becomes an error in a future release. Set
+# explicitly to preserve the previous behavior — each async fixture
+# gets its own event loop per-test.
+asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 
 markers = [

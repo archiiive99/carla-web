@@ -292,9 +292,11 @@ class ImageCompressor:
         arr = np.frombuffer(raw_data, dtype=np.uint8).reshape(height, width, 4)
         arr = self._auto_expose_bgra(arr)
         # BGRA -> RGB (alpha is dropped here; see test_pattern harness in
-        # tools/compare_render.py for channel-order evidence).
+        # tools/compare_render.py for channel-order evidence). Mode param is
+        # omitted — PIL infers "RGB" from the (H, W, 3) uint8 shape, and the
+        # explicit form was deprecated in Pillow 11 / removed in Pillow 13.
         rgb = arr[:, :, [2, 1, 0]]
-        img = Image.fromarray(rgb, "RGB")
+        img = Image.fromarray(rgb)
         buf = BytesIO()
         save_kwargs: dict = {"format": fmt, "quality": quality}
         if fmt == "JPEG":
