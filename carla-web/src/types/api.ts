@@ -58,12 +58,25 @@ export interface ReplayConfig {
 
 // --- Health / bridge info ---
 
+/** Shape of GET /health. Mirrors the bridge's realtime_session.snapshot()
+ *  spread into the top-level response in main.py health_check(). */
 export interface HealthResponse {
   status: string;
   carla_connected: boolean;
   ws_clients: number;
   active_sensors: number;
+  // Spread from realtime_session.snapshot() — keep in sync with
+  // carla-web-bridge/src/realtime_session.py::snapshot() keys.
   default_vehicle_id?: number | null;
   default_camera_id?: number | null;
+  session_armed?: boolean;
+  camera_arm_ready?: boolean;
   session_ready?: boolean;
+  state?:
+    | "IDLE"
+    | "ARMING"
+    | "VEHICLE_PENDING"
+    | "CAMERA_PENDING"
+    | "READY"
+    | "RECOVERING";
 }
