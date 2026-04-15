@@ -91,11 +91,13 @@ class CarlaClientManager:
                 )
                 self._connected = True
                 self._connected_at_monotonic = time.monotonic()
-                # Force async mode so the simulation ticks in real-time
-                # Without this, CARLA may stay in sync mode where nothing moves
-                await asyncio.to_thread(self._ensure_async_mode)
+                # Force sync mode with a fixed 0.05s timestep. The bridge
+                # drives physics via world.tick() in _world_tick_loop so the
+                # simulation runs deterministically at 20 Hz regardless of
+                # UE5's offscreen render rate.
+                await asyncio.to_thread(self._ensure_sync_mode)
                 logger.info(
-                    "Connected to CARLA %s at %s:%d (async mode forced)",
+                    "Connected to CARLA %s at %s:%d (sync mode forced)",
                     await asyncio.to_thread(self._client.get_server_version),
                     CARLA_HOST,
                     CARLA_PORT,
@@ -161,7 +163,7 @@ class CarlaClientManager:
             world = client.get_world()
         return client, world
 
-    def _ensure_async_mode(self) -> None:
+    def _ensure_sync_mode(self) -> None:
         """Force CARLA into synchronous mode with fixed timestep.
 
         The bridge drives the simulation via world.tick() in the tick loop.
@@ -178,21 +180,6 @@ class CarlaClientManager:
             settings.max_substeps = 10
             world.apply_settings(settings)
             logger.info("Set CARLA to synchronous mode (fixed_delta=0.05, bridge-driven ticking)")
-
-    def _cleanup_actors_sync(self) -> None:
-        if not self._spawned_actor_ids or self._client is None:
-            return
-        try:
-            with self._rpc_lock:
-                actors = self._client.get_world().get_actors(list(self._spawned_actor_ids))
-            for actor in actors:
-                if actor is not None:
-                    if actor.type_id.startswith("sensor."):
-                        actor.stop()
-                    actor.destroy()
-        except Exception:
-            pass
-        self._spawned_actor_ids.clear()
 
     async def _heartbeat_loop(self) -> None:
         while self._should_run:
