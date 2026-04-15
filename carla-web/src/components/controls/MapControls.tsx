@@ -22,6 +22,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Map, Check } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useSimulationStore, useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
 
@@ -110,14 +111,10 @@ export function MapControls() {
                       onSelect={() => setSelectedMap(m)}
                       className="text-xs"
                     >
-                      {isCurrent ? (
-                        <Check className="mr-2 size-3 text-success" aria-hidden="true" />
-                      ) : (
-                        <Map className="mr-2 size-3" aria-hidden="true" />
-                      )}
+                      <Map className="mr-2 size-3" aria-hidden="true" />
                       {display}
                       {isCurrent && (
-                        <span className="ml-auto text-2xs text-muted-foreground">(current)</span>
+                        <Check className="ml-auto size-3 text-success" aria-label="Current map" />
                       )}
                     </CommandItem>
                   );
@@ -149,9 +146,9 @@ export function MapControls() {
           <div className="space-y-2 opacity-60">
             <div className="flex items-center gap-2">
               <Label className="text-xs">Map Layers</Label>
-              <span className="text-3xs uppercase tracking-wide text-muted-foreground">
+              <Badge variant="outline" className="h-4 px-1.5 text-2xs uppercase tracking-wide text-muted-foreground">
                 not wired
-              </span>
+              </Badge>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {MAP_LAYERS.map((layer) => (

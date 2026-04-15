@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
+import { Badge } from "@/components/ui/badge";
 import { useActorStore } from "@/stores/actorStore";
 import { carlaApi } from "@/lib/carla-api";
 
@@ -114,7 +115,7 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label className="text-xs">Throttle</Label>
-          <span className="font-mono text-2xs tabular-nums text-muted-foreground">{(control.throttle * 100).toFixed(0)}%</span>
+          <span className="inline-block min-w-10 text-right font-mono text-2xs tabular-nums text-muted-foreground">{(control.throttle * 100).toFixed(0)}%</span>
         </div>
         <Slider
           min={0}
@@ -130,7 +131,7 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
         />
         <div className="flex items-center justify-between">
           <Label className="text-xs">Steering</Label>
-          <span className="font-mono text-2xs tabular-nums text-muted-foreground">{(control.steer * 100).toFixed(0)}%</span>
+          <span className="inline-block min-w-10 text-right font-mono text-2xs tabular-nums text-muted-foreground">{(control.steer * 100).toFixed(0)}%</span>
         </div>
         <Slider
           min={-1}
@@ -146,7 +147,7 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
         />
         <div className="flex items-center justify-between">
           <Label className="text-xs">Brake</Label>
-          <span className="font-mono text-2xs tabular-nums text-muted-foreground">{(control.brake * 100).toFixed(0)}%</span>
+          <span className="inline-block min-w-10 text-right font-mono text-2xs tabular-nums text-muted-foreground">{(control.brake * 100).toFixed(0)}%</span>
         </div>
         <Slider
           min={0}
@@ -190,11 +191,11 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
 
       {/* Doors — stub UI, no bridge endpoint yet */}
       <div className="space-y-2 opacity-60">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <Label className="text-xs">Doors</Label>
-          <span className="text-3xs uppercase tracking-wide text-muted-foreground">
+          <Badge variant="outline" className="h-4 px-1.5 text-2xs uppercase tracking-wide text-muted-foreground">
             not wired
-          </span>
+          </Badge>
         </div>
         <div className="grid grid-cols-4 gap-1.5">
           {["FL", "FR", "RL", "RR"].map((door) => (

@@ -34,7 +34,7 @@ export function ActorMetadataBadges({
           <Button
             variant="outline"
             size="sm"
-            className="h-5 gap-1 px-1.5 text-2xs text-muted-foreground hover:text-foreground"
+            className="h-5 gap-1 px-1.5 text-2xs text-muted-foreground hover:border-primary/40 hover:bg-primary/5 hover:text-foreground"
             onClick={() => onSelectParent(actor.parent_id!)}
             title={`Attached to actor #${actor.parent_id}`}
           >

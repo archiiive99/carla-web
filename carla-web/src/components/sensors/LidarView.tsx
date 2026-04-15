@@ -47,7 +47,7 @@ export default function LidarView({ sensorId, className }: LidarViewProps) {
         <div className="flex items-center gap-1.5">
           <span
             ref={pointCountRef}
-            className="font-mono text-2xs tabular-nums text-muted-foreground"
+            className="font-mono text-2xs tabular-nums text-success transition-colors"
           >
             0 pts
           </span>
