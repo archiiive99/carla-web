@@ -58,6 +58,29 @@ POSES: Dict[str, Pose] = {
         x=118.9, y=55.8, z=1.8,
         yaw=180.0, pitch=-8.0, roll=0.0,
     ),
+    # iter-13-revisit-pose-coverage: additional pinned poses for
+    # multi-angle parity measurement.
+    "birdseye_clear_midday": Pose(
+        # Top-down at the iter-01 intersection. z=80m altitude, looking
+        # straight down (pitch=-89). Tests road+overhead-asphalt at
+        # different scale than the street-level pose.
+        x=118.9, y=55.8, z=80.0,
+        yaw=0.0, pitch=-89.0, roll=0.0,
+    ),
+    "chase_clear_midday": Pose(
+        # Follow-cam: behind + above the street pose, slight downward
+        # pitch. Approximates a typical third-person chase camera.
+        x=121.5, y=55.8, z=4.0,
+        yaw=180.0, pitch=-15.0, roll=0.0,
+    ),
+    "intersection_corner_midday": Pose(
+        # Same intersection viewed from the corner — yaw+90 from the
+        # street pose. Puts buildings + sidewalk + traffic light inside
+        # the central frame (vs. the down-the-road framing of the
+        # street pose).
+        x=118.9, y=55.8, z=1.8,
+        yaw=90.0, pitch=-8.0, roll=0.0,
+    ),
 }
 
 

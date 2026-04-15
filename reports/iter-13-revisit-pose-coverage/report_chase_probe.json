@@ -1,0 +1,46 @@
+{
+  "label": "chase_probe",
+  "pose": {
+    "name": "chase_clear_midday",
+    "x": 121.5,
+    "y": 55.8,
+    "z": 4.0,
+    "yaw": 180.0,
+    "pitch": -15.0,
+    "roll": 0.0
+  },
+  "metrics": {
+    "psnr_db": 11.498005103369596,
+    "ssim": 0.2982113732263977,
+    "delta_e_mean": 34.077655684660535,
+    "roi_pixel_count": 182736,
+    "roi_mode": "road"
+  },
+  "images": {
+    "reference": "ue5_reference_chase_probe.png",
+    "measured": "web_render_chase_probe.png",
+    "roi_overlay": "roi_overlay_chase_probe.png"
+  },
+  "capture": {
+    "width": 1920,
+    "height": 1080
+  },
+  "roi_polygon_frac": [
+    [
+      0.2800000011920929,
+      0.75
+    ],
+    [
+      0.7200000286102295,
+      0.75
+    ],
+    [
+      0.7200000286102295,
+      0.949999988079071
+    ],
+    [
+      0.2800000011920929,
+      0.949999988079071
+    ]
+  ]
+}

@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 6 rows ✅, 4 rows ⚠️, 12 rows queued. §6.5 raise still active — see `SESSION-RAISE.md`.
+**Summary:** 7 rows ✅, 4 rows ⚠️, 12 rows queued. §6.5 raise still active — see `SESSION-RAISE.md`.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -17,7 +17,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 12 | Wet-surface response (✅-on-arrival) | **✅** | 11.54 (wet) / 11.03 (dry) | 0.228/0.213 | 35.20/35.89 | ~30 min | 8e29b8db3 |
 | 04 | Lane markings (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~20 min | 0622c17bd |
 | 10 | Traffic lights (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~15 min | c848a4fca |
-| 10-revisit-glb-bulb | TL GLB-bulb mesh recolor | **✅** | 11.03 | 0.213 | 35.90 | ~35 min | (this commit) |
+| 10-revisit-glb-bulb | TL GLB-bulb mesh recolor | **✅** | 11.03 | 0.213 | 35.90 | ~35 min | e9a22e940 |
+| 13-revisit-pose-coverage | +3 poses (birdseye/chase/intersection) | **✅** | 8.68/11.50/8.74 | 0.36/0.30/0.14 | 46.5/34.1/44.7 | ~35 min | (this commit) |
 
 ## Notes
 
