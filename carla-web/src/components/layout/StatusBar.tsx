@@ -46,7 +46,9 @@ export function StatusBar() {
   useEffect(() => {
     if (connectionStatus === "connected") {
       if (connectedAtRef.current === null) {
-        connectedAtRef.current = Date.now();
+        // performance.now() so the uptime readout doesn't drift if the
+        // OS clock jumps. Paired with the performance.now() read below.
+        connectedAtRef.current = performance.now();
       }
     } else {
       connectedAtRef.current = null;
@@ -83,7 +85,7 @@ export function StatusBar() {
         );
       }
       if (connectedAtRef.current !== null) {
-        setUptime(formatUptime(Date.now() - connectedAtRef.current));
+        setUptime(formatUptime(performance.now() - connectedAtRef.current));
       }
     });
     return unsub;

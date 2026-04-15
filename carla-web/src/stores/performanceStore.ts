@@ -65,6 +65,9 @@ export const usePerformanceStore = create<PerformanceState>((set) => ({
       };
     }),
 
-  markConnected: () => set({ connectedSince: Date.now() }),
+  // performance.now() so TelemetryPanel's uptime display survives OS
+  // clock jumps (laptop sleep across time-zones, NTP step, manual
+  // reset). connectedSince has no wall-clock consumers.
+  markConnected: () => set({ connectedSince: performance.now() }),
   markDisconnected: () => set({ connectedSince: null }),
 }));

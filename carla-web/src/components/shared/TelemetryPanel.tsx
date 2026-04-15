@@ -18,7 +18,10 @@ function formatBandwidth(bytesPerSec: number): string {
 
 function formatUptime(connectedSince: number | null): string {
   if (!connectedSince) return "--";
-  const totalSec = Math.max(0, Math.floor((Date.now() - connectedSince) / 1000));
+  // connectedSince is set via performance.now() in performanceStore so
+  // both reads come from the same monotonic source — diff stays accurate
+  // across OS clock jumps.
+  const totalSec = Math.max(0, Math.floor((performance.now() - connectedSince) / 1000));
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
