@@ -20,12 +20,11 @@ export function formatMapName(raw: string | null | undefined): string {
 }
 
 /**
- * Extract a user-facing message from a caught value. Prefer the Error's
- * message when available; fall back to a stable "Unknown error" string so
- * toast copy doesn't jitter between `"Error"` / `"Unknown"` / `String(e)`
- * across callsites (was 25+ inline ternaries before this helper).
+ * Extract a user-facing message from a caught value. Internal helper for
+ * reportError — callers should use reportError for toast parity instead
+ * of rolling their own toast.error template.
  */
-export function errorMessage(e: unknown): string {
+function errorMessage(e: unknown): string {
   return e instanceof Error ? e.message : "Unknown error"
 }
 

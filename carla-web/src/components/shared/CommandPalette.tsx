@@ -1,5 +1,5 @@
 
-import { errorMessage } from "@/lib/utils";
+import { reportError } from "@/lib/utils";
 import { useState, useEffect, useCallback } from "react";
 import {
   Command,
@@ -84,7 +84,7 @@ export function CommandPalette() {
         .then(() => {
           if (!opts?.silent) toast.success(label);
         })
-        .catch((e) => toast.error(`${label} failed: ${errorMessage(e)}`));
+        .catch((e) => reportError(label, e));
     },
     [],
   );
