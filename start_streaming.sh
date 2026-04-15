@@ -3,11 +3,13 @@
 # tmux session with panes for CARLA + Bridge + Frontend + (optionally) Signaling
 #
 # Usage:
-#   ./start_streaming.sh                      # Launch all (no pixel streaming)
+#   ./start_streaming.sh                       # Launch all (no pixel streaming)
 #   ./start_streaming.sh --pixel-streaming     # Launch all with UE5 Pixel Streaming
 #   ./start_streaming.sh --no-carla            # Bridge + Frontend only
+#   ./start_streaming.sh --gpu <N>             # Pin CARLA to graphics adapter N (default: 2)
 #   ./start_streaming.sh --kill                # Stop everything
 #   ./start_streaming.sh --status              # Health check
+#   ./start_streaming.sh --help                # Show this usage
 #
 # Access:
 #   Browser: http://<server-ip>:58336
@@ -32,11 +34,16 @@ BRIDGE="$ROOT/carla-web-bridge"
 FRONTEND="$ROOT/carla-web"
 SIGNALING_SERVER="$UE5/Engine/Plugins/Media/PixelStreaming2/Resources/WebServers/SignallingWebServer"
 
+usage() {
+  sed -n '3,16p' "$0" | sed 's/^# \{0,1\}//'
+}
+
 while [[ $# -gt 0 ]]; do
   case $1 in
     --no-carla) NO_CARLA=true; shift ;;
     --pixel-streaming) PIXEL_STREAMING=true; shift ;;
     --gpu) GPU="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
     --kill)
       echo "Stopping carla-web..."
       tmux kill-session -t "$SESSION" 2>/dev/null && echo "Done." || echo "Not running."
@@ -57,7 +64,10 @@ while [[ $# -gt 0 ]]; do
       echo "=== Pixel Streaming Signaling ==="
       ss -tln | grep -q ":$SIGNALING_PLAYER_PORT " && echo "Signaling: listening (port $SIGNALING_PLAYER_PORT)" || echo "Signaling: not running"
       exit 0 ;;
-    *) shift ;;
+    *)
+      echo "Unknown flag: $1" >&2
+      usage >&2
+      exit 2 ;;
   esac
 done
 
