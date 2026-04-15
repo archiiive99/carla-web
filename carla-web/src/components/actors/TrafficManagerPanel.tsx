@@ -27,6 +27,7 @@ import { TrafficCone } from "lucide-react";
 import { useActorStore } from "@/stores/actorStore";
 import { useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
+import { reportError } from "@/lib/utils";
 
 export function TrafficManagerPanel() {
   const isConnected = useIsConnected();
@@ -34,6 +35,26 @@ export function TrafficManagerPanel() {
   const vehicleIds = useActorStore((s) => s.actorsByType.vehicles);
 
   const [globalSpeedPct, setGlobalSpeedPct] = useState(0);
+  // Per-vehicle auto-lane-change intent. No read-back from CARLA
+  // (tm.auto_lane_change has no getter), so start each vehicle optimistic-true
+  // — matches CARLA's default for autopilot-managed vehicles.
+  const [autoLaneChange, setAutoLaneChange] = useState<Record<number, boolean>>({});
+  const [laneBusy, setLaneBusy] = useState<number | null>(null);
+
+  const toggleAutoLane = useCallback(async (vehicleId: number) => {
+    const current = autoLaneChange[vehicleId] ?? true;
+    const next = !current;
+    setAutoLaneChange((prev) => ({ ...prev, [vehicleId]: next }));
+    setLaneBusy(vehicleId);
+    try {
+      await carlaApi.setVehicleAutoLaneChange(vehicleId, next);
+    } catch (e) {
+      setAutoLaneChange((prev) => ({ ...prev, [vehicleId]: current }));
+      reportError(`Auto lane change #${vehicleId}`, e);
+    } finally {
+      setLaneBusy(null);
+    }
+  }, [autoLaneChange]);
 
   const handleGlobalSpeed = useCallback((value: number | readonly number[]) => {
     const v = Array.isArray(value) ? value[0] : value;
@@ -103,15 +124,14 @@ export function TrafficManagerPanel() {
 
             <Separator />
 
-            {/* Per-vehicle table — read-only preview; per-vehicle TM calls
-                aren't exposed by the bridge yet. */}
+            {/* Per-vehicle table — Auto Lane Change is live (bridge
+                /api/traffic/vehicle/:id/lane). Speed % is still read-only:
+                CARLA's tm.vehicle_percentage_speed_difference is write-only,
+                so we'd need to track edit state separately + we don't today. */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <h4 className="text-xs font-medium">Per-Vehicle Settings</h4>
-                <span className="text-3xs uppercase tracking-wide text-muted-foreground">
-                  not wired
-                </span>
-                <Badge variant="secondary" className="ml-auto h-4 px-1.5 text-2xs tabular-nums">
+                <Badge variant="secondary" className="ml-auto h-5 px-2 text-2xs tabular-nums">
                   {vehicleIds.length} vehicles
                 </Badge>
               </div>
@@ -126,18 +146,24 @@ export function TrafficManagerPanel() {
                       <TableHead className="h-8 text-sm">Auto Lane</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody className="opacity-60">
+                  <TableBody>
                     {vehicleIds.map((id) => {
                       const actor = actors.get(id);
+                      const laneOn = autoLaneChange[id] ?? true;
                       return (
                         <TableRow key={id}>
                           <TableCell className="py-2 font-mono tabular-nums text-xs">#{id}</TableCell>
                           <TableCell className="py-2 text-xs">
                             {actor?.type_id.split(".").pop() ?? "—"}
                           </TableCell>
-                          <TableCell className="py-2 text-xs">0%</TableCell>
+                          <TableCell className="py-2 text-xs text-muted-foreground">—</TableCell>
                           <TableCell className="py-2">
-                            <Switch defaultChecked disabled aria-label={`Auto lane change for actor #${id}`} />
+                            <Switch
+                              checked={laneOn}
+                              onCheckedChange={() => toggleAutoLane(id)}
+                              disabled={!isConnected || laneBusy === id}
+                              aria-label={`Auto lane change for actor #${id}`}
+                            />
                           </TableCell>
                         </TableRow>
                       );

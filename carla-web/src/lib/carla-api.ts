@@ -295,6 +295,14 @@ export class CarlaApi {
     });
   }
 
+  /** Set per-vehicle auto-lane-change behavior (TrafficManager). */
+  async setVehicleAutoLaneChange(vehicleId: number, enabled: boolean): Promise<void> {
+    await request(this.url(`/api/traffic/vehicle/${vehicleId}/lane`), {
+      method: "POST",
+      body: JSON.stringify({ auto_lane_change: enabled, force_lane_change: false, lane_offset: 0 }),
+    });
+  }
+
   // --- Navigation ---
 
   async getTopology(): Promise<TopologyEdge[]> {
