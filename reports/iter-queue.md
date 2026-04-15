@@ -31,7 +31,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-04  Lane markings — texture authoring or decal pipeline  (✅-on-arrival — full procedural shader chunk shipped in iter-01: white/yellow stripes, stop lines, zebra crosswalks, arrows, wear; closed 2026-04-15T09:21+~20min)
 [ ] iter-07  Vegetation — extracted trees / bushes / grass instances
 [ ] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle
-[ ] iter-09  Street lights — emissive + point-light contribution at night
+[~] iter-09  Street lights — emissive + point-light contribution at night  (opened 2026-04-15T09:39:18Z, Phase A)
 [x] iter-10  Traffic lights — emissive bulb + correct hue  (✅-on-arrival — basic feature shipped via indicator-sphere; GLTF-mesh recolor queued as iter-10-revisit-glb-bulb; closed 2026-04-15T09:23+~15min)
 [x] iter-10-revisit-glb-bulb  Traverse GLTF, recolor authored bulb mesh by name  (✅ — bulb primitive (WorldGridMaterial) detected + replaced with state-driven emissive material; visual confirmation distant TL shows current state color; closed 2026-04-15T09:25+~35min)
 [x] iter-12  Wet-surface response — driven by CARLA wetness param  (✅-on-arrival — binding shipped in iter-01; verified end-to-end via new --weather-wetness flag; PSNR moves +0.51 dB dry→wet vs 0.02 dB noise floor; closed 2026-04-15T09:14+~30min)
