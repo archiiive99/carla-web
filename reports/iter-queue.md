@@ -21,7 +21,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-05  Sky + sun direction parity (Hosek-Wilkie or HDR)     (⚠️ §6.1 raise — closed 2026-04-15T07:50:51Z+~80min; Path A applied + tsc-clean, measurement blocked by BP_CarlaWeather wiring defect; see iter-05/report.md)
 [x] iter-engine-weather-bp  BP_CarlaWeather → SkyAtmosphere wiring fix   (⚠️ §4.3 tuning-exhausted — closed 2026-04-15T08:06+~2h. C++ override of lone ADirectionalLight verifiably runs each set_weather but UE5's "night" is owned by something else. See iter-engine-weather-bp/report.md §7.8.)
 [ ] iter-engine-weather-bp-revisit  BP_GeneralSceneSettings + SkyAtmosphere chain inspection  (needs UE editor session on GPU 2 — out of CLI scope)
-[ ] iter-05-revisit-roi-sky  Add sky-ROI mode to compare.py harness     (≤30min once iter-engine-weather-bp lands)
+[~] iter-05-revisit-roi-sky  Add sky-ROI mode to compare.py harness     (opened 2026-04-15T09:06:46Z, Phase A — harness-only, web/UE-independent)
 [ ] iter-05-revisit-pathB  Hosek-Wilkie shader if Path A still misses    (queued, only if needed)
 [ ] iter-05-revisit-pathC  HDR cubemap per TOD/cloud bucket              (queued, only if Path A+B miss)
 [ ] iter-06  Shadows from sun — cascaded SM tuning                (depends on iter-05 sun pose)
