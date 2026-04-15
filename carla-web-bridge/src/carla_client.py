@@ -106,14 +106,22 @@ class CarlaClientManager:
             except Exception as exc:
                 message = str(exc)
                 if "std::exception" in message:
+                    # Hold std-exception retries at a fixed short delay
+                    # — they usually clear as soon as CARLA finishes its
+                    # own startup, so exponential backoff would just make
+                    # the user wait longer for the simulator to come up.
                     delay = RECONNECT_STD_EXCEPTION_DELAY
+                else:
+                    # Exponential backoff for other failures, capped.
+                    delay = min(delay * 2, RECONNECT_MAX_DELAY)
+                # Log AFTER computing the final delay so the message matches
+                # the actual sleep duration (previously logged the pre-double
+                # value for non-std exceptions — drift the user would notice).
                 logger.warning(
                     "CARLA connection failed (%s). Retrying in %.0fs…",
                     exc,
                     delay,
                 )
-                if "std::exception" not in message:
-                    delay = min(delay * 2, RECONNECT_MAX_DELAY)
                 await asyncio.sleep(delay)
 
     async def disconnect(self) -> None:
