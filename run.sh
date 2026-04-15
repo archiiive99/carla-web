@@ -34,6 +34,10 @@ USE_DOCKER=false
 SKIP_CARLA=false
 CARLA_MAP="Town10HD"
 RESOLUTION="1920x1080"
+# UE5's Vulkan renderer ignores CUDA_VISIBLE_DEVICES and picks adapter
+# by -graphicsadapter. Never 0 on this host (display GPU); 2 and 3 are
+# the usable compute adapters.
+GPU_ID=2
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -42,6 +46,7 @@ while [[ $# -gt 0 ]]; do
         --skip-carla)  SKIP_CARLA=true; shift ;;
         --map)         CARLA_MAP="$2"; shift 2 ;;
         --res)         RESOLUTION="$2"; shift 2 ;;
+        --gpu)         GPU_ID="$2"; shift 2 ;;
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
             echo ""
@@ -50,6 +55,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --skip-carla   Don't start CARLA server (use existing)"
             echo "  --map NAME     Initial map (default: Town10HD)"
             echo "  --res WxH      Resolution (default: 1920x1080)"
+            echo "  --gpu N        UE5 graphics adapter (default: 2)"
             exit 0
             ;;
         *) echo "Unknown: $1"; exit 1 ;;
@@ -126,8 +132,8 @@ if ! $SKIP_CARLA; then
             log "  CARLA server (package): PID $! on port $CARLA_RPC_PORT"
         elif [ -f "$UE_EDITOR" ] && [ -f "$UPROJECT" ]; then
             # Fallback: run via UnrealEditor directly
-            log "  Package not found, launching via UnrealEditor..."
-            CUDA_VISIBLE_DEVICES=0 "$UE_EDITOR" "$UPROJECT" -game $CARLA_FLAGS &
+            log "  Package not found, launching via UnrealEditor (GPU $GPU_ID)..."
+            CUDA_VISIBLE_DEVICES=$GPU_ID "$UE_EDITOR" "$UPROJECT" -game $CARLA_FLAGS -graphicsadapter=$GPU_ID &
             PIDS+=($!)
             log "  CARLA server (editor): PID $! on port $CARLA_RPC_PORT"
         else

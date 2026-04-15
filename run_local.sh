@@ -49,12 +49,16 @@ trap cleanup EXIT INT TERM
 # ── 1. CARLA Server ──
 if [ "$NO_CARLA" = false ]; then
   echo "[1/3] Starting CARLA server (GPU $GPU_ID)..."
+  # UE5's Vulkan renderer ignores CUDA_VISIBLE_DEVICES — it picks a
+  # physical adapter by -graphicsadapter. Pass both so the (rare) CUDA
+  # workload and the primary render path both land on the selected GPU.
   export CUDA_VISIBLE_DEVICES=$GPU_ID
   ln -sfn "$SCRIPT_DIR/Unreal/CarlaUnreal" "$ENGINE_PROJECT_LINK"
   "$UE5_DIR/Engine/Binaries/Linux/UnrealEditor" \
     "$UPROJECT_PATH" \
     -game -RenderOffScreen -nosound -unattended \
     -ResX=640 -ResY=480 -carla-rpc-port=$CARLA_PORT \
+    -graphicsadapter=$GPU_ID \
     > /tmp/carla-server.log 2>&1 &
   PIDS+=($!)
   echo "  PID: ${PIDS[-1]} (log: /tmp/carla-server.log)"
