@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class ClientConnection:
     """Tracks a single WebSocket client."""
 
-    __slots__ = ("ws", "client_id", "subscriptions", "connected_at", "last_stats", "on_unsubscribe")
+    __slots__ = ("ws", "client_id", "subscriptions", "last_stats", "on_unsubscribe")
 
     def __init__(
         self,
@@ -32,7 +32,6 @@ class ClientConnection:
         self.ws = ws
         self.client_id = client_id
         self.subscriptions: set[int] = set()
-        self.connected_at = time.time()
         self.last_stats: dict | None = None
         self.on_unsubscribe = on_unsubscribe
 
