@@ -824,15 +824,17 @@ class SensorManager:
             return encode_frame(Channel.COLLISION, payload)
         if kind == KIND_LANE_INVASION:
             count = len(packet.marking_types)
+            # Single pack call instead of a loop of `payload += struct.pack("<I", m)`
+            # which was O(count) concat-allocations. marking_types is typically
+            # small (1–4) but the old form still reallocated immutable bytes.
             payload = struct.pack(
-                "<IIdI",
+                f"<IIdI{count}I",
                 packet.sensor_id,
                 packet.frame,
                 packet.timestamp,
                 count,
+                *packet.marking_types,
             )
-            for m in packet.marking_types:
-                payload += struct.pack("<I", m)
             return encode_frame(Channel.LANE_INVASION, payload)
         if kind == KIND_DVS:
             event_count = len(packet.raw_data) // 8
