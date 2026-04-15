@@ -18,11 +18,11 @@ import {
 import { useActorStore } from "@/stores/actorStore";
 import { useIsConnected } from "@/stores/simulationStore";
 import type { CarlaActor } from "@/types/carla";
+import { ActorGroupSection } from "./actor-list/ActorGroupSection";
 import {
-  ActorGroupSection,
   actorDisplayName,
   type ActorGroupDef,
-} from "./actor-list/ActorGroupSection";
+} from "./actor-list/actor-group-defs";
 import { ActorLifecycleFooter } from "./actor-list/ActorLifecycleFooter";
 
 const GROUP_DEFS: ActorGroupDef[] = [

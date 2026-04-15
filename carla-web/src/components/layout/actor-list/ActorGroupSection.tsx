@@ -19,18 +19,7 @@ import { SENSOR_REGISTRY } from "@/lib/sensor-registry";
 import { cn } from "@/lib/utils";
 import type { CarlaActor } from "@/types/carla";
 import { BRIDGE_EGO_ROLE } from "@/constants";
-
-export interface ActorGroupDef {
-  key: string;
-  label: string;
-  icon: React.ReactNode;
-}
-
-export function actorDisplayName(actor: CarlaActor): string {
-  const parts = actor.type_id.split(".");
-  const name = parts.length > 2 ? parts.slice(2).join(" ") : parts[parts.length - 1];
-  return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
+import { actorDisplayName, type ActorGroupDef } from "./actor-group-defs";
 
 function ActorItemIcon({ actor }: { actor: CarlaActor }) {
   const className = "size-3 shrink-0 text-muted-foreground";
