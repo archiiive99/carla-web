@@ -18,6 +18,11 @@ SAMPLE_HZ = 10.0
 TOLERANCE_METERS = 5.0
 MIN_MOVEMENT_METERS = 1.0
 
+# Repo root = carla-web-bridge/tools/e2e/<file> → 3 parents up.
+# Used by _best_effort_delete_recording to locate CARLA's recorder output
+# without hard-coding the author's $HOME.
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+
 
 @pytest.mark.asyncio
 async def test_e5_recording_roundtrip(
@@ -144,8 +149,8 @@ def _best_effort_delete_recording(filename: str) -> None:
     for candidate in (
         Path.cwd() / filename,
         Path.cwd().parent / filename,
-        Path("/data1/song99/carla/Unreal/CarlaUnreal") / filename,
-        Path("/data1/song99/carla/Unreal/CarlaUnreal/Saved") / filename,
+        _REPO_ROOT / "Unreal" / "CarlaUnreal" / filename,
+        _REPO_ROOT / "Unreal" / "CarlaUnreal" / "Saved" / filename,
     ):
         try:
             if candidate.exists():
