@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { UI_STATE_KEY } from "@/constants";
 
 export type CameraMode = "follow" | "birdseye" | "orbit" | "fpv" | "camera-match";
 
@@ -44,7 +45,7 @@ function loadUiState(): Partial<UIState> {
         ? new URLSearchParams(window.location.search)
         : null;
     hasCameraOverride = Boolean(params?.get("camPose") || params?.get("camMatch"));
-    const saved = localStorage.getItem("carla-ui-state");
+    const saved = localStorage.getItem(UI_STATE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved) as Partial<UIState>;
       if (hasCameraOverride) {
@@ -62,7 +63,7 @@ function loadUiState(): Partial<UIState> {
 
 function saveUiState(state: Partial<UIState>) {
   try {
-    localStorage.setItem("carla-ui-state", JSON.stringify({
+    localStorage.setItem(UI_STATE_KEY, JSON.stringify({
       leftPanelOpen: state.leftPanelOpen,
       rightPanelOpen: state.rightPanelOpen,
       bottomPanelOpen: state.bottomPanelOpen,

@@ -19,6 +19,12 @@ export const APP_SETTINGS_KEY = "carla-web-settings";
  *  declaration instead of silently desyncing the sites. */
 export const BRIDGE_URL_KEY = "bridgeUrl";
 
+/** localStorage key for the UIStore persisted slice (panels / theme / camera
+ *  mode / perf-overlay / showCityEnvironment). Centralized alongside the other
+ *  keys so a rename hits one line; previously duplicated between the loader
+ *  and writer in uiStore.ts. */
+export const UI_STATE_KEY = "carla-ui-state";
+
 // Toast copy used from multiple callsites. Centralized so wording edits
 // don't leave straggler versions.
 export const SPAWN_NO_POINTS_MSG = "No spawn points available on this map";
