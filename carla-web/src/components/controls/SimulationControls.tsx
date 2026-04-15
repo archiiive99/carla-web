@@ -144,7 +144,7 @@ export function SimulationControls() {
                 }).catch(() => {});
               }}
             />
-            <div className="flex justify-between text-2xs text-muted-foreground">
+            <div className="flex justify-between font-mono text-2xs tabular-nums text-muted-foreground">
               <span>0.5x</span>
               <span>1x</span>
               <span>2x</span>
@@ -166,7 +166,7 @@ export function SimulationControls() {
           aria-label="Toggle synchronous simulation mode"
           className="peer"
         />
-        <Label htmlFor="sync-mode" className="text-xs text-muted-foreground peer-disabled:opacity-50">
+        <Label htmlFor="sync-mode" className="text-sm text-muted-foreground peer-disabled:opacity-50">
           Sync
         </Label>
       </div>

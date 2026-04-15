@@ -16,11 +16,11 @@ interface CollisionEntry {
 
 function getSeverity(impulse: number): {
   label: string;
-  variant: "default" | "secondary" | "destructive";
+  className: string;
 } {
-  if (impulse > 1000) return { label: "Heavy", variant: "destructive" };
-  if (impulse > 100) return { label: "Medium", variant: "default" };
-  return { label: "Light", variant: "secondary" };
+  if (impulse > 1000) return { label: "Heavy", className: "bg-destructive/10 text-destructive" };
+  if (impulse > 100) return { label: "Medium", className: "bg-warning/10 text-warning" };
+  return { label: "Light", className: "bg-success/10 text-success" };
 }
 
 interface CollisionLogProps {
@@ -80,14 +80,10 @@ export default function CollisionLog({ sensorId, className }: CollisionLogProps)
                 return (
                   <div
                     key={event.id}
-                    className={cn(
-                      "flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted border-l-2",
-                      event.impulse > 1000 ? "border-l-destructive" : event.impulse > 100 ? "border-l-warning" : "border-l-success"
-                    )}
+                    className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted"
                   >
                     <Badge
-                      variant={severity.variant}
-                      className="h-4 px-1 text-2xs"
+                      className={cn("h-5 px-1.5 text-2xs", severity.className)}
                     >
                       {severity.label}
                     </Badge>

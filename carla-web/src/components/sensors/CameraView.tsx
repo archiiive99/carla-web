@@ -129,7 +129,7 @@ export default function CameraView({
       <CardContent className="relative flex-1 p-2">
         <ContextMenu>
           <ContextMenuTrigger>
-            <div className="flex h-full w-full items-center justify-center bg-background">
+            <div className="flex h-full w-full items-center justify-center bg-overlay-bg">
               <canvas
                 ref={canvasRef}
                 aria-label="Camera sensor feed"

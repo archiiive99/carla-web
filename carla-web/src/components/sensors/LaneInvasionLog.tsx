@@ -68,14 +68,7 @@ export default function LaneInvasionLog({
               {events.map((event) => (
                 <div
                   key={event.id}
-                  className={cn(
-                    "flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted border-l-2",
-                    event.markingTypes.some((t) => t.toLowerCase().includes("solid"))
-                      ? "border-l-destructive"
-                      : event.markingTypes.some((t) => t.toLowerCase().includes("broken"))
-                        ? "border-l-warning"
-                        : "border-l-muted-foreground"
-                  )}
+                  className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted"
                 >
                   <div className="flex flex-1 gap-1">
                     {event.markingTypes.map((type, i) => (

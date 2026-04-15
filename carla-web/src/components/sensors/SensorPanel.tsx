@@ -280,7 +280,7 @@ export function SensorPanel({ className }: { className?: string }) {
         }}
       >
         {cells.slice(0, totalCells).map((cell, index) => (
-          <div key={index} className="min-h-0 min-w-0">
+          <div key={index} className="min-h-0 min-w-0 transition-shadow duration-150 hover:shadow-md">
             {cell ? (
               <SensorCell
                 cell={cell}

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -115,7 +116,7 @@ export function LeftPanel() {
 
   return (
     <aside aria-label="Actors list" className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border/60 bg-sidebar text-sidebar-foreground shadow-sm">
-      <div className="flex items-center justify-between px-3 py-2">
+      <div className="flex h-10 items-center justify-between px-3 py-2">
         <div className="flex items-center gap-2">
           <h2 className="text-sm font-semibold">Actors</h2>
           <Badge
@@ -162,6 +163,7 @@ export function LeftPanel() {
               aria-label={`Filter to ${t}s${pressed ? " (active, click to clear)" : ""}`}
               aria-pressed={pressed}
               onClick={() => setTypeFilter(pressed ? null : t)}
+              className={cn(pressed && "ring-1 ring-primary/30")}
             >
               <Icon className="size-3.5" aria-hidden="true" />
             </Button>

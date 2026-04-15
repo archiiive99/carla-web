@@ -127,14 +127,14 @@ export function ActorDetails() {
         {/* Accordion sections */}
         <Accordion multiple defaultValue={["transform", "velocity"]}>
           <AccordionItem value="transform">
-            <AccordionTrigger className="py-2 text-sm">Transform</AccordionTrigger>
+            <AccordionTrigger className="py-2 text-sm font-medium">Transform</AccordionTrigger>
             <AccordionContent>
               <TransformDisplay actor={actor} />
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="velocity">
-            <AccordionTrigger className="py-2 text-sm">Velocity</AccordionTrigger>
+            <AccordionTrigger className="py-2 text-sm font-medium">Velocity</AccordionTrigger>
             <AccordionContent>
               <VelocityDisplay actor={actor} />
             </AccordionContent>
@@ -143,7 +143,7 @@ export function ActorDetails() {
           {/* Type-specific sections */}
           {actor.type === "vehicle" && (
             <AccordionItem value="vehicle">
-              <AccordionTrigger className="py-2 text-sm">Vehicle Controls</AccordionTrigger>
+              <AccordionTrigger className="py-2 text-sm font-medium">Vehicle Controls</AccordionTrigger>
               <AccordionContent>
                 <VehicleDetails actorId={actor.id} />
               </AccordionContent>
@@ -152,7 +152,7 @@ export function ActorDetails() {
 
           {actor.type === "sensor" && (
             <AccordionItem value="sensor">
-              <AccordionTrigger className="py-2 text-sm">Sensor Config</AccordionTrigger>
+              <AccordionTrigger className="py-2 text-sm font-medium">Sensor Config</AccordionTrigger>
               <AccordionContent>
                 <SensorDetails actorId={actor.id} typeId={actor.type_id} />
               </AccordionContent>

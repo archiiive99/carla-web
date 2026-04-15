@@ -58,17 +58,17 @@ export function EmptyCell({
     });
 
   return (
-    <Card className="flex h-full items-center justify-center border-dashed bg-transparent transition-colors hover:bg-muted/50">
+    <Card className="flex h-full items-center justify-center border-dashed bg-muted/20 transition-colors hover:bg-muted/40">
       <Popover>
         <PopoverTrigger
           render={
             <Button
               variant="ghost"
               size="icon"
-              className="size-9 rounded-full border border-dashed border-muted-foreground/60"
+              className="size-10 rounded-full border-2 border-dashed border-muted-foreground/70 hover:border-primary/60 hover:bg-primary/5"
               aria-label="Add sensor to cell"
             >
-              <Plus className="size-4 text-muted-foreground" aria-hidden="true" />
+              <Plus className="size-5 text-muted-foreground" aria-hidden="true" />
             </Button>
           }
         />
@@ -94,7 +94,7 @@ export function EmptyCell({
                     key={s.id}
                     variant="ghost"
                     size="sm"
-                    className="h-auto justify-start px-2 py-1 text-left text-2xs"
+                    className="h-auto justify-start px-2 py-1.5 text-left text-2xs hover:bg-accent hover:text-accent-foreground"
                     disabled={usedSensorIds.has(s.id)}
                     onClick={() => onSelect(s.id, s.type)}
                   >
