@@ -97,16 +97,6 @@ async def get_sensor_config(sensor_id: int):
     return await asyncio.to_thread(_get)
 
 
-@router.post("/{sensor_id}/config")
-async def update_sensor_config(sensor_id: int, attributes: dict[str, str]):
-    _require_connection()
-    return {
-        "status": "updated",
-        "id": sensor_id,
-        "note": "Sensor attribute changes require re-spawning the sensor",
-    }
-
-
 # --- D3: live attribute adjustment via destroy + respawn -------------------
 #
 # Live-adjustable attributes vs. recreate-required:
