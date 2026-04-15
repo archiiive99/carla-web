@@ -109,11 +109,16 @@ def capture_carla_reference(
         wetness=0.0,
     )
     world.set_weather(weather)
-    # Give the engine ~2 s (10 @ 20Hz) to propagate weather + sun-position
-    # changes through its render targets. Running CARLA is -benchmark
-    # -fps=20; a shorter wait captures frames rendered during the weather
-    # transition and bakes that into the reference.
-    for _ in range(10):
+    # iter-05 finding: the prior 10-tick wait was insufficient — histogram
+    # auto-exposure (per the iter-01 AEM_Histogram fix) needs ~50 frames to
+    # converge from a previous-weather render-target state, OR the
+    # scene-capture sees the previous frame's render target before the new
+    # SkyAtmosphere + DirectionalLight values propagate. Without the longer
+    # wait, the captured reference is exposed for whatever the prior weather
+    # was — at iter-05 measurement time the previous frame was night, so
+    # the captured "midday" frame still showed streetlights and a black sky.
+    # 60 ticks @ 20Hz = 3 s is the empirical floor for stable midday capture.
+    for _ in range(60):
         try:
             world.tick()
         except RuntimeError:
@@ -136,10 +141,12 @@ def capture_carla_reference(
     )
     sensor = world.spawn_actor(cam_bp, transform)
 
-    # Drain ~8 frames with no listener so the render target converges on
-    # the new camera pose + weather. Without this the first captured frame
-    # is often the render target's previous contents (dark or stale).
-    for _ in range(8):
+    # iter-05 finding: 8 ticks isn't enough for histogram auto-exposure to
+    # adapt after camera spawn; bumped to 30. With the upstream weather-wait
+    # also bumped (60 ticks above), total post-set-weather wait before
+    # capture is ~4.5 s which empirically lets histogram + render-target
+    # converge from any previous weather state.
+    for _ in range(30):
         try:
             world.tick()
         except RuntimeError:

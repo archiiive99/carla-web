@@ -18,7 +18,11 @@ Bumped lighting-stack rows ahead of geometry rows.
 
 ```
 [x] iter-01  Road surface PBR + parity harness MVP                (⚠️ measured FAIL >±10% — §6.3 raised in 369009cc6, see report)
-[~] iter-05  Sky + sun direction parity (Hosek-Wilkie or HDR)     (opened 2026-04-15T07:50:51Z, Phase A)
+[x] iter-05  Sky + sun direction parity (Hosek-Wilkie or HDR)     (⚠️ §6.1 raise — closed 2026-04-15T07:50:51Z+~80min; Path A applied + tsc-clean, measurement blocked by BP_CarlaWeather wiring defect; see iter-05/report.md)
+[ ] iter-engine-weather-bp  BP_CarlaWeather → SkyAtmosphere wiring fix   (newly inserted before iter-06; blocks ALL future render-parity measurement)
+[ ] iter-05-revisit-roi-sky  Add sky-ROI mode to compare.py harness     (≤30min once iter-engine-weather-bp lands)
+[ ] iter-05-revisit-pathB  Hosek-Wilkie shader if Path A still misses    (queued, only if needed)
+[ ] iter-05-revisit-pathC  HDR cubemap per TOD/cloud bucket              (queued, only if Path A+B miss)
 [ ] iter-06  Shadows from sun — cascaded SM tuning                (depends on iter-05 sun pose)
 [ ] iter-11  Post-process calibration — tonemap, exposure, bloom   (closes warm/cool color balance)
 [ ] iter-02  Building façades — windows, materials, silhouettes
