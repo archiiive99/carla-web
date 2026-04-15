@@ -68,8 +68,6 @@ export const useActorStore = create<ActorState>((set, get) => ({
     vehicles: [],
     walkers: [],
     sensors: [],
-    trafficLights: [],
-    other: [],
   },
 
   setEgoVehicleId: (id) => {
