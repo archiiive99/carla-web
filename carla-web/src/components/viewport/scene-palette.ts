@@ -81,11 +81,27 @@ export const VEHICLE_REVERSE = "#22c55e";
 /** Walker body capsule (placeholder mesh) primary color. */
 export const WALKER_BODY = "#f97316";
 
+/** Walker torso emissive tint — slight warm glow so the safety-vis
+ *  body still reads on dark backgrounds without a direct light. */
+export const WALKER_EMISSIVE = "#9a3412";
+
 /** Walker body capsule secondary (limbs). */
 export const WALKER_LIMB = "#fb923c";
 
 /** Walker proximity-warning sphere. */
 export const WALKER_WARNING = "#f59e0b";
+
+/** Per-actor deterministic body-color variations — safety-vis hue band
+ *  (high-visibility orange/amber/red range). walkerBodyColor() picks one
+ *  by `abs(actorId) % length` so a crowd reads as distinct individuals. */
+export const WALKER_BODY_VARIATIONS = [
+  WALKER_BODY, // "#f97316" — orange (default)
+  "#ea580c",   // darker orange-red
+  "#fb923c",   // light orange
+  "#f59e0b",   // amber
+  "#fbbf24",   // yellow-orange
+  "#dc2626",   // red-orange
+] as const;
 
 // ──────────────────────────────────────────────────────────────────────
 // Traffic lights

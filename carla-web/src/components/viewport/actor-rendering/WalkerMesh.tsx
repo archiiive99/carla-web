@@ -3,25 +3,21 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { CarlaActor } from "@/types/carla";
 import { carlaToThree } from "./shared";
-import { WALKER_BODY, WALKER_LIMB, WALKER_WARNING } from "../scene-palette";
+import {
+  WALKER_BODY_VARIATIONS,
+  WALKER_EMISSIVE,
+  WALKER_LIMB,
+  WALKER_WARNING,
+} from "../scene-palette";
 
 // iter-08-skin-tones: deterministic body color per actor.id so a
 // crowd of walkers reads as visually distinct individuals rather than
-// a uniform orange swarm. Returns one of the safety-visibility
-// palette variations (orange-red → orange → amber → yellow-orange).
-// Distinct enough at distance to differentiate; all within the
-// "high-vis safety" hue band so the no-mistaken-for-real-person
-// principle still applies.
-const WALKER_BODY_VARIATIONS = [
-  "#f97316", // orange (default WALKER_BODY)
-  "#ea580c", // darker orange-red
-  "#fb923c", // light orange
-  "#f59e0b", // amber
-  "#fbbf24", // yellow-orange
-  "#dc2626", // red-orange
-];
+// a uniform orange swarm. All variations live in scene-palette as
+// WALKER_BODY_VARIATIONS (high-vis safety hue band).
 function walkerBodyColor(actorId: number): string {
-  return WALKER_BODY_VARIATIONS[Math.abs(actorId) % WALKER_BODY_VARIATIONS.length];
+  return WALKER_BODY_VARIATIONS[
+    Math.abs(actorId) % WALKER_BODY_VARIATIONS.length
+  ];
 }
 
 export const WalkerMesh = memo(function WalkerMesh({
@@ -90,7 +86,7 @@ export const WalkerMesh = memo(function WalkerMesh({
         <capsuleGeometry args={[0.18, 0.55, 6, 12]} />
         <meshStandardMaterial
           color={bodyColor}
-          emissive="#9a3412"
+          emissive={WALKER_EMISSIVE}
           emissiveIntensity={0.12}
           roughness={0.8}
         />
