@@ -195,10 +195,12 @@ export const useActorStore = create<ActorState>((set, get) => ({
       return spawned;
     }
     for (let i = 0; i < Math.min(count, spawnPoints.length); i++) {
+      const transform = spawnPoints[i];
+      if (!transform) continue;
       try {
         const actor = await carlaApi.spawnVehicle({
           blueprint,
-          transform: spawnPoints[i],
+          transform,
           autopilot: true,
         });
         spawned.push(actor);

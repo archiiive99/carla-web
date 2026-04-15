@@ -13,6 +13,9 @@ export interface ActorGroupDef {
  *  exports non-component helpers). */
 export function actorDisplayName(actor: CarlaActor): string {
   const parts = actor.type_id.split(".");
-  const name = parts.length > 2 ? parts.slice(2).join(" ") : parts[parts.length - 1];
+  // String.split always returns a non-empty array for any string
+  // (even "" splits to [""]), so parts[parts.length - 1] is always
+  // defined in practice; `?? ""` satisfies noUncheckedIndexedAccess.
+  const name = parts.length > 2 ? parts.slice(2).join(" ") : parts[parts.length - 1] ?? "";
   return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }

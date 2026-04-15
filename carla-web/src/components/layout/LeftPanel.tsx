@@ -94,7 +94,10 @@ export function LeftPanel() {
         actor.type === "walker" ? "walkers" :
         actor.type === "sensor" ? "sensors" :
         actor.type === "traffic_light" ? "trafficLights" : "other";
-      map[key].push(actor);
+      // `map` is initialized with all 5 keys above; the lookup is
+      // always defined. Guard with an explicit array or create
+      // empty to satisfy noUncheckedIndexedAccess.
+      (map[key] ??= []).push(actor);
     }
     return map;
   }, [allActors, search]);

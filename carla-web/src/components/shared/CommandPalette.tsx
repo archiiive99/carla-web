@@ -194,10 +194,12 @@ export function CommandPalette() {
                   const points = await carlaApi.getSpawnPoints();
                   const store = useActorStore.getState();
                   for (let i = 0; i < Math.min(10, points.length); i++) {
+                    const transform = points[i];
+                    if (!transform) continue;
                     try {
                       await store.spawnWalker({
                         blueprint: "walker.pedestrian.0001",
-                        transform: points[i],
+                        transform,
                       });
                     } catch { break; }
                   }
