@@ -176,10 +176,12 @@ def encode_world_tick_payload(
 
     Each actor: (id, (x,y,z), (pitch,yaw,roll), (vx,vy,vz))
     """
-    buf = struct.pack("<IdI", frame, timestamp, len(actors))
+    # bytearray.extend is O(N) total; the previous `buf += ...` loop
+    # reallocated an immutable bytes object on every step (O(N²)).
+    buf = bytearray(struct.pack("<IdI", frame, timestamp, len(actors)))
     for actor_id, pos, rot, vel in actors:
-        buf += struct.pack("<I9f", actor_id, *pos, *rot, *vel)
-    return buf
+        buf.extend(struct.pack("<I9f", actor_id, *pos, *rot, *vel))
+    return bytes(buf)
 
 
 def decode_world_tick_payload(

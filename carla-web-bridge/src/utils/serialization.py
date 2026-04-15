@@ -160,15 +160,19 @@ def serialize_weather(w: Any) -> WeatherParams:
 
 def encode_world_tick(frame: int, timestamp: float, actors: list[Any]) -> bytes:
     """Encode all actor transforms into the binary world tick format."""
-    buf = struct.pack("<IdI", frame, timestamp, len(actors))
+    # bytearray.extend is O(N) total; the previous `buf += ...` loop
+    # reallocated an immutable bytes object on every step (O(N²)).
+    # Today `actors` is usually just [ego], but the loop runs every tick
+    # (20Hz) — cheap to future-proof.
+    buf = bytearray(struct.pack("<IdI", frame, timestamp, len(actors)))
     for actor in actors:
         t = actor.get_transform()
         v = actor.get_velocity()
-        buf += struct.pack(
+        buf.extend(struct.pack(
             "<I9f",
             actor.id,
             t.location.x, t.location.y, t.location.z,
             t.rotation.pitch, t.rotation.yaw, t.rotation.roll,
             v.x, v.y, v.z,
-        )
-    return buf
+        ))
+    return bytes(buf)
