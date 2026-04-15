@@ -198,18 +198,6 @@ async def health_check():
     }
 
 
-@app.get("/api/info")
-async def get_info():
-    return {
-        "bridge_version": "0.1.0",
-        "carla_connected": carla_manager.is_connected,
-        "carla_version": await asyncio.to_thread(carla_manager.get_server_version) if carla_manager.is_connected else None,
-        "active_sensors": len(sensor_manager.get_sensor_ids()),
-        "ws_clients": ws_broadcaster.client_count,
-        **realtime_session.snapshot(),
-    }
-
-
 @app.get("/api/realtime/session")
 async def get_realtime_session():
     if carla_manager.is_connected:
