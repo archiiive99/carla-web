@@ -36,9 +36,16 @@ export default function SegmentationView({
   const { bitmapRef } = useCameraSensorData(sensorId);
 
   // Reset "received" state when switching sensors (avoids stale last frame).
+  // Pure state reset uses the React-19 "adjust state during render" idiom;
+  // ref mutation + DOM side-effects legitimately need an effect because
+  // refs/DOM nodes only exist after commit.
+  const [lastSensorId, setLastSensorId] = useState(sensorId);
+  if (lastSensorId !== sensorId) {
+    setLastSensorId(sensorId);
+    setHasReceivedFrame(false);
+  }
   useEffect(() => {
     hasReceivedFrameRef.current = false;
-    setHasReceivedFrame(false);
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext("2d");
