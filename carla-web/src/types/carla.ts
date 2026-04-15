@@ -124,7 +124,6 @@ export enum SensorType {
   Gnss = "sensor.other.gnss",
   Collision = "sensor.other.collision",
   LaneInvasion = "sensor.other.lane_invasion",
-  Obstacle = "sensor.other.obstacle",
 }
 
 export interface SensorConfig {

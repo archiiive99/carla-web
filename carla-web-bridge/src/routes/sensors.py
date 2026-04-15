@@ -29,14 +29,16 @@ def _require_connection() -> None:
         raise HTTPException(status_code=503, detail="Not connected to CARLA server")
 
 
+# Only sensors with a full bridge-side encode path in _kind_for_type are
+# advertised here. optical_flow / dvs / obstacle have no mapping — the
+# bridge would silently drop their frames, which historically misled clients
+# into spawning sensors that then rendered forever-blank panels.
 SENSOR_TYPES = [
     {"type": "sensor.camera.rgb", "category": "camera", "description": "RGB Camera"},
     {"type": "sensor.camera.depth", "category": "camera", "description": "Depth Camera"},
     {"type": "sensor.camera.semantic_segmentation", "category": "camera", "description": "Semantic Segmentation"},
     {"type": "sensor.camera.instance_segmentation", "category": "camera", "description": "Instance Segmentation"},
-    {"type": "sensor.camera.optical_flow", "category": "camera", "description": "Optical Flow"},
     {"type": "sensor.camera.normals", "category": "camera", "description": "Normals Camera"},
-    {"type": "sensor.camera.dvs", "category": "camera", "description": "DVS Camera"},
     {"type": "sensor.lidar.ray_cast", "category": "lidar", "description": "LiDAR Ray-Cast"},
     {"type": "sensor.lidar.ray_cast_semantic", "category": "lidar", "description": "Semantic LiDAR"},
     {"type": "sensor.other.radar", "category": "radar", "description": "Radar"},
@@ -44,7 +46,6 @@ SENSOR_TYPES = [
     {"type": "sensor.other.gnss", "category": "gnss", "description": "GNSS"},
     {"type": "sensor.other.collision", "category": "event", "description": "Collision Detector"},
     {"type": "sensor.other.lane_invasion", "category": "event", "description": "Lane Invasion Detector"},
-    {"type": "sensor.other.obstacle", "category": "event", "description": "Obstacle Detector"},
 ]
 
 

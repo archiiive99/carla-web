@@ -10,7 +10,6 @@ import {
   Navigation,
   AlertTriangle,
   ArrowLeftRight,
-  CircleAlert,
   type LucideIcon,
 } from "lucide-react";
 import { SensorType } from "@/types/carla";
@@ -141,12 +140,11 @@ export const SENSOR_REGISTRY: Record<string, SensorRegistryEntry> = {
     icon: ArrowLeftRight,
     category: "event",
   },
-  [SensorType.Obstacle]: {
-    component: CollisionLog,
-    displayName: "Obstacle Detector",
-    icon: CircleAlert,
-    category: "event",
-  },
+  // sensor.other.obstacle is intentionally absent: the bridge's
+  // _kind_for_type has no "obstacle" branch, so frames are silently
+  // dropped before encoding. Registering a CollisionLog renderer here
+  // just hands the user a forever-blank event log. SensorCell's
+  // "Unknown: <type_id>" fallback is the honest state.
 };
 
 export function getSensorDisplayName(typeId: string): string {
