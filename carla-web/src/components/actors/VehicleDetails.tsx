@@ -60,6 +60,13 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
   useEffect(() => {
     let cancelled = false;
     const poll = async () => {
+      // The user isn't seeing the VehicleDetails sheet when the tab is
+      // hidden — skip the HTTP round-trip to save bandwidth instead of
+      // uselessly polling /api/actors/:id twice per second in the
+      // background.
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+        return;
+      }
       try {
         const actor = await carlaApi.getActor(actorId);
         if (!cancelled && actor.control) {
