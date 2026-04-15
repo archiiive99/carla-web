@@ -28,11 +28,19 @@ export function MiniMap({ className }: MiniMapProps) {
   const [topology, setTopology] = useState<TopologyEdge[]>([]);
 
   // Refetch topology whenever the active map changes (avoids keeping the
-  // previous map's road network after a load/reload).
+  // previous map's road network after a load/reload). The synchronous
+  // "clear-on-map-change" used to live in the effect body; React 19
+  // flags that as a cascading-render risk, so we now use the
+  // "adjust state during render" idiom to clear topology the moment
+  // currentMap flips, and keep only the (impure) fetch in useEffect.
   const currentMap = useSimulationStore((s) => s.currentMap);
+  const [lastMap, setLastMap] = useState(currentMap);
+  if (lastMap !== currentMap) {
+    setLastMap(currentMap);
+    setTopology([]);
+  }
   useEffect(() => {
     let cancelled = false;
-    setTopology([]);
     carlaApi.getTopology().then((data) => { if (!cancelled) setTopology(data); }).catch(() => {});
     return () => { cancelled = true; };
   }, [currentMap]);
