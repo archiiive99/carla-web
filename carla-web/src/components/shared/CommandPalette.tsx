@@ -38,6 +38,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useSimulationStore, useIsConnected } from "@/stores/simulationStore";
 import { useActorStore } from "@/stores/actorStore";
+import { useSensorStore } from "@/stores/sensorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { carlaApi } from "@/lib/carla-api";
 import { toast } from "sonner";
@@ -113,7 +114,6 @@ export function CommandPalette() {
                   // Bridge resets the world → existing actor/sensor IDs are
                   // stale. Refresh proactively to avoid ghost rows.
                   useActorStore.getState().refreshActors();
-                  const { useSensorStore } = await import("@/stores/sensorStore");
                   useSensorStore.getState().refreshSensors();
                 }, "Reload Map")
               }

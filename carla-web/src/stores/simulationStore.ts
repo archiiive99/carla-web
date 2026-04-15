@@ -1,4 +1,4 @@
-import { reportError } from "@/lib/utils";
+import { reportError, formatMapName } from "@/lib/utils";
 import { create } from "zustand";
 import { toast } from "sonner";
 import type { CarlaWeatherParams, WeatherPreset } from "@/types/carla";
@@ -6,6 +6,8 @@ import { carlaApi } from "@/lib/carla-api";
 import { BRIDGE_URL_DEFAULT, BRIDGE_URL_KEY } from "@/constants";
 import { normalizeBridgeUrl } from "@/lib/bridge-url";
 import { useEventStore } from "@/stores/eventStore";
+import { useActorStore } from "@/stores/actorStore";
+import { useSensorStore } from "@/stores/sensorStore";
 
 export type ConnectionStatus =
   | "disconnected"
@@ -155,17 +157,12 @@ export const useSimulationStore = create<SimulationState>((set) => ({
     try {
       await carlaApi.loadMap(name);
       set({ currentMap: name });
-      const { formatMapName } = await import("@/lib/utils");
       const short = formatMapName(name) || name;
       toast.success(`Map loaded: ${short}`);
       useEventStore.getState().addEvent("map", `Loaded ${short}`);
       // Proactively refresh actor + sensor stores — the backend rebuilds the
       // world so every actor id from the previous map is now stale. Waiting
       // for the 2s poll tick would briefly show ghost vehicles.
-      const [{ useActorStore }, { useSensorStore }] = await Promise.all([
-        import("@/stores/actorStore"),
-        import("@/stores/sensorStore"),
-      ]);
       useActorStore.getState().refreshActors();
       useSensorStore.getState().refreshSensors();
     } catch (e) {
