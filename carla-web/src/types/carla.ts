@@ -152,6 +152,30 @@ export interface Blueprint {
   attributes: BlueprintAttribute[];
 }
 
+// --- Map environment (GET /api/map/environment) ---
+
+interface EnvObj {
+  name: string;
+  t: { x: number; y: number; z: number; yaw: number };
+  b: { x: number; y: number; z: number; ex: number; ey: number; ez: number; yaw: number };
+}
+
+export interface MapEnvironment {
+  buildings: EnvObj[];
+  roads: EnvObj[];
+  sidewalks: EnvObj[];
+  vegetation: EnvObj[];
+  poles: EnvObj[];
+  walls: EnvObj[];
+  fences: EnvObj[];
+  traffic_lights: EnvObj[];
+  traffic_signs: EnvObj[];
+  water: EnvObj[];
+  rocks: EnvObj[];
+  guard_rails: EnvObj[];
+  road_lines: EnvObj[];
+}
+
 // --- Navigation ---
 
 export interface TopologyEdge {

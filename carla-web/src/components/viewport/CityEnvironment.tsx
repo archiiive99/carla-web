@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSimulationStore } from "@/stores/simulationStore"
+import { carlaApi } from "@/lib/carla-api"
 import { MapEnv, SafeRender, c2t, yawRad } from "./city-environment/shared"
 import { MISSING_ASSET } from "./scene-palette"
 import { Buildings } from "./city-environment/Buildings"
@@ -46,9 +47,7 @@ export function CityEnvironment() {
     setEnv(null)
     async function load() {
       try {
-        const res = await fetch("/api/map/environment")
-        if (!res.ok) return
-        const data: MapEnv = await res.json()
+        const data = await carlaApi.getMapEnvironment()
         if (!cancelled) setEnv(data)
       } catch {
         setTimeout(load, 3000)

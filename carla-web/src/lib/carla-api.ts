@@ -9,6 +9,7 @@ import type {
   VehicleControl,
   TopologyEdge,
   WeatherPreset,
+  MapEnvironment,
 } from "@/types/carla";
 import type {
   SimulationStatus,
@@ -313,6 +314,13 @@ export class CarlaApi {
 
   async getRoadGeometry(distance = 5): Promise<{ x: number; y: number; z: number; yaw: number; road_id: number; lane_id: number; lane_width: number; is_junction: boolean }[]> {
     return request(this.url(`/api/map/road-geometry?distance=${distance}`));
+  }
+
+  /** Fetch the static CARLA map population (buildings, vegetation, signals,
+   *  …). Shape defined by `MapEnvironment` — must match the bridge
+   *  `/api/map/environment` response. */
+  async getMapEnvironment(): Promise<MapEnvironment> {
+    return request<MapEnvironment>(this.url("/api/map/environment"));
   }
 
   // --- Recording ---

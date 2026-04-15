@@ -7,27 +7,13 @@ import {
 
 // ---------- types ----------
 
-export interface EnvObj {
-  name: string
-  t: { x: number; y: number; z: number; yaw: number }
-  b: { x: number; y: number; z: number; ex: number; ey: number; ez: number; yaw: number }
-}
-
-export interface MapEnv {
-  buildings: EnvObj[]
-  roads: EnvObj[]
-  sidewalks: EnvObj[]
-  vegetation: EnvObj[]
-  poles: EnvObj[]
-  walls: EnvObj[]
-  fences: EnvObj[]
-  traffic_lights: EnvObj[]
-  traffic_signs: EnvObj[]
-  water: EnvObj[]
-  rocks: EnvObj[]
-  guard_rails: EnvObj[]
-  road_lines: EnvObj[]
-}
+// MapEnv + EnvObj live in src/types/carla.ts so that both the city-env
+// components AND the CarlaApi client share one source of truth. These
+// re-exports are kept for backward compat across the city-environment
+// siblings that already import from "./shared".
+import type { MapEnvironment } from "@/types/carla"
+export type MapEnv = MapEnvironment
+export type EnvObj = MapEnvironment["buildings"][number]
 
 // ---------- coordinate conversion ----------
 
