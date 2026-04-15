@@ -241,21 +241,6 @@ class WebSocketBroadcaster:
             recipients = [c for c in clients if c.client_id in target_clients]
         await self._fanout(data, recipients)
 
-    async def broadcast_sensor_data(
-        self,
-        channel: int,
-        sensor_id: int,
-        frame: int,
-        timestamp: float,
-        payload: bytes,
-    ) -> None:
-        """Encode and broadcast sensor data to subscribed clients."""
-        message = encode_frame(channel, payload)
-        recipients = [
-            c for c in self._clients.values() if sensor_id in c.subscriptions
-        ]
-        await self._fanout(message, recipients)
-
     async def broadcast_world_tick(self, tick_data: bytes) -> None:
         """Send world tick to ALL connected clients."""
         message = encode_frame(Channel.WORLD_TICK, tick_data)

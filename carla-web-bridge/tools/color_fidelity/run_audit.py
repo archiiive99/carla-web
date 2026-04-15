@@ -816,7 +816,7 @@ def section_live(args: argparse.Namespace, out_dir: Path) -> SectionResult:
         "- wire-equivalence proof: `sensor_manager._encode_camera_packet()` calls\n"
         "  `image_compressor.compress_bgra_to_jpeg(...)`, then passes those bytes\n"
         "  unchanged into `encode_camera_payload(...)` and `encode_frame(...)`\n"
-        "  (`src/sensor_manager.py:813-841`). `ws_broadcaster.broadcast_sensor_data`\n"
+        "  (`src/sensor_manager.py:813-841`). `ws_broadcaster.broadcast_raw`\n"
         "  sends the already-encoded frame without rewriting payload bytes.\n"
     )
     header += f"- capture subject: {capture_meta['capture_subject']}\n"
