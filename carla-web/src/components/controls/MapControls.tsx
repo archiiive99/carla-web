@@ -86,12 +86,15 @@ export function MapControls() {
     if (!selectedMap) return;
     setLoading(true);
     try {
-      // Store's loadMap already toasts on success with the cleaned name
-      // and logs a map event — don't double-toast the raw path here.
+      // Store's loadMap already toasts on both success (cleaned name +
+      // "map" event) and failure ("Map load failed: ..."). Rethrows on
+      // failure so the dialog stays open and the loading indicator
+      // stays true — a silent error would have let the dialog close
+      // as if the map loaded.
       await loadMap(selectedMap);
       setOpen(false);
-    } catch (e) {
-      reportError("Load map", e);
+    } catch {
+      // Store already reported the error; nothing more to do here.
     } finally {
       setLoading(false);
     }

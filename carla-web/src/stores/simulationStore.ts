@@ -156,18 +156,23 @@ export const useSimulationStore = create<SimulationState>((set) => ({
   loadMap: async (name) => {
     try {
       await carlaApi.loadMap(name);
-      set({ currentMap: name });
-      const short = formatMapName(name) || name;
-      toast.success(`Map loaded: ${short}`);
-      useEventStore.getState().addEvent("map", `Loaded ${short}`);
-      // Proactively refresh actor + sensor stores — the backend rebuilds the
-      // world so every actor id from the previous map is now stale. Waiting
-      // for the 2s poll tick would briefly show ghost vehicles.
-      useActorStore.getState().refreshActors();
-      useSensorStore.getState().refreshSensors();
     } catch (e) {
+      // Report here AND rethrow — callers like MapControls use the
+      // throw to drive post-action UI state (close the dialog only on
+      // success, keep loading indicator otherwise). Swallowing the
+      // error would let that caller proceed as if the load succeeded.
       reportError("Map load", e);
+      throw e;
     }
+    set({ currentMap: name });
+    const short = formatMapName(name) || name;
+    toast.success(`Map loaded: ${short}`);
+    useEventStore.getState().addEvent("map", `Loaded ${short}`);
+    // Proactively refresh actor + sensor stores — the backend rebuilds the
+    // world so every actor id from the previous map is now stale. Waiting
+    // for the 2s poll tick would briefly show ghost vehicles.
+    useActorStore.getState().refreshActors();
+    useSensorStore.getState().refreshSensors();
   },
 
   updateFromTick: (tick, time) =>
