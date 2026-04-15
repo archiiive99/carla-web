@@ -36,8 +36,10 @@ function WalkerSpawnTab() {
     try {
       const points = await carlaApi.getSpawnPoints();
       if (points.length > 0) {
+        // Match VehicleSpawnTab: explicit undefined-guard so a freak
+        // empty slot in the returned list can't propagate into setTransform.
         const random = points[Math.floor(Math.random() * points.length)];
-        setTransform(random);
+        if (random) setTransform(random);
       } else {
         toast.error(SPAWN_NO_POINTS_MSG);
       }

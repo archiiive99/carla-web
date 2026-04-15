@@ -31,11 +31,15 @@ export function ActorLifecycleFooter() {
   const quickSpawnVehicle = useCallback(async () => {
     try {
       const points = await carlaApi.getSpawnPoints();
-      if (!points.length) {
+      // Math.floor(Math.random() * n) is in-bounds when n>0 but
+      // `arr[i]` under noUncheckedIndexedAccess is T|undefined — guard
+      // with a combined length + presence check so spawnVehicle never
+      // gets fed a phantom `undefined` transform.
+      const pt = points[Math.floor(Math.random() * points.length)];
+      if (!pt) {
         toast.error(SPAWN_NO_POINTS_MSG);
         return;
       }
-      const pt = points[Math.floor(Math.random() * points.length)];
       await useActorStore.getState().spawnVehicle({
         blueprint: "vehicle.tesla.model3",
         transform: pt,
@@ -49,11 +53,11 @@ export function ActorLifecycleFooter() {
   const quickSpawnWalker = useCallback(async () => {
     try {
       const points = await carlaApi.getSpawnPoints();
-      if (!points.length) {
+      const pt = points[Math.floor(Math.random() * points.length)];
+      if (!pt) {
         toast.error(SPAWN_NO_POINTS_MSG);
         return;
       }
-      const pt = points[Math.floor(Math.random() * points.length)];
       await useActorStore.getState().spawnWalker({
         blueprint: "walker.pedestrian.0001",
         transform: pt,
