@@ -38,8 +38,11 @@ function VehicleSpawnTab() {
     try {
       const points = await carlaApi.getSpawnPoints();
       if (points.length > 0) {
+        // Math.floor(Math.random() * points.length) is guaranteed in-bounds,
+        // but noUncheckedIndexedAccess widens the lookup to
+        // CarlaTransform | undefined. Guard explicitly.
         const random = points[Math.floor(Math.random() * points.length)];
-        setTransform(random);
+        if (random) setTransform(random);
       } else {
         toast.error(SPAWN_NO_POINTS_MSG);
       }

@@ -136,8 +136,11 @@ export function SimulationControls() {
               aria-label="Simulation speed"
               onValueChange={(v) => {
                 const idx = Array.isArray(v) ? v[0] : v;
+                // Slider min/max/step keep idx within SPEED_STEPS bounds,
+                // but noUncheckedIndexedAccess treats arr[i] as T|undefined.
+                // Clamp defensively; falls back to the middle step (1×).
+                const multiplier = SPEED_STEPS[idx] ?? 1;
                 setSpeedIdx(idx);
-                const multiplier = SPEED_STEPS[idx];
                 // Slider drags fire onValueChange per step; silent-swallow
                 // follows the same pattern as VehicleDetails / TrafficManager
                 // so a transient bridge hiccup doesn't spam speed-change

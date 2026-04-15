@@ -61,7 +61,10 @@ export function MapControls() {
   const [layerBusy, setLayerBusy] = useState<string | null>(null);
 
   const toggleLayer = useCallback(async (key: string) => {
-    const current = enabledLayers[key];
+    // noUncheckedIndexedAccess types arbitrary-key lookups as T|undefined —
+    // a layer the user hasn't toggled yet is absent from the record.
+    // Treat missing as false (the starting "unloaded" default).
+    const current = enabledLayers[key] ?? false;
     const next = !current;
     setEnabledLayers((prev) => ({ ...prev, [key]: next }));
     setLayerBusy(key);
