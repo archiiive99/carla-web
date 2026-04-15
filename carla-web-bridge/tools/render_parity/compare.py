@@ -124,6 +124,41 @@ def capture_carla_reference(
         except RuntimeError:
             time.sleep(0.1)
 
+    # iter-13-followon-harness-stabilize: clear any NPC vehicles spawned
+    # at/near the camera world-coords. Without this the harness camera
+    # spawns INSIDE an auto-spawned vehicle's hood, putting the hood
+    # across the entire road ROI in the captured reference. iter-13's
+    # measurement (PSNR=7) was contaminated by exactly this artifact.
+    # Default radius 8 m covers a typical car length plus buffer; the
+    # ROI starts at frame Y=0.75 which corresponds to a few meters in
+    # front of the camera, so a 4-8 m clear radius is sufficient.
+    npc_clear_radius_m = 8.0
+    cleared_count = 0
+    for actor in world.get_actors().filter("vehicle.*"):
+        try:
+            loc = actor.get_location()
+        except Exception:
+            continue
+        dx = loc.x - pose.x
+        dy = loc.y - pose.y
+        dz = loc.z - pose.z
+        if (dx * dx + dy * dy + dz * dz) ** 0.5 <= npc_clear_radius_m:
+            try:
+                if actor.destroy():
+                    cleared_count += 1
+            except Exception:
+                pass
+    if cleared_count > 0:
+        print(f"[harness] cleared {cleared_count} NPC vehicle(s) within {npc_clear_radius_m}m of pose")
+        # Tick a few frames to let the destruction propagate before the
+        # camera spawn — otherwise the actor's mesh can still be in the
+        # render target on the next captured frame.
+        for _ in range(5):
+            try:
+                world.tick()
+            except RuntimeError:
+                time.sleep(0.05)
+
     blueprint_library = world.get_blueprint_library()
     cam_bp = blueprint_library.find("sensor.camera.rgb")
     cam_bp.set_attribute("image_size_x", str(CAPTURE_W))

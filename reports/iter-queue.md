@@ -35,7 +35,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-10  Traffic lights — emissive bulb + correct hue
 [ ] iter-12  Wet-surface response — driven by CARLA wetness param
 [x] iter-13  Scene-palette unification — three.js material constants module  (⚠️ refactor SUCCESS, web render byte-pattern unchanged; measurement regression due to CARLA NPC vehicle blocking ROI — not refactor — see iter-13/report.md §7.4)
-[~] iter-13-followon-harness-stabilize  Add "destroy NPC vehicles at camera pose before capture" to compare.py (opened 2026-04-15T09:00:56Z, Phase A)
+[x] iter-13-followon-harness-stabilize  Add NPC-clear-before-capture to compare.py  (✅ first PASS of session — PSNR ΔΔ=0.02 dB across 2 runs; reference now shows clean asphalt; closed 2026-04-15T09:00+~35min)
 [ ] iter-14  LOD pipeline — distant geometry impostors / decimated meshes
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
