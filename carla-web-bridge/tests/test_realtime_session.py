@@ -348,28 +348,54 @@ async def test_invalidate_actor_ignores_unrelated_id(manager):
     assert snap["state"] == SessionState.READY.name
 
 
-# --- B3a: camera config drift on adoption ----------------------------------
+# --- adoption always destroys managed leftovers regardless of camera state -
+#
+# Pre-migration, this section had four tests (config-drift rejection,
+# prefers-lowest-id, prefers-best-match, destroys-all-when-all-drift)
+# that exercised the now-removed _camera_config_matches preference logic.
+# The current manager destroys every managed leftover unconditionally,
+# so all four collapsed to the same assertion. Collapsed into a single
+# parametrized test documenting the invariant across representative
+# camera configurations.
 
 
-def test_adopted_camera_with_drifted_config_is_rejected(manager, carla_stub, sensor_stub):
+def _make_cam(actor_id: int, parent: "_Actor", attrs: dict[str, str]) -> "_Actor":
+    return _Actor(actor_id, type_id="sensor.camera.rgb", parent=parent, attributes=attrs)
+
+
+_MATCHING_CAM_ATTRS = {
+    "image_size_x": str(DEFAULT_CAMERA_WIDTH),
+    "image_size_y": str(DEFAULT_CAMERA_HEIGHT),
+    "fov": str(DEFAULT_CAMERA_FOV),
+    "sensor_tick": str(DEFAULT_CAMERA_SENSOR_TICK),
+}
+
+
+@pytest.mark.parametrize(
+    "attached_cams",
+    [
+        # (camera_id, attributes) tuples to attach to the managed vehicle
+        [],
+        [(2002, {"image_size_x": "640", "image_size_y": "480", "fov": "90"})],  # one drifted
+        [(2002, dict(_MATCHING_CAM_ATTRS)), (3003, dict(_MATCHING_CAM_ATTRS))],  # two matching
+        [(2002, {"image_size_x": "640"}), (3003, dict(_MATCHING_CAM_ATTRS))],  # drift + match
+        [(2002, {"image_size_x": "640"}), (3003, {"image_size_x": "1024"})],  # two drifted
+    ],
+    ids=["no-camera", "drifted", "two-matching", "mixed", "all-drifted"],
+)
+def test_adopt_destroys_vehicle_and_all_cameras(manager, carla_stub, attached_cams):
     vehicle = _Actor(1001)
-    # Simulate a camera whose attributes differ from DEFAULT_CAMERA_* config.
-    drifted_camera = _Actor(
-        2002,
-        type_id="sensor.camera.rgb",
-        parent=vehicle,
-        attributes={
-            "image_size_x": "640",
-            "image_size_y": "480",
-            "fov": "90",
-        },
-    )
     carla_stub._actors[1001] = vehicle
-    carla_stub._actors[2002] = drifted_camera
+    cams = []
+    for cam_id, attrs in attached_cams:
+        cam = _make_cam(cam_id, vehicle, attrs)
+        carla_stub._actors[cam_id] = cam
+        cams.append(cam)
     result = manager._adopt_orphan_managed_vehicle_sync()
     assert result is None
     assert vehicle.destroyed is True
-    assert drifted_camera.destroyed is True
+    for cam in cams:
+        assert cam.destroyed is True
 
 
 # --- adoption policy: any managed leftover is destroyed (post migration) ---
@@ -396,61 +422,6 @@ def test_adopt_destroys_any_managed_leftover_regardless_of_pose(
     result = manager._adopt_orphan_managed_vehicle_sync()
     assert result is None
     assert vehicle.destroyed is True
-
-
-# --- B3.3.5: multiple cameras, deterministic selection --------------------
-
-
-def test_adopt_prefers_lowest_id_config_matching_camera(manager, carla_stub):
-    vehicle = _Actor(1001)
-    matching_attrs = {
-        "image_size_x": str(DEFAULT_CAMERA_WIDTH),
-        "image_size_y": str(DEFAULT_CAMERA_HEIGHT),
-        "fov": str(DEFAULT_CAMERA_FOV),
-        "sensor_tick": str(DEFAULT_CAMERA_SENSOR_TICK),
-    }
-    cam_high = _Actor(3003, type_id="sensor.camera.rgb", parent=vehicle, attributes=dict(matching_attrs))
-    cam_low = _Actor(2002, type_id="sensor.camera.rgb", parent=vehicle, attributes=dict(matching_attrs))
-    carla_stub._actors.update({1001: vehicle, 2002: cam_low, 3003: cam_high})
-    result = manager._adopt_orphan_managed_vehicle_sync()
-    assert result is None
-    assert vehicle.destroyed is True
-    assert cam_high.destroyed is True
-    assert cam_low.destroyed is True
-
-
-def test_adopt_prefers_best_matching_camera_even_if_not_lowest_id(manager, carla_stub):
-    vehicle = _Actor(1001)
-    drifted = _Actor(2002, type_id="sensor.camera.rgb", parent=vehicle, attributes={"image_size_x": "640"})
-    matching = _Actor(
-        3003,
-        type_id="sensor.camera.rgb",
-        parent=vehicle,
-        attributes={
-            "image_size_x": str(DEFAULT_CAMERA_WIDTH),
-            "image_size_y": str(DEFAULT_CAMERA_HEIGHT),
-            "fov": str(DEFAULT_CAMERA_FOV),
-            "sensor_tick": str(DEFAULT_CAMERA_SENSOR_TICK),
-        },
-    )
-    carla_stub._actors.update({1001: vehicle, 2002: drifted, 3003: matching})
-    result = manager._adopt_orphan_managed_vehicle_sync()
-    assert result is None
-    assert vehicle.destroyed is True
-    assert drifted.destroyed is True
-    assert matching.destroyed is True
-
-
-def test_adopt_destroys_all_cameras_when_all_drift(manager, carla_stub):
-    vehicle = _Actor(1001)
-    drifted_a = _Actor(2002, type_id="sensor.camera.rgb", parent=vehicle, attributes={"image_size_x": "640"})
-    drifted_b = _Actor(3003, type_id="sensor.camera.rgb", parent=vehicle, attributes={"image_size_x": "1024"})
-    carla_stub._actors.update({1001: vehicle, 2002: drifted_a, 3003: drifted_b})
-    result = manager._adopt_orphan_managed_vehicle_sync()
-    assert result is None
-    assert vehicle.destroyed is True
-    assert drifted_a.destroyed is True
-    assert drifted_b.destroyed is True
 
 
 # --- module constants ------------------------------------------------------
