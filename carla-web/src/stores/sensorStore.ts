@@ -17,20 +17,25 @@ interface SensorState {
   refreshSensors: () => Promise<void>;
 }
 
-export const useSensorStore = create<SensorState>((set) => ({
+export const useSensorStore = create<SensorState>((set, get) => ({
   sensors: new Map(),
   subscriptions: new Set(),
   pendingSubscriptions: new Set(),
 
   subscribe: (sensorId) => {
     // Retry at 0/500/1500ms to cover the race where the ws-receiver worker
-    // hasn't finished connecting when the first subscribe lands.
+    // hasn't finished connecting when the first subscribe lands. Each retry
+    // re-checks `subscriptions` so a quick unsubscribe() immediately after
+    // subscribe() isn't undone by the later retries landing on the bridge.
     const worker = getGlobalWsWorker();
     if (worker) {
       const msg = { type: "subscribe", data: { sensorId } };
       worker.postMessage(msg);
-      setTimeout(() => worker.postMessage(msg), 500);
-      setTimeout(() => worker.postMessage(msg), 1500);
+      const retryIfStillSubscribed = () => {
+        if (get().subscriptions.has(sensorId)) worker.postMessage(msg);
+      };
+      setTimeout(retryIfStillSubscribed, 500);
+      setTimeout(retryIfStillSubscribed, 1500);
     }
     set((state) => {
       const subs = new Set(state.subscriptions);
