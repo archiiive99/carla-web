@@ -1,5 +1,4 @@
 const DEFAULT_BRIDGE_PORT = 58337;
-const DEFAULT_SIGNALING_PORT = 58341;
 
 /** Map the page's HTTP(S) protocol to its matching WebSocket variant. */
 function wsProtocolFor(pageProtocol: string): "ws:" | "wss:" {
@@ -27,14 +26,6 @@ function buildSameOriginUrl(protocol: "http:" | "ws:"): string {
 
 export function getDefaultBridgeUrl(): string {
   return buildSameOriginUrl("http:");
-}
-
-export function getDefaultPixelStreamingUrl(): string {
-  if (typeof window === "undefined") {
-    return `ws://127.0.0.1:${DEFAULT_SIGNALING_PORT}`;
-  }
-  const page = new URL(window.location.href);
-  return `${wsProtocolFor(page.protocol)}//${page.hostname}:${DEFAULT_SIGNALING_PORT}`;
 }
 
 export function normalizeBridgeUrl(value: string): string {
