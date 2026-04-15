@@ -7,9 +7,9 @@
 
 | Metric | Value |
 |---|---|
-| PSNR (dB) | 14.29 |
-| SSIM | 0.0073 |
-| Mean ΔE (CIE76) | 21.48 |
+| PSNR (dB) | 14.32 |
+| SSIM | 0.2819 |
+| Mean ΔE (CIE76) | 19.83 |
 
 ## Images
 

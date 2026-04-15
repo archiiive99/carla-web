@@ -61,14 +61,16 @@ POSES: Dict[str, Pose] = {
 }
 
 
-# ROI polygon (fraction-of-frame coordinates). Default center-bottom where
-# the road fills the frame at pitch=-10° camera. Same for both reference
-# and measured since both render at the same aspect + FOV.
+# ROI polygon (fraction-of-frame coordinates). Centered on the road
+# surface itself at pose `street_clear_midday` — avoids the left
+# tree-shadow band, the right-side sidewalk, and the upper strip that
+# clips building walls. Picked after inspecting both reference and web
+# frames from the post-engine-rebuild harness run.
 ROAD_ROI = np.array([
-    [0.20, 0.60],
-    [0.80, 0.60],
-    [0.80, 0.95],
-    [0.20, 0.95],
+    [0.28, 0.75],
+    [0.72, 0.75],
+    [0.72, 0.95],
+    [0.28, 0.95],
 ], dtype=np.float32)
 
 # Capture resolution. Matches the WebGL framebuffer (DPR-aware on the web

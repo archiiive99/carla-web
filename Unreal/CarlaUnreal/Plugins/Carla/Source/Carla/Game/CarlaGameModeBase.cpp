@@ -56,16 +56,19 @@ ACarlaGameModeBase::ACarlaGameModeBase(const FObjectInitializer& ObjectInitializ
   // HUD
   HUDClass = ACarlaHUD::StaticClass();
 
-  static ConstructorHelpers::FClassFinder<AWeather> WeatherBlueprintClass(
+  // WeatherClass is nominally set by the CarlaGameMode Blueprint's default
+  // value, but on this project that assignment does not survive the first
+  // load (Blueprint references into /Game/Carla/Blueprints/Weather/ get
+  // stripped or recompiled inconsistently after an engine rebuild). Pin
+  // the default in C++ so /api/simulation and the harness's reference
+  // capture don't crash at ACarlaGameModeBase::InitGame on a missing
+  // weather class.
+  static ConstructorHelpers::FClassFinder<AWeather> WeatherBP(
       TEXT("/Game/Carla/Blueprints/Weather/BP_CarlaWeather"));
-  if (WeatherBlueprintClass.Succeeded()) {
-    WeatherClass = WeatherBlueprintClass.Class;
+  if (WeatherBP.Succeeded()) {
+    WeatherClass = WeatherBP.Class;
   } else {
     WeatherClass = AWeather::StaticClass();
-    UE_LOG(
-        LogCarla,
-        Warning,
-        TEXT("Weather blueprint not found, falling back to native AWeather"));
   }
 
   TaggerDelegate = CreateDefaultSubobject<UTaggerDelegate>(TEXT("TaggerDelegate"));
@@ -156,18 +159,7 @@ void ACarlaGameModeBase::InitGame(
   else if (WeatherClass != nullptr) {
     Episode->Weather = World->SpawnActor<AWeather>(WeatherClass);
   } else {
-    UClass* LoadedWeatherClass = StaticLoadClass(
-        AWeather::StaticClass(),
-        nullptr,
-        TEXT("/Game/Carla/Blueprints/Weather/BP_CarlaWeather.BP_CarlaWeather_C"));
-    if (LoadedWeatherClass != nullptr) {
-      WeatherClass = LoadedWeatherClass;
-      Episode->Weather = World->SpawnActor<AWeather>(WeatherClass);
-      UE_LOG(LogCarla, Warning, TEXT("WeatherClass was unset; loaded BP_CarlaWeather fallback"));
-    } else {
-      Episode->Weather = World->SpawnActor<AWeather>(AWeather::StaticClass());
-      UE_LOG(LogCarla, Warning, TEXT("Weather blueprint missing; spawned native AWeather fallback"));
-    }
+    UE_LOG(LogCarla, Error, TEXT("Missing weather class!"));
   }
 
   GameInstance->NotifyInitGame();

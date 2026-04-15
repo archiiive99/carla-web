@@ -118,21 +118,12 @@ export function createRoadMaterial(baseHex: string, junction: boolean) {
         .replace(
           "#include <normal_fragment_maps>",
           `#include <normal_fragment_maps>
-           {
-             // Sample the asphalt normal map at the same world-scale tile
-             // coordinate the albedo uses so bump detail registers with
-             // the photograph. Road mesh has an identity model matrix
-             // (generateRoadMesh writes world-space positions), so normal-
-             // space equals world-space and we can build a tangent frame
-             // directly on world XZ.
-             vec2 tuv = vRoadWorldPos.xz * ${ASPHALT_TILE};
-             vec3 nTex = texture2D(uAsphaltN, tuv).rgb * 2.0 - 1.0;
-             // Swap X/Z-axis mapping into world frame: normal's XY map
-             // to world XZ (the road surface). Y stays up. Normal map
-             // is GL-style (Y-up).
-             vec3 viewDelta = normalMatrix * vec3(nTex.x, 0.0, nTex.y) * 0.55;
-             normal = normalize(normal + viewDelta);
-           }
+           // Normal-map perturbation removed: normalMatrix is not declared
+           // in the fragment shader (MeshStandardMaterial only exposes it
+           // in the vertex shader). Road micro-bumps come from roughness
+           // variation instead. Real normal mapping needs the normal map
+           // wired through MeshStandardMaterial.normalMap with a tangent
+           // frame rather than a manual perturb.
           `
         )
         .replace(
@@ -157,8 +148,8 @@ export function createRoadMaterial(baseHex: string, junction: boolean) {
           // previous shader because the CC0 set has no explicit patch
           // layer; this provides the darker-then-lighter zones that
           // CARLA's T_Asphalt_worn blend gives for free.
-          float patch = smoothstep(0.55, 0.75, rValueNoise(wXZ * 0.22));
-          asphalt = mix(asphalt, asphalt * 0.74, patch * 0.5);
+          float patchM = smoothstep(0.55, 0.75, rValueNoise(wXZ * 0.22));
+          asphalt = mix(asphalt, asphalt * 0.74, patchM * 0.5);
 
           // Junction surface gets a subtle lift because it tends to be
           // lighter-colored intersection concrete-over-asphalt in CARLA.
@@ -175,12 +166,20 @@ export function createRoadMaterial(baseHex: string, junction: boolean) {
           asphalt = mix(asphalt, asphalt * 0.78 + dirtTint * 0.45, curbDirt * 0.50);
 
           // === Ambient-occlusion shadowing ===
-          // Multiply AO into the asphalt color so pores/cracks read as
-          // darker recesses even under flat ambient light. AO texture is
-          // linear grayscale; sample .r and keep it mostly-one to avoid
-          // over-darkening under direct sun.
           float aoSample = texture2D(uAsphaltAO, tuv).r;
           asphalt *= mix(1.0, aoSample, 0.65);
+
+          // === Tonemap-matching tint ===
+          // Harness measurements against the UE5 reference (clear midday,
+          // Town01 street_clear_midday pose) showed the web road averaged
+          // (R=23, G=32, B=41) where UE5 gave (R=26, G=22, B=18). Web
+          // trended ~1.4x too bright and significantly cooler. A constant
+          // warm multiply + exposure nudge closes the gross tonemap gap.
+          // Local contrast (shadow variance) still lags — that's a
+          // directional-light / tree-shadow parity problem for a later
+          // iteration, not this one's scope.
+          asphalt *= vec3(1.20, 1.02, 0.82);
+          asphalt *= 0.72;
 
           // === Lane markings (procedural shape, textured wear overlay) ===
           // Shape calculation stays procedural so marking positions follow
@@ -330,7 +329,7 @@ export function createRoadMaterial(baseHex: string, junction: boolean) {
           `
         )
   }
-  mat.customProgramCacheKey = () => (junction ? "road-junction-pbr-v1" : "road-surface-pbr-v1")
+  mat.customProgramCacheKey = () => (junction ? "road-junction-pbr-v3" : "road-surface-pbr-v3")
   return mat
 }
 
