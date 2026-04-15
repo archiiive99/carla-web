@@ -12,9 +12,10 @@ export function WorldScene() {
   return (
     <div
       ref={divRef}
-      className="h-full w-full"
-      // The canvas draws here. Keep pointer-events-auto so R3F receives
-      // clicks on actor meshes (WorldCanvas routes events to this div).
+      className="pointer-events-auto h-full w-full"
+      // Explicit pointer-events-auto so R3F receives clicks on actor meshes
+      // (WorldCanvas routes events to this div) AND useMainViewportMouseControls
+      // receives mouse rotation/panning/wheel regardless of ancestors' pointer-events.
       // The parent <main> uses pointer-events-none on its own background so
       // overlay chrome above this stays interactive without blocking the
       // rendered scene.
