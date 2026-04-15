@@ -1,5 +1,5 @@
 
-import { useRef, useCallback, useState } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -118,6 +118,16 @@ export function WeatherControls() {
     },
     [setWeather],
   );
+
+  // Clear the pending debounce on unmount so the fire-after-unmount
+  // setWeather closure doesn't leak — the Popover closes often and the
+  // component would otherwise keep sending stale values against a store
+  // reference whose component tree is gone.
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   return (
     <Popover>
