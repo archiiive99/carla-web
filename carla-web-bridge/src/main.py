@@ -102,7 +102,7 @@ async def lifespan(app: FastAPI):
         yield
         logger.info("CARLA Web Bridge test mode stopped.")
         return
-    adaptive_controller.start(asyncio.get_running_loop())
+    adaptive_controller.start()
 
     # Start CARLA connection in background (non-blocking)
     connect_task = asyncio.create_task(carla_manager.connect())

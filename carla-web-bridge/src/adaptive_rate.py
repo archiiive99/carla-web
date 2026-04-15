@@ -527,14 +527,18 @@ class AdaptiveRateController:
     def rate_controller(self) -> RateController:
         return self.sensor_manager.rate_controller
 
-    def start(self, loop: asyncio.AbstractEventLoop | None = None) -> None:
+    def start(self) -> None:
         if self._task is not None and not self._task.done():
             return
         if not ADAPTIVE_RATE_ENABLED:
             logger.info("Adaptive rate control loop disabled (ADAPTIVE_RATE_ENABLED=false)")
             return
-        loop = loop or asyncio.get_event_loop()
-        self._task = loop.create_task(self._run())
+        # get_running_loop() raises if called outside an async context.
+        # The sole caller (main.py lifespan) is always inside one.
+        # Previously this fell back to asyncio.get_event_loop(), which
+        # emits DeprecationWarning on 3.10+ and raises on 3.12+ when no
+        # loop is running — an error path nobody exercises.
+        self._task = asyncio.get_running_loop().create_task(self._run())
         logger.info("Adaptive rate control loop started (sample_hz=%.2f)", self.sample_hz)
 
     def stop(self) -> None:
