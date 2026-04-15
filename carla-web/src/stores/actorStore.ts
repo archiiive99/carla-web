@@ -12,8 +12,6 @@ interface ActorsByType {
   vehicles: number[];
   walkers: number[];
   sensors: number[];
-  trafficLights: number[];
-  other: number[];
 }
 
 interface ActorState {
@@ -37,12 +35,14 @@ interface ActorState {
 }
 
 function classifyActors(actors: Map<number, CarlaActor>): ActorsByType {
+  // Only the three groups that UI actually reads are bucketed here.
+  // Traffic-light + other-actor groupings used to be built every tick
+  // but were write-only; LeftPanel rebuilds its own richer grouping
+  // from the full actor map (it needs CarlaActor objects, not IDs).
   const result: ActorsByType = {
     vehicles: [],
     walkers: [],
     sensors: [],
-    trafficLights: [],
-    other: [],
   };
   for (const [id, actor] of actors) {
     switch (actor.type) {
@@ -55,11 +55,6 @@ function classifyActors(actors: Map<number, CarlaActor>): ActorsByType {
       case "sensor":
         result.sensors.push(id);
         break;
-      case "traffic_light":
-        result.trafficLights.push(id);
-        break;
-      default:
-        result.other.push(id);
     }
   }
   return result;
