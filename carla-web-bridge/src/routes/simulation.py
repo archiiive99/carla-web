@@ -8,11 +8,9 @@ from fastapi import APIRouter, HTTPException
 
 from src.carla_client import carla_manager
 from src.models.schemas import (
-    ErrorResponse,
     SimulationSettings,
     SimulationStatus,
 )
-from src.utils.serialization import serialize_weather
 
 router = APIRouter(prefix="/api/simulation", tags=["simulation"])
 

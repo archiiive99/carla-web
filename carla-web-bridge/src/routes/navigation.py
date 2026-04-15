@@ -7,7 +7,7 @@ import asyncio
 from fastapi import APIRouter, HTTPException
 
 from src.carla_client import carla_manager
-from src.models.schemas import RouteQueryRequest, WaypointQuery
+from src.models.schemas import RouteQueryRequest
 from src.utils.serialization import carla_transform_to_dict
 
 router = APIRouter(prefix="/api/map", tags=["navigation"])
