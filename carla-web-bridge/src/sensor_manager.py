@@ -226,6 +226,15 @@ class SensorManager:
         if subs:
             subs.discard(client_id)
         self._rate_controller.clear_subscription(client_id, sensor_id)
+        # When the last subscriber drops out, pause CARLA's frame
+        # production. Without this, `sensor.listen()` stays installed
+        # and the engine keeps generating render-target frames that go
+        # into _sensor_queues and then get discarded by
+        # _sensor_worker_once's active-subscribers short-circuit — real
+        # GPU/CPU cost spent on data the bridge immediately throws away.
+        # A later subscribe() re-installs the listener.
+        if subs is not None and len(subs) == 0:
+            self._stop_listener(sensor_id)
 
     # --- adaptive-rate control surface (D1/D2) -------------------------------
 
@@ -507,6 +516,23 @@ class SensorManager:
         sensor.listen(lambda data, sid=sensor_id: self._on_sensor_data(sid, data))
         self._listening.add(sensor_id)
         logger.info("Started listener for sensor %d", sensor_id)
+
+    def _stop_listener(self, sensor_id: int) -> None:
+        """Pause frame production when no one is subscribed.
+
+        subscribe() / _start_listener reinstalls the callback on the next
+        viewer, so the sensor actor remains spawned — cheaper than
+        destroy+respawn and preserves its CARLA id.
+        """
+        sensor = self._sensors.get(sensor_id)
+        if sensor is None or sensor_id not in self._listening:
+            return
+        try:
+            sensor.stop()
+        except Exception as exc:
+            logger.debug("sensor.stop() failed for %d: %s", sensor_id, exc)
+        self._listening.discard(sensor_id)
+        logger.info("Stopped listener for sensor %d (no subscribers)", sensor_id)
 
     # --- worker plumbing -----------------------------------------------------
 
