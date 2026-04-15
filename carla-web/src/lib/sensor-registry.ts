@@ -4,9 +4,7 @@ import {
   Layers,
   Grid3x3,
   Eye,
-  Wind,
   Box,
-  Zap,
   Radar,
   Gauge,
   Navigation,
@@ -62,9 +60,13 @@ function labeledCamera(label: string): ComponentType<SensorViewProps> {
 
 const DepthView = labeledCamera("Depth Camera");
 const InstanceSegView = labeledCamera("Instance Segmentation");
-const OpticalFlowView = labeledCamera("Optical Flow");
 const NormalsView = labeledCamera("Surface Normals");
-const DvsView = labeledCamera("DVS Events");
+// sensor.camera.optical_flow and sensor.camera.dvs are intentionally
+// absent: the bridge has no wire encoding for optical flow, and DVS is
+// emitted on CH_DVS=0x0B as a sparse event binary that no client-side
+// decoder understands. Advertising either in the registry would hand
+// the user a forever-blank camera panel. SensorCell falls back to
+// "Unknown: <type_id>" for missing entries, which is the honest state.
 
 export const SENSOR_REGISTRY: Record<string, SensorRegistryEntry> = {
   [SensorType.CameraRgb]: {
@@ -91,22 +93,10 @@ export const SENSOR_REGISTRY: Record<string, SensorRegistryEntry> = {
     icon: Grid3x3,
     category: "camera",
   },
-  [SensorType.CameraOpticalFlow]: {
-    component: OpticalFlowView,
-    displayName: "Optical Flow",
-    icon: Wind,
-    category: "camera",
-  },
   [SensorType.CameraNormals]: {
     component: NormalsView,
     displayName: "Surface Normals",
     icon: Box,
-    category: "camera",
-  },
-  [SensorType.CameraDvs]: {
-    component: DvsView,
-    displayName: "DVS Events",
-    icon: Zap,
     category: "camera",
   },
   [SensorType.LidarRayCast]: {
