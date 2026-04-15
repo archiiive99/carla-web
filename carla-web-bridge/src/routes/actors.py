@@ -349,12 +349,6 @@ async def set_lights(actor_id: int, req: LightStateRequest):
     return await asyncio.to_thread(_set)
 
 
-@router.post("/{actor_id}/physics")
-async def set_physics(actor_id: int, params: dict):
-    _require_connection()
-    return {"status": "physics_updated", "id": actor_id, "note": "Not yet implemented"}
-
-
 @router.get("/{actor_id}/bounding-box")
 async def get_bounding_box(actor_id: int):
     _require_connection()
