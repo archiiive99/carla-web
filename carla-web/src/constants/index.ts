@@ -1,15 +1,13 @@
 // 42. Centralize all magic numbers and defaults
 
-import { getDefaultBridgeUrl, getDefaultPixelStreamingUrl } from "@/lib/bridge-url";
+import { getDefaultBridgeUrl } from "@/lib/bridge-url";
 
 export const BRIDGE_URL_DEFAULT = getDefaultBridgeUrl();
-export const PIXEL_STREAMING_URL_DEFAULT = getDefaultPixelStreamingUrl();
 export const FRONTEND_PORT = 58336;
 
 /** localStorage key for the SettingsPage AppSettings blob. Exported so the
- *  SettingsPage writer and readers elsewhere (getPixelStreamingUrl below)
- *  share one source of truth — renaming the key won't silently break one
- *  side. */
+ *  SettingsPage writer and any future config readers share one source of
+ *  truth — renaming the key won't silently break one side. */
 export const APP_SETTINGS_KEY = "carla-web-settings";
 
 /** localStorage key where the normalized bridge URL is cached. Shared by the
@@ -27,23 +25,6 @@ export const SPAWN_NO_POINTS_MSG = "No spawn points available on this map";
  *  vehicle amidst NPC traffic. Must match
  *  carla-web-bridge's EGO_ROLE_NAME — see project_managed_actor_tagging. */
 export const BRIDGE_EGO_ROLE = "bridge_ego";
-
-/** Read the user-configured Pixel Streaming URL from SettingsPage, falling
- *  back to the environment default. Used by viewport components so that
- *  edits in /settings actually take effect. */
-export function getPixelStreamingUrl(): string {
-  if (typeof window === "undefined") return PIXEL_STREAMING_URL_DEFAULT;
-  try {
-    const saved = localStorage.getItem(APP_SETTINGS_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved) as { signalingUrl?: string };
-      if (parsed.signalingUrl && typeof parsed.signalingUrl === "string") {
-        return parsed.signalingUrl;
-      }
-    }
-  } catch { /* ignore */ }
-  return PIXEL_STREAMING_URL_DEFAULT;
-}
 
 // Performance
 export const MAX_LIDAR_POINTS = 200_000;

@@ -176,7 +176,7 @@ export function ActorDetails() {
                 ? "Spectator camera control is unavailable in the current CARLA runtime"
                 : spectatorAvailable === null
                   ? "Checking spectator camera availability..."
-                  : "Move the CARLA spectator camera here (visible in Pixel Streaming; the 3D viewport is independent)"
+                  : "Move the CARLA spectator camera here (affects the native UE5 editor view; the browser 3D viewport is independent)"
             }
             onClick={async () => {
               try {

@@ -19,18 +19,15 @@ import { CarlaApi } from "@/lib/carla-api";
 import {
   APP_SETTINGS_KEY,
   BRIDGE_URL_DEFAULT,
-  PIXEL_STREAMING_URL_DEFAULT,
 } from "@/constants";
 import { normalizeBridgeUrl } from "@/lib/bridge-url";
 
 interface AppSettings {
   bridgeUrl: string;
-  signalingUrl: string;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
   bridgeUrl: BRIDGE_URL_DEFAULT,
-  signalingUrl: PIXEL_STREAMING_URL_DEFAULT,
 };
 
 function loadSettings(): AppSettings {
@@ -134,19 +131,6 @@ export default function SettingsPage() {
                 />
                 <p className="text-2xs text-muted-foreground">
                   HTTP + WebSocket origin for the bridge process. Polling reconnects within ~2s of saving.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="signaling-url" className="text-xs">Pixel Streaming URL</Label>
-                <Input
-                  id="signaling-url"
-                  value={settings.signalingUrl}
-                  onChange={(e) => update({ signalingUrl: e.target.value })}
-                  className="text-xs"
-                />
-                <p className="text-2xs text-muted-foreground">
-                  Used by the "UE5 Pixel Streaming" viewport mode. Toggle the mode off and on to apply a changed URL.
                 </p>
               </div>
 
