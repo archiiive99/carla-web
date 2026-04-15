@@ -31,9 +31,13 @@ export function ConnectionOverlay() {
   }, [connectionStatus]);
 
   const disconnectedFor = disconnectedAt ? now - disconnectedAt : 0;
-  // Only show after 60s of uninterrupted disconnection AND we were previously connected.
-  // This avoids flashing during brief bridge reloads (HMR, restarts).
-  const show = wasEverConnected && connectionStatus !== "connected" && disconnectedFor > 60_000;
+  // Two thresholds:
+  //  - wasEverConnected (brief drop / HMR reload): 60s grace so we don't flash
+  //    during uvicorn --reload bounces.
+  //  - Never connected (first visit, bridge not running): 10s so the user gets
+  //    a clear "bridge unreachable" signal instead of a blank blinking UI.
+  const threshold = wasEverConnected ? 60_000 : 10_000;
+  const show = connectionStatus !== "connected" && disconnectedFor > threshold;
 
   if (!show) return null;
 
@@ -45,9 +49,9 @@ export function ConnectionOverlay() {
           <h2 className="mb-2 text-xl font-semibold">
             {connectionStatus === "connecting"
               ? "Bridge up — waiting for CARLA"
-              : connectionStatus === "error"
-                ? "Bridge unreachable"
-                : "Connection Lost"}
+              : wasEverConnected
+                ? "Connection lost"
+                : "Can't reach the bridge"}
           </h2>
           <p className="mb-6 text-sm text-muted-foreground">
             {connectionStatus === "connecting" ? (
@@ -57,13 +61,25 @@ export function ConnectionOverlay() {
                 If the UE5 Editor crashed, restart it; the bridge will reconnect
                 automatically.
               </>
-            ) : (
+            ) : wasEverConnected ? (
               <>
-                Cannot reach the CARLA bridge at
+                Bridge went quiet at
                 <br />
                 <code className="mt-2 inline-block rounded bg-muted px-1.5 py-0.5 text-xs">
                   {bridgeUrl}
                 </code>
+                <br />
+                Usually recovers within a few seconds of a reload.
+              </>
+            ) : (
+              <>
+                Tried to reach the CARLA bridge at
+                <br />
+                <code className="mt-2 inline-block rounded bg-muted px-1.5 py-0.5 text-xs">
+                  {bridgeUrl}
+                </code>
+                <br />
+                Is <code className="inline-block rounded bg-muted px-1.5 py-0.5 text-xs">./start_streaming.sh</code> running?
               </>
             )}
           </p>
