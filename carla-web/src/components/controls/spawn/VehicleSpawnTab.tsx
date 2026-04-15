@@ -18,7 +18,8 @@ import { carlaApi } from "@/lib/carla-api";
 import { reportError } from "@/lib/utils";
 import type { Blueprint, CarlaTransform } from "@/types/carla";
 import { SPAWN_NO_POINTS_MSG } from "@/constants";
-import { TransformInputs, DEFAULT_TRANSFORM } from "./TransformInputs";
+import { TransformInputs } from "./TransformInputs";
+import { DEFAULT_TRANSFORM } from "./default-transform";
 
 export
 function VehicleSpawnTab() {

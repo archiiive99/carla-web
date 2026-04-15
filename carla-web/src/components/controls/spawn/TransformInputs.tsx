@@ -66,7 +66,3 @@ export function TransformInputs({
   );
 }
 
-export const DEFAULT_TRANSFORM: CarlaTransform = {
-  location: { x: 0, y: 0, z: 2 },
-  rotation: { pitch: 0, yaw: 0, roll: 0 },
-};
