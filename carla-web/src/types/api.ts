@@ -76,7 +76,6 @@ export interface HealthResponse {
     | "IDLE"
     | "ARMING"
     | "VEHICLE_PENDING"
-    | "CAMERA_PENDING"
     | "READY"
     | "RECOVERING";
 }
