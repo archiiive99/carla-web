@@ -9,7 +9,9 @@ async function waitForCarla() {
       const res = await fetch(`${BRIDGE_URL}/health`);
       const data = await res.json();
       if (data.carla_connected) return true;
-    } catch {}
+    } catch {
+      // bridge not up yet — keep polling
+    }
     await new Promise((r) => setTimeout(r, 1000));
   }
   return false;
@@ -323,10 +325,9 @@ test.describe("CARLA Integration", () => {
     await page.goto("/");
     await page.waitForTimeout(8000);
 
-    // TopBar should show "Connected" badge (green)
-    const connected = page.getByText("Connected");
-    // It might show "Connecting..." first then "Connected" or stay as "Disconnected"
-    // depending on bridge connection. Check for any connection indicator.
+    // TopBar might show "Connecting..." first then "Connected" or stay as
+    // "Disconnected" depending on bridge connection. Just assert the header
+    // is visible — the specific badge text is exercised by unit tests.
     const header = page.locator("header").first();
     await expect(header).toBeVisible();
   });
@@ -414,37 +415,39 @@ test.describe("Sensor Pipeline", () => {
     const sensor = await sRes.json();
 
     // 3. Connect WebSocket and subscribe
-    const received = await new Promise<boolean>(async (resolve) => {
+    const received = await new Promise<boolean>((resolve) => {
       const timeout = setTimeout(() => resolve(false), 10000);
 
-      try {
-        const ws = await new Promise<WebSocket>((res, rej) => {
-          const w = new WebSocket("ws://localhost:58337/ws");
-          w.binaryType = "arraybuffer";
-          w.onopen = () => res(w);
-          w.onerror = () => rej(new Error("WS connect failed"));
-        });
+      void (async () => {
+        try {
+          const ws = await new Promise<WebSocket>((res, rej) => {
+            const w = new WebSocket("ws://localhost:58337/ws");
+            w.binaryType = "arraybuffer";
+            w.onopen = () => res(w);
+            w.onerror = () => rej(new Error("WS connect failed"));
+          });
 
-        // Subscribe to sensor
-        ws.send(JSON.stringify({ action: "subscribe", sensor_id: sensor.id }));
+          // Subscribe to sensor
+          ws.send(JSON.stringify({ action: "subscribe", sensor_id: sensor.id }));
 
-        // Wait for binary frame
-        ws.onmessage = (event) => {
-          if (event.data instanceof ArrayBuffer && event.data.byteLength > 5) {
-            const view = new DataView(event.data);
-            const channel = view.getUint8(0);
-            if (channel === 0x01) {
-              // Camera frame received!
-              clearTimeout(timeout);
-              ws.close();
-              resolve(true);
+          // Wait for binary frame
+          ws.onmessage = (event) => {
+            if (event.data instanceof ArrayBuffer && event.data.byteLength > 5) {
+              const view = new DataView(event.data);
+              const channel = view.getUint8(0);
+              if (channel === 0x01) {
+                // Camera frame received!
+                clearTimeout(timeout);
+                ws.close();
+                resolve(true);
+              }
             }
-          }
-        };
-      } catch {
-        clearTimeout(timeout);
-        resolve(false);
-      }
+          };
+        } catch {
+          clearTimeout(timeout);
+          resolve(false);
+        }
+      })();
     });
 
     expect(received).toBe(true);
@@ -475,30 +478,32 @@ test.describe("Sensor Pipeline", () => {
     const sensor = await sRes.json();
 
     // Connect and subscribe
-    const received = await new Promise<boolean>(async (resolve) => {
+    const received = await new Promise<boolean>((resolve) => {
       const timeout = setTimeout(() => resolve(false), 10000);
-      try {
-        const ws = await new Promise<WebSocket>((res, rej) => {
-          const w = new WebSocket("ws://localhost:58337/ws");
-          w.binaryType = "arraybuffer";
-          w.onopen = () => res(w);
-          w.onerror = () => rej(new Error("fail"));
-        });
-        ws.send(JSON.stringify({ action: "subscribe", sensor_id: sensor.id }));
-        ws.onmessage = (event) => {
-          if (event.data instanceof ArrayBuffer) {
-            const ch = new DataView(event.data).getUint8(0);
-            if (ch === 0x07) { // IMU channel
-              clearTimeout(timeout);
-              ws.close();
-              resolve(true);
+      void (async () => {
+        try {
+          const ws = await new Promise<WebSocket>((res, rej) => {
+            const w = new WebSocket("ws://localhost:58337/ws");
+            w.binaryType = "arraybuffer";
+            w.onopen = () => res(w);
+            w.onerror = () => rej(new Error("fail"));
+          });
+          ws.send(JSON.stringify({ action: "subscribe", sensor_id: sensor.id }));
+          ws.onmessage = (event) => {
+            if (event.data instanceof ArrayBuffer) {
+              const ch = new DataView(event.data).getUint8(0);
+              if (ch === 0x07) { // IMU channel
+                clearTimeout(timeout);
+                ws.close();
+                resolve(true);
+              }
             }
-          }
-        };
-      } catch {
-        clearTimeout(timeout);
-        resolve(false);
-      }
+          };
+        } catch {
+          clearTimeout(timeout);
+          resolve(false);
+        }
+      })();
     });
     expect(received).toBe(true);
 

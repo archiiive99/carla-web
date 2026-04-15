@@ -8,7 +8,9 @@ async function waitForCarla() {
       const res = await fetch(`${BRIDGE_URL}/health`);
       const data = await res.json();
       if (data.carla_connected) return true;
-    } catch {}
+    } catch {
+      // bridge not up yet — keep polling
+    }
     await new Promise((r) => setTimeout(r, 1000));
   }
   return false;

@@ -8,15 +8,12 @@ async function waitForCarla() {
       const res = await fetch(`${BRIDGE_URL}/health`);
       const data = await res.json();
       if (data.carla_connected) return true;
-    } catch {}
+    } catch {
+      // bridge not up yet — keep polling
+    }
     await new Promise((r) => setTimeout(r, 1000));
   }
   return false;
-}
-
-function speedKmh(actor: { velocity?: { x: number; y: number; z: number } }): number {
-  const v = actor.velocity ?? { x: 0, y: 0, z: 0 };
-  return Math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2) * 3.6;
 }
 
 test.describe("WASD Vehicle Controls", () => {
@@ -122,7 +119,8 @@ test.describe("WASD Vehicle Controls", () => {
 
     // Verify the browser can call the low-latency managed-ego control API
     // through the Vite proxy (this is the same path VehicleControls uses).
-    const result = await page.evaluate(async (vid) => {
+    // The endpoint routes to the managed-ego by default, so no id in the URL.
+    const result = await page.evaluate(async () => {
       try {
         const res = await fetch(`/api/realtime/control`, {
           method: "POST",
@@ -139,7 +137,7 @@ test.describe("WASD Vehicle Controls", () => {
       } catch (e) {
         return { error: String(e) };
       }
-    }, vehicleId);
+    });
 
     console.log("Browser -> bridge control API:", JSON.stringify(result));
     expect(result.ok).toBe(true);

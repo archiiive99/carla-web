@@ -133,6 +133,7 @@ function handleBinaryFrame(buffer: ArrayBuffer) {
       // source migration); CH_CAMERA is still used by surface-normals which
       // remains a streamed engine-derived visual buffer. Route as before;
       // RGB subscribers just never observe payloads for their sensorId.
+    // falls through
     case CH_DEPTH:
     case CH_SEGMENTATION:
       if (imagePort) {
