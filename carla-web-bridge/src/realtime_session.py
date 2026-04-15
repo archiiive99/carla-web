@@ -9,10 +9,6 @@ from enum import Enum, auto
 from typing import TYPE_CHECKING, Any
 
 from src.config import (
-    DEFAULT_CAMERA_FOV,
-    DEFAULT_CAMERA_HEIGHT,
-    DEFAULT_CAMERA_SENSOR_TICK,
-    DEFAULT_CAMERA_WIDTH,
     SESSION_ARM_DELAY_SECONDS,
     CAMERA_ARM_DELAY_SECONDS,
 )
@@ -30,9 +26,6 @@ DEFAULT_VEHICLE_BLUEPRINTS = (
 )
 
 MANAGED_ROLE_NAME = "bridge_ego"
-
-MIN_VEHICLE_Z = -10.0
-MAX_ADOPTED_VEHICLE_Z_DELTA = 5.0
 
 CLEAR_DAYTIME_WEATHER = dict(
     cloudiness=10.0,
@@ -429,24 +422,6 @@ class RealtimeSessionManager:
         except Exception:
             return None
 
-    def _camera_has_parent_sync(
-        self,
-        actor_id: int,
-        expected_parent_id: int | None,
-    ) -> bool:
-        try:
-            camera_actor = self._carla.get_actor(actor_id)
-            if camera_actor is None or not getattr(camera_actor, "is_alive", False):
-                return False
-            parent = camera_actor.parent
-            if parent is None or not getattr(parent, "is_alive", False):
-                return False
-            if expected_parent_id is not None and int(parent.id) != int(expected_parent_id):
-                return False
-            return True
-        except Exception:
-            return False
-
     def _adopt_orphan_managed_vehicle_sync(self) -> tuple[int, int | None] | None:
         """Destroy stale managed leftovers from prior bridge runs.
 
@@ -503,39 +478,6 @@ class RealtimeSessionManager:
         logger.info("Destroying stale managed leftovers before fresh respawn: %s", stale_ids)
         self._destroy_all_managed(managed_vehicles, attached_cameras)
         return None
-
-    def _camera_config_matches(self, cam: Any) -> bool:
-        try:
-            attrs = getattr(cam, "attributes", None) or {}
-            return (
-                str(attrs.get("image_size_x", "")) == str(DEFAULT_CAMERA_WIDTH)
-                and str(attrs.get("image_size_y", "")) == str(DEFAULT_CAMERA_HEIGHT)
-                and str(attrs.get("fov", "")) == str(DEFAULT_CAMERA_FOV)
-                and str(attrs.get("sensor_tick", "")) == str(DEFAULT_CAMERA_SENSOR_TICK)
-            )
-        except Exception:
-            return False
-
-    def _vehicle_pose_valid(self, vehicle: Any) -> bool:
-        try:
-            transform = vehicle.get_transform()
-            location = transform.location
-            z = float(location.z)
-            if z < MIN_VEHICLE_Z:
-                return False
-
-            world = self._carla.refresh_world()
-            carla_map = world.get_map()
-            get_waypoint = getattr(carla_map, "get_waypoint", None)
-            if get_waypoint is None:
-                return True
-            waypoint = get_waypoint(location)
-            if waypoint is None:
-                return False
-            surface_z = float(waypoint.transform.location.z)
-            return abs(surface_z - z) <= MAX_ADOPTED_VEHICLE_Z_DELTA
-        except Exception:
-            return False
 
     def _destroy_all_managed(
         self,
