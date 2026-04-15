@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, ExternalLink, Link as LinkIcon, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { useSensorStore } from "@/stores/sensorStore";
 import { useActorStore } from "@/stores/actorStore";
+import { useUIStore } from "@/stores/uiStore";
 import { getSensorDisplayName } from "@/lib/sensor-registry";
 
 interface SensorDetailsProps {
@@ -37,11 +39,19 @@ export function SensorDetails({ actorId, typeId }: SensorDetailsProps) {
   }, [actorId, isSubscribed, subscribe, unsubscribe]);
 
   const openInSensorPanel = useCallback(() => {
+    // Make the panel visible first so the user can actually see what their
+    // click did. BottomPanel might be collapsed (⚠ hidden from view) or
+    // parked on a different tab (Map / Roads / Telemetry / Events) —
+    // force-open + switch to Sensors tab, then dispatch the grid-add event.
+    const ui = useUIStore.getState();
+    if (!ui.bottomPanelOpen) ui.setBottomPanelOpen(true);
+    if (ui.bottomPanelTab !== "sensors") ui.setBottomTab("sensors");
     window.dispatchEvent(
       new CustomEvent("sensor-panel:open", {
         detail: { sensorId: actorId, typeId },
       }),
     );
+    toast.success(`${getSensorDisplayName(typeId)} #${actorId} added to sensor grid`);
   }, [actorId, typeId]);
 
   const loc = sensor?.transform.location;
