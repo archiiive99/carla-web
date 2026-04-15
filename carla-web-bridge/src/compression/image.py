@@ -208,12 +208,6 @@ class ImageCompressor:
             return self._turbojpeg_encode(raw_data, width, height, quality)
         return self._pillow_encode(raw_data, width, height, quality, "JPEG")
 
-    def compress_bgra_to_webp(
-        self, raw_data: bytes, width: int, height: int, quality: int = 80
-    ) -> bytes:
-        """BGRA raw buffer -> WebP bytes."""
-        return self._pillow_encode(raw_data, width, height, quality, "WEBP")
-
     def apply_depth_colormap(
         self, raw_data: bytes, width: int, height: int
     ) -> bytes:

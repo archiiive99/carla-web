@@ -72,11 +72,3 @@ def test_segmentation_palette():
     result = image_compressor.apply_segmentation_palette(raw, 640, 480)
     assert result[:2] == b"\xff\xd8"
     assert len(result) > 0
-
-
-def test_webp_encode():
-    raw = _make_bgra_image(320, 240)
-    webp = image_compressor.compress_bgra_to_webp(raw, 320, 240, quality=80)
-    # WebP files start with RIFF
-    assert webp[:4] == b"RIFF"
-    assert len(webp) < len(raw)
