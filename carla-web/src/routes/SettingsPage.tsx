@@ -102,10 +102,10 @@ export default function SettingsPage() {
 
   return (
     <div className="flex h-screen flex-col">
-      <header className="flex h-12 shrink-0 items-center gap-3 border-b px-4">
+      <header className="flex h-14 shrink-0 items-center gap-3 border-b px-4">
         <Link
           to="/"
-          className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex size-9 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="Back to simulation"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
@@ -190,7 +190,7 @@ export default function SettingsPage() {
                 <span className="text-muted-foreground">Status</span>
                 <Badge
                   variant={connectionStatus === "connected" ? "default" : "secondary"}
-                  className="h-4 px-1.5 text-2xs capitalize"
+                  className="h-5 px-2 text-2xs capitalize"
                 >
                   {connectionStatus}
                 </Badge>

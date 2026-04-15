@@ -180,24 +180,18 @@ export default function GnssView({ sensorId, className }: GnssViewProps) {
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-2 p-2">
         {/* Coordinates — wrap gracefully on narrow cells */}
-        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
-          <div className="flex items-baseline gap-1">
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-xs">
+          <div className="flex items-baseline gap-1.5">
             <span className="text-muted-foreground">Lat</span>
-            <span ref={latRef} className="font-mono tabular-nums">
-              0.000000
-            </span>
+            <span ref={latRef} className="font-mono tabular-nums text-foreground">0.000000</span>
           </div>
-          <div className="flex items-baseline gap-1">
+          <div className="flex items-baseline gap-1.5">
             <span className="text-muted-foreground">Lon</span>
-            <span ref={lonRef} className="font-mono tabular-nums">
-              0.000000
-            </span>
+            <span ref={lonRef} className="font-mono tabular-nums text-foreground">0.000000</span>
           </div>
-          <div className="flex items-baseline gap-1">
+          <div className="flex items-baseline gap-1.5">
             <span className="text-muted-foreground">Alt</span>
-            <span ref={altRef} className="font-mono tabular-nums">
-              0.00
-            </span>
+            <span ref={altRef} className="font-mono tabular-nums text-foreground">0.00</span>
             <span className="text-muted-foreground">m</span>
           </div>
         </div>
