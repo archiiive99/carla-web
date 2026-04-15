@@ -5,7 +5,6 @@ import json
 import os
 import sys
 
-from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -200,13 +199,3 @@ def aggregate_observed_fps(counts: dict[tuple[int, str], int], second: int) -> l
             }
         )
     return rows
-
-
-def count_broadcast_targets(frames: list[tuple[bytes, set[str] | None]], sensor_id: int) -> dict[str, int]:
-    counts: dict[str, int] = defaultdict(int)
-    for _payload, targets in frames:
-        if not targets:
-            continue
-        for client_id in targets:
-            counts[client_id] += 1
-    return counts
