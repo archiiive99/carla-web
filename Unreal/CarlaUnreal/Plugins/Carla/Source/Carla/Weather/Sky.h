@@ -23,6 +23,13 @@ public:
 
 	ASkyBase(const FObjectInitializer& ObjectInitializer);
 
+	// Public accessors for the protected component pointers. Allows AWeather
+	// (and other engine code) to drive the sun/moon directional lights
+	// directly from FWeatherParameters when the BP_CarlaWeather event chain
+	// is broken or absent. See Weather.cpp AWeather::ApplyWeather.
+	UDirectionalLightComponent* GetDirectionalLightSun() const { return DirectionalLightComponentSun; }
+	UDirectionalLightComponent* GetDirectionalLightMoon() const { return DirectionalLightComponentMoon; }
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")

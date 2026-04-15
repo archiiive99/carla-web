@@ -1,0 +1,45 @@
+{
+  "label": "after_bp_fix",
+  "pose": {
+    "name": "street_clear_midday",
+    "x": 118.9,
+    "y": 55.8,
+    "z": 1.8,
+    "yaw": 180.0,
+    "pitch": -8.0,
+    "roll": 0.0
+  },
+  "metrics": {
+    "psnr_db": 9.466977013374366,
+    "ssim": 0.2518223520464859,
+    "delta_e_mean": 32.102371053473824,
+    "roi_pixel_count": 182736
+  },
+  "images": {
+    "reference": "ue5_reference_after_bp_fix.png",
+    "measured": "web_render_after_bp_fix.png",
+    "roi_overlay": "roi_overlay_after_bp_fix.png"
+  },
+  "capture": {
+    "width": 1920,
+    "height": 1080
+  },
+  "roi_polygon_frac": [
+    [
+      0.2800000011920929,
+      0.75
+    ],
+    [
+      0.7200000286102295,
+      0.75
+    ],
+    [
+      0.7200000286102295,
+      0.949999988079071
+    ],
+    [
+      0.2800000011920929,
+      0.949999988079071
+    ]
+  ]
+}

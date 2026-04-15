@@ -7,10 +7,13 @@
 #include "Carla/Weather/Weather.h"
 #include "Carla.h"
 #include "Carla/Sensor/SceneCaptureCamera.h"
+#include "Carla/Weather/Sky.h"
 
 #include <util/ue-header-guard-begin.h>
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkyLightComponent.h"
+#include "Components/DirectionalLightComponent.h"
+#include "Engine/DirectionalLight.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 #include <util/ue-header-guard-end.h>
@@ -75,6 +78,64 @@ void AWeather::ApplyWeather(const FWeatherParameters& InWeather)
 
     // Call the blueprint that actually changes the weather.
     RefreshWeather(Weather);
+
+    // C++ fallback: drive sun direction directly from FWeatherParameters.
+    // Runs AFTER RefreshWeather so the C++ override has the last word.
+    // Tries ASkyBase actors first (Carla custom sky framework); falls back
+    // to engine-standard ADirectionalLight actors for maps like Town01_Opt
+    // that don't use ASkyBase. iter-05 confirmed set_weather() succeeds in
+    // libcarla but the rendered scene ignored sun-pose fields — this fix
+    // makes propagation deterministic regardless of BP state. See
+    // reports/iter-engine-weather-bp/investigation.md.
+    {
+        const float SunPitch = -Weather.SunAltitudeAngle;
+        const float SunYaw = Weather.SunAzimuthAngle;
+        const float DayFactor = FMath::Clamp((Weather.SunAltitudeAngle + 5.0f) / 10.0f, 0.0f, 1.0f);
+
+        TArray<AActor*> SkyActors;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASkyBase::StaticClass(), SkyActors);
+        int32 SkyHits = 0;
+        for (AActor* Actor : SkyActors)
+        {
+            ASkyBase* Sky = Cast<ASkyBase>(Actor);
+            if (!Sky) continue;
+            if (UDirectionalLightComponent* SunLight = Sky->GetDirectionalLightSun())
+            {
+                SunLight->SetRelativeRotation(FRotator(SunPitch, SunYaw, 0.0f));
+                SunLight->SetIntensity(10.0f * DayFactor);
+                ++SkyHits;
+            }
+            if (UDirectionalLightComponent* MoonLight = Sky->GetDirectionalLightMoon())
+            {
+                MoonLight->SetIntensity(0.5f * (1.0f - DayFactor));
+            }
+        }
+
+        // Fallback: drive any plain ADirectionalLight actors. Maps like
+        // Town01_Opt place a stock ADirectionalLight as the sun without an
+        // ASkyBase wrapper.
+        TArray<AActor*> DirLights;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADirectionalLight::StaticClass(), DirLights);
+        int32 DirHits = 0;
+        for (AActor* Actor : DirLights)
+        {
+            ADirectionalLight* Light = Cast<ADirectionalLight>(Actor);
+            if (!Light || !Light->GetLightComponent()) continue;
+            // Only drive lights that look sun-shaped: not too dim, top-level
+            // (no parent attachment). Skip any artist-placed accent lights.
+            if (Light->GetAttachParentActor() != nullptr) continue;
+            Light->SetActorRotation(FRotator(SunPitch, SunYaw, 0.0f));
+            // Cast to UDirectionalLightComponent for SetIntensity (LightComponent base lacks it).
+            if (UDirectionalLightComponent* DLC = Cast<UDirectionalLightComponent>(Light->GetLightComponent()))
+            {
+                DLC->SetIntensity(10.0f * DayFactor);
+            }
+            ++DirHits;
+        }
+
+        UE_LOG(LogCarla, Log, TEXT("AWeather::ApplyWeather C++ propagation: ASkyBase=%d DirLight=%d  SunPitch=%.1f SunYaw=%.1f DayFactor=%.2f"),
+               SkyHits, DirHits, SunPitch, SunYaw, DayFactor);
+    }
 }
 
 void AWeather::NotifyWeather(ASensor* Sensor)

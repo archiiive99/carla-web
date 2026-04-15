@@ -19,7 +19,8 @@ Bumped lighting-stack rows ahead of geometry rows.
 ```
 [x] iter-01  Road surface PBR + parity harness MVP                (⚠️ measured FAIL >±10% — §6.3 raised in 369009cc6, see report)
 [x] iter-05  Sky + sun direction parity (Hosek-Wilkie or HDR)     (⚠️ §6.1 raise — closed 2026-04-15T07:50:51Z+~80min; Path A applied + tsc-clean, measurement blocked by BP_CarlaWeather wiring defect; see iter-05/report.md)
-[~] iter-engine-weather-bp  BP_CarlaWeather → SkyAtmosphere wiring fix   (opened 2026-04-15T08:06:04Z, Phase A; C++ path 2 chosen)
+[x] iter-engine-weather-bp  BP_CarlaWeather → SkyAtmosphere wiring fix   (⚠️ §4.3 tuning-exhausted — closed 2026-04-15T08:06+~2h. C++ override of lone ADirectionalLight verifiably runs each set_weather but UE5's "night" is owned by something else. See iter-engine-weather-bp/report.md §7.8.)
+[ ] iter-engine-weather-bp-revisit  BP_GeneralSceneSettings + SkyAtmosphere chain inspection  (needs UE editor session on GPU 2 — out of CLI scope)
 [ ] iter-05-revisit-roi-sky  Add sky-ROI mode to compare.py harness     (≤30min once iter-engine-weather-bp lands)
 [ ] iter-05-revisit-pathB  Hosek-Wilkie shader if Path A still misses    (queued, only if needed)
 [ ] iter-05-revisit-pathC  HDR cubemap per TOD/cloud bucket              (queued, only if Path A+B miss)
@@ -33,7 +34,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-09  Street lights — emissive + point-light contribution at night
 [ ] iter-10  Traffic lights — emissive bulb + correct hue
 [ ] iter-12  Wet-surface response — driven by CARLA wetness param
-[ ] iter-13  Scene-palette unification — three.js material constants module
+[ ] iter-13  Scene-palette unification — three.js material constants module  (BUMPED to next — UE-independent, doesn't depend on the blocked weather chain)
 [ ] iter-14  LOD pipeline — distant geometry impostors / decimated meshes
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
