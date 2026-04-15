@@ -13,7 +13,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 UPROJECT_PATH="$SCRIPT_DIR/Unreal/CarlaUnreal/CarlaUnreal.uproject"
 ENGINE_PROJECT_LINK="$UE5_DIR/CarlaUnreal"
 CARLA_PORT=58338
-GPU_ID=0
+# Never 0: adapter 0 is the host's display GPU. 2/3 are the usable
+# compute adapters (matches start_streaming.sh default).
+GPU_ID=2
 BG=false
 LOG_FILE="/tmp/carla-server.log"
 PID_FILE="/tmp/carla-server.pid"
@@ -59,12 +61,16 @@ start_carla() {
   export CUDA_VISIBLE_DEVICES=$GPU_ID
   ln -sfn "$SCRIPT_DIR/Unreal/CarlaUnreal" "$ENGINE_PROJECT_LINK"
 
+  # The old -ExecCmds='r.RayTracing=0,r.RHIThread.Enable 0,r.RHICmdBypass 1'
+  # was intentionally removed during the iteration-01 render-parity work
+  # (see start_streaming.sh header) — it disabled the render thread and
+  # forced immediate-mode RHI dispatch, starving the post-process stack and
+  # producing the underexposed / flat-lit output that blocked parity testing.
   "$UE5_DIR/Engine/Binaries/Linux/UnrealEditor" \
     "$UPROJECT_PATH" \
     -game -RenderOffScreen -nosound -unattended \
     -ResX=640 -ResY=480 -carla-rpc-port=$CARLA_PORT \
     -graphicsadapter=$GPU_ID \
-    -ExecCmds="r.RayTracing=0,r.RHIThread.Enable 0,r.RHICmdBypass 1" \
     >> "$LOG_FILE" 2>&1 &
   CARLA_PID=$!
   disown $CARLA_PID
