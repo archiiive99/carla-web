@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { Bird, Eye, Move3d, User, Video } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useUIStore, type CameraMode } from "@/stores/uiStore";
 import { PerformanceOverlay } from "@/components/shared/PerformanceOverlay";
 import { useActorStore } from "@/stores/actorStore";
 import { VehicleControls } from "@/components/controls/VehicleControls";
 import { BRIDGE_EGO_ROLE } from "@/constants";
 import { useEgoVehicleResolution } from "@/hooks/useEgoVehicleResolution";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { FullscreenToggle } from "./FullscreenToggle";
 import { ViewportBody } from "./ViewportBody";
 
@@ -67,20 +68,19 @@ export function MainViewport({ className }: MainViewportProps) {
         {cameraModes.map(({ mode, icon: Icon, label }) => {
           const active = cameraMode === mode;
           return (
-            <button
+            <Button
               key={mode}
               type="button"
+              size="icon-sm"
+              variant={active ? "default" : "ghost"}
               onClick={() => setCameraMode(mode)}
               title={label}
               aria-label={label}
               aria-pressed={active}
-              className={cn(
-                "flex size-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-                active && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-              )}
+              className={cn(!active && "text-muted-foreground")}
             >
               <Icon className="size-4" aria-hidden="true" />
-            </button>
+            </Button>
           );
         })}
       </div>

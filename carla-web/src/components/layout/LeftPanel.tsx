@@ -181,7 +181,7 @@ export function LeftPanel() {
         ) : allActors.length === 0 ? (
           <div className="space-y-2 p-3">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-7 w-full" />
+              <Skeleton key={i} className="h-8 w-full" />
             ))}
           </div>
         ) : (

@@ -111,7 +111,7 @@ export function StatusBar() {
   }, []);
 
   return (
-    <footer className="flex h-7 shrink-0 flex-nowrap items-center justify-between gap-2 overflow-hidden border-t px-3 text-xs text-muted-foreground">
+    <footer className="flex h-8 shrink-0 flex-nowrap items-center justify-between gap-2 overflow-hidden border-t px-3 text-xs text-muted-foreground">
       <div className="flex min-w-0 shrink items-center gap-3 overflow-hidden whitespace-nowrap">
         <span
           className={`flex items-center gap-1 ${latencyTierToken(tier)}`}

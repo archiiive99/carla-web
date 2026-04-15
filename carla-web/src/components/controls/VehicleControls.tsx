@@ -150,7 +150,7 @@ export function VehicleControls({ actorId, enabled }: VehicleControlsProps) {
       <div className="flex items-center gap-3 rounded-md border border-border/60 bg-background/80 p-2 backdrop-blur-sm">
         {/* Speed readout */}
         <div className="flex flex-col items-center px-3">
-          <span className="font-mono text-2xl font-bold tabular-nums leading-none tracking-tight">{Math.round(speed)}</span>
+          <span className="font-mono text-2xl font-semibold tabular-nums leading-none tracking-tight">{Math.round(speed)}</span>
           <span className="mt-0.5 text-2xs font-medium uppercase tracking-wider text-muted-foreground">km/h</span>
         </div>
         <div className="w-px self-stretch bg-border/60" />

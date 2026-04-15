@@ -282,7 +282,7 @@ export function MiniMap({ className }: MiniMapProps) {
           <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-chart-4" aria-hidden="true" />Vehicles</div>
           <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-chart-2" aria-hidden="true" />Walkers</div>
           <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-chart-6" aria-hidden="true" />Sensors</div>
-          <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-amber-500" aria-hidden="true" />Selected</div>
+          <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-primary" aria-hidden="true" />Selected</div>
         </div>
       </CardContent>
     </Card>

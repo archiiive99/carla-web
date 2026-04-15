@@ -105,7 +105,7 @@ export function ActorGroupSection({
                   </span>
                   {actor.role_name === BRIDGE_EGO_ROLE && (
                     <Star
-                      className="size-2.5 shrink-0 fill-amber-500 text-amber-500"
+                      className="size-2.5 shrink-0 fill-warning text-warning"
                       aria-label="Bridge-managed ego vehicle"
                     />
                   )}
