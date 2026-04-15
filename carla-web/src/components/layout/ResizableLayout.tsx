@@ -22,9 +22,14 @@ function getSavedLayout(key: string): Layout | undefined {
     const saved = localStorage.getItem(key);
     if (saved) {
       const layout = JSON.parse(saved) as Layout;
-      // Sanity check: if left panel is < 10%, layout is broken, ignore it
-      const values = Object.values(layout);
-      if (values.length > 0 && typeof values[0] === "number" && values[0] < 10) {
+      // Sanity check: the horizontal layout's "left" panel is collapsible
+      // with minSize=10. Layouts saved with left < 10 collapse the actor
+      // list to a sliver; drop the stored value and fall back to defaults.
+      // (Previously this read `Object.values(layout)[0]`, which works only
+      // while insertion order happens to put "left" first — fragile across
+      // browsers/serializers.)
+      const leftSize = layout["left"];
+      if (typeof leftSize === "number" && leftSize < 10) {
         localStorage.removeItem(key);
         return undefined;
       }
