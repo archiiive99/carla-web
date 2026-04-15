@@ -45,7 +45,6 @@ class SessionState(Enum):
     IDLE = auto()
     ARMING = auto()
     VEHICLE_PENDING = auto()
-    CAMERA_PENDING = auto()
     READY = auto()
     RECOVERING = auto()
 
@@ -56,29 +55,21 @@ class SessionInvariantError(RuntimeError):
 
 # Allowed transitions for the explicit session lifecycle. Illegal hops are
 # treated as invariant violations and forced into RECOVERING by _transition().
+# Post single-source migration the lifecycle is
+# IDLE → ARMING → VEHICLE_PENDING → READY, with RECOVERING as the recovery hub.
 _ALLOWED_TRANSITIONS: dict[SessionState, set[SessionState]] = {
     SessionState.IDLE: {SessionState.ARMING, SessionState.RECOVERING},
     SessionState.ARMING: {
         SessionState.VEHICLE_PENDING,
-        SessionState.CAMERA_PENDING,
         SessionState.READY,
         SessionState.RECOVERING,
         SessionState.IDLE,
     },
     SessionState.VEHICLE_PENDING: {
-        SessionState.CAMERA_PENDING,
         SessionState.READY,
         SessionState.RECOVERING,
-    },
-    SessionState.CAMERA_PENDING: {
-        SessionState.VEHICLE_PENDING,
-        SessionState.READY,
-        SessionState.RECOVERING,
-        SessionState.CAMERA_PENDING,
-        SessionState.ARMING,
     },
     SessionState.READY: {
-        SessionState.CAMERA_PENDING,
         SessionState.RECOVERING,
         SessionState.ARMING,
         SessionState.IDLE,
@@ -228,13 +219,6 @@ class RealtimeSessionManager:
                     self._vehicle_id = await asyncio.to_thread(self._ensure_vehicle_sync)
                     self._vehicle_ready_at_monotonic = time.monotonic()
                     self._transition(SessionState.READY, reason="fresh vehicle spawned")
-                    return self.snapshot()
-
-                if self._state is SessionState.CAMERA_PENDING:
-                    # Legacy state — can only be reached if a pre-migration
-                    # session persisted through a hot reload. Promote straight
-                    # to READY; no camera will be spawned.
-                    self._transition(SessionState.READY, reason="camera-pending collapsed post migration")
                     return self.snapshot()
             except Exception as exc:
                 logger.warning("Managed session arm deferred: %s", exc)
