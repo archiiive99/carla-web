@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 7 rows ✅, 4 rows ⚠️, 12 rows queued. §6.5 raise still active — see `SESSION-RAISE.md`.
+**Summary:** 8 rows ✅, 4 rows ⚠️, 13 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -18,7 +18,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 04 | Lane markings (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~20 min | 0622c17bd |
 | 10 | Traffic lights (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~15 min | c848a4fca |
 | 10-revisit-glb-bulb | TL GLB-bulb mesh recolor | **✅** | 11.03 | 0.213 | 35.90 | ~35 min | e9a22e940 |
-| 13-revisit-pose-coverage | +3 poses (birdseye/chase/intersection) | **✅** | 8.68/11.50/8.74 | 0.36/0.30/0.14 | 46.5/34.1/44.7 | ~35 min | (this commit) |
+| 13-revisit-pose-coverage | +3 poses (birdseye/chase/intersection) | **✅** | 8.68/11.50/8.74 | 0.36/0.30/0.14 | 46.5/34.1/44.7 | ~35 min | 912978c7e |
+| 09 | Street lights (night pose, 4 SpotLights) | **✅** | **40.23** | 0.68 | **0.59** | ~55 min | (this commit) |
 
 ## Notes
 

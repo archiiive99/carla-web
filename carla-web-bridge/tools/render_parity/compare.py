@@ -81,6 +81,22 @@ POSES: Dict[str, Pose] = {
         x=118.9, y=55.8, z=1.8,
         yaw=90.0, pitch=-8.0, roll=0.0,
     ),
+    # iter-09: night pose. Same x/y/yaw as street_clear_midday but with
+    # a sun_alt=-30 weather override (sun below horizon). Used to
+    # measure the iter-09 NightStreetLights contribution.
+    "street_clear_night": Pose(
+        x=118.9, y=55.8, z=1.8,
+        yaw=180.0, pitch=-8.0, roll=0.0,
+    ),
+}
+
+# iter-09 — per-pose weather overrides. Pose name → dict of
+# WeatherParameters fields to override. If a pose isn't present here
+# the iter-01 default block (sun_alt=60, cloudiness=10, etc.) applies.
+POSE_WEATHER_OVERRIDES: Dict[str, Dict[str, float]] = {
+    "street_clear_night": {
+        "sun_altitude_angle": -30.0,
+    },
 }
 
 
@@ -137,22 +153,21 @@ def capture_carla_reference(
     client.set_timeout(10.0)
     world = client.get_world()
 
-    # Force clear/midday so the measured pair is under identical lighting.
-    # iter-12 wetness override (default 0.0): when set non-zero, drives the
-    # web RoadMesh's uWetness uniform via the bridge's weather broadcast,
-    # producing a visibly wetter asphalt (lower roughness, glossier
-    # specular). Used to verify the existing wet-surface binding.
+    # Force clear/midday by default; iter-12 wetness + iter-09 night
+    # overrides come through the pose object's .wetness attribute and
+    # the POSE_WEATHER_OVERRIDES registry respectively.
+    overrides = getattr(pose, "_weather_overrides", {}) or {}
     weather = carla.WeatherParameters(
-        cloudiness=10.0,
-        precipitation=0.0,
-        precipitation_deposits=0.0,
-        wind_intensity=5.0,
-        sun_azimuth_angle=220.0,
-        sun_altitude_angle=60.0,
-        fog_density=0.0,
-        fog_distance=0.0,
-        fog_falloff=0.0,
-        wetness=getattr(pose, "wetness", 0.0),
+        cloudiness=overrides.get("cloudiness", 10.0),
+        precipitation=overrides.get("precipitation", 0.0),
+        precipitation_deposits=overrides.get("precipitation_deposits", 0.0),
+        wind_intensity=overrides.get("wind_intensity", 5.0),
+        sun_azimuth_angle=overrides.get("sun_azimuth_angle", 220.0),
+        sun_altitude_angle=overrides.get("sun_altitude_angle", 60.0),
+        fog_density=overrides.get("fog_density", 0.0),
+        fog_distance=overrides.get("fog_distance", 0.0),
+        fog_falloff=overrides.get("fog_falloff", 0.0),
+        wetness=overrides.get("wetness", getattr(pose, "wetness", 0.0)),
     )
     world.set_weather(weather)
     # iter-05 finding: the prior 10-tick wait was insufficient — histogram
@@ -553,6 +568,8 @@ def main() -> int:
     # iter-12: stash the wetness override on the pose so capture_carla_reference
     # can read it without a second arg-passing path.
     setattr(pose, "wetness", float(args.weather_wetness))
+    # iter-09: stash per-pose weather overrides similarly.
+    setattr(pose, "_weather_overrides", POSE_WEATHER_OVERRIDES.get(args.pose, {}))
 
     out_dir = Path(args.out).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)

@@ -6,6 +6,7 @@ import { ActorRenderer } from "./ActorRenderer";
 import { RoadNetwork } from "./RoadNetwork";
 import { CityEnvironment } from "./CityEnvironment";
 import { EgoHeadlights } from "./EgoHeadlights";
+import { NightStreetLights } from "./NightStreetLights";
 import {
   GroundPlane,
   WeatherFog,
@@ -182,6 +183,7 @@ export function WorldCanvas({ showApproxEnvironment }: WorldCanvasProps) {
       >
         <WeatherLighting />
         <WeatherFog />
+        <NightStreetLights />
         <GroundPlane />
         {showApproxEnvironment && (
           <SceneErrorBoundary>
