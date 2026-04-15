@@ -11,8 +11,12 @@ export function ConnectionOverlay() {
   const connectionStatus = useSimulationStore((s) => s.connectionStatus);
   const bridgeUrl = useSimulationStore((s) => s.bridgeUrl);
   const refreshStatus = useSimulationStore((s) => s.refreshStatus);
+  // performance.now() rather than Date.now() so the disconnected-threshold
+  // check doesn't drift if the OS clock jumps (time-zone change while
+  // laptop asleep, manual time adjustment, NTP step). Both timestamps
+  // are taken from the same monotonic source so their diff is stable.
   const [disconnectedAt, setDisconnectedAt] = useState<number | null>(null);
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(() => performance.now());
   const [wasEverConnected, setWasEverConnected] = useState(false);
 
   useEffect(() => {
@@ -21,12 +25,12 @@ export function ConnectionOverlay() {
       setDisconnectedAt(null);
       return;
     }
-    setDisconnectedAt((prev) => prev ?? Date.now());
+    setDisconnectedAt((prev) => prev ?? performance.now());
   }, [connectionStatus]);
 
   useEffect(() => {
     if (connectionStatus === "connected") return;
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    const timer = window.setInterval(() => setNow(performance.now()), 1000);
     return () => window.clearInterval(timer);
   }, [connectionStatus]);
 
