@@ -394,17 +394,13 @@ class SensorManager:
         self._rate_controller.clear_sensor(sensor_id)
         self._carla.untrack_actor(sensor_id)
 
-    def prune_dead_sensors(self) -> list[int]:
-        removed: list[int] = []
+    def _prune_dead_sensors(self) -> None:
         for sensor_id, sensor in list(self._sensors.items()):
-            if getattr(sensor, "is_alive", True):
-                continue
-            removed.append(sensor_id)
-            self._drop_dead_sensor_ref(sensor_id)
-        return removed
+            if not getattr(sensor, "is_alive", True):
+                self._drop_dead_sensor_ref(sensor_id)
 
     def get_sensor_ids(self) -> list[int]:
-        self.prune_dead_sensors()
+        self._prune_dead_sensors()
         return list(self._sensors.keys())
 
     # --- CARLA sync helpers --------------------------------------------------
