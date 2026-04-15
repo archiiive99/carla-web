@@ -62,12 +62,15 @@ export function Walls({ objects }: { objects: EnvObj[] }) {
         objects={objects}
         scale={{ mode: "fit-bbox" }}
         receiveShadow
-        // iter-14: cull walls beyond 300m of the iter-01 measurement
-        // pose. The static reference point is acceptable for parity
-        // measurement (camera doesn't move during a harness capture);
-        // iter-14-revisit-runtime-lod would track the live camera.
+        // iter-14-revisit-runtime-lod: opt this site into runtime
+        // camera-tracked culling. Walls beyond 300m of the live camera
+        // are zero-scaled (invisible) each frame; re-evaluation
+        // throttled to camera-moved-≥5m. Replaces iter-14's static
+        // referencePoint for this site only — still infallible to
+        // harness fixed-camera measurement (camera at iter-01 pose
+        // means the cull radius is the same set of walls).
         maxDistance={300}
-        referencePoint={[118.9, 55.8, 1.8]}
+        runtimeCull
       />
     </Suspense>
   )

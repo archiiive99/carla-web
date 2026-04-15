@@ -1,6 +1,7 @@
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 import * as THREE from "three"
 import { useGLTF } from "@react-three/drei"
+import { useFrame } from "@react-three/fiber"
 import { EnvObj, c2t, yawRad, extractGeoAndMat } from "./shared"
 
 // Scale modes CARLA props use when falling back to a single-mesh glTF.
@@ -54,6 +55,8 @@ export function GltfInstanced({
   receiveShadow = false,
   maxDistance = Infinity,
   referencePoint = [0, 0, 0],
+  runtimeCull = false,
+  runtimeCullSensitivity = 5,
 }: {
   path: string
   objects: EnvObj[]
@@ -61,18 +64,33 @@ export function GltfInstanced({
   receiveShadow?: boolean
   maxDistance?: number
   referencePoint?: [number, number, number]
+  /** iter-14-revisit-runtime-lod: when true, ignore the static
+   *  referencePoint and re-evaluate per-instance visibility against the
+   *  live camera position each frame (throttled by
+   *  runtimeCullSensitivity meters). Builds InstancedMesh at full
+   *  objects.length and toggles per-instance scale instead of filtering
+   *  at build time. */
+  runtimeCull?: boolean
+  /** Re-evaluate the runtime cull only when the camera has moved this
+   *  many meters since the last evaluation. Default 5m. */
+  runtimeCullSensitivity?: number
 }) {
   const { scene } = useGLTF(path)
+  const meshRef = useRef<THREE.InstancedMesh | null>(null)
+  const lastCullPos = useRef(new THREE.Vector3(Infinity, Infinity, Infinity))
+
   const group = useMemo(() => {
     const g = new THREE.Group()
     const extracted = extractGeoAndMat(scene)
     if (!extracted) return g
 
-    // iter-14: build-time distance cull — filter once, then use the
-    // post-cull length as the InstancedMesh count.
+    // iter-14: build-time distance cull (when runtimeCull is OFF).
+    // iter-14-revisit-runtime-lod: when runtimeCull is ON, keep all
+    // instances at build time and let useFrame toggle per-instance
+    // visibility against the live camera.
     const [refX, refY, refZ] = referencePoint
     const r2 = maxDistance * maxDistance
-    const kept: EnvObj[] = (maxDistance === Infinity)
+    const kept: EnvObj[] = (runtimeCull || maxDistance === Infinity)
       ? objects
       : objects.filter((obj) => {
           const dx = obj.b.x - refX
@@ -102,7 +120,39 @@ export function GltfInstanced({
     mesh.castShadow = true
     if (receiveShadow) mesh.receiveShadow = true
     g.add(mesh)
+    meshRef.current = mesh
     return g
-  }, [objects, scene, scale.mode, receiveShadow, maxDistance, referencePoint])
+  }, [objects, scene, scale.mode, receiveShadow, maxDistance, referencePoint, runtimeCull])
+
+  useFrame(({ camera }) => {
+    if (!runtimeCull || !meshRef.current) return
+    if (camera.position.distanceTo(lastCullPos.current) < runtimeCullSensitivity) return
+    lastCullPos.current.copy(camera.position)
+
+    const r2 = maxDistance * maxDistance
+    const dummy = new THREE.Object3D()
+    for (let i = 0; i < objects.length; i++) {
+      const obj = objects[i]
+      const pos = c2t(obj.b.x, obj.b.y, obj.b.z)
+      const dx = pos.x - camera.position.x
+      const dy = pos.y - camera.position.y
+      const dz = pos.z - camera.position.z
+      const inRange = (dx * dx + dy * dy + dz * dz) <= r2
+      if (inRange) {
+        dummy.position.set(pos.x, pos.y, pos.z)
+        dummy.rotation.set(0, yawRad(obj.b.yaw), 0)
+        applyScale(dummy, obj, scale.mode)
+      } else {
+        // Hide by zero-scale; cheaper than removing-and-re-adding.
+        dummy.scale.set(0, 0, 0)
+        dummy.position.set(0, 0, 0)
+        dummy.rotation.set(0, 0, 0)
+      }
+      dummy.updateMatrix()
+      meshRef.current.setMatrixAt(i, dummy.matrix)
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true
+  })
+
   return <primitive object={group} />
 }
