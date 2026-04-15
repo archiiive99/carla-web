@@ -159,10 +159,6 @@ export const SENSOR_REGISTRY: Record<string, SensorRegistryEntry> = {
   },
 };
 
-export function getSensorEntry(typeId: string): SensorRegistryEntry | undefined {
-  return SENSOR_REGISTRY[typeId];
-}
-
 export function getSensorDisplayName(typeId: string): string {
   return SENSOR_REGISTRY[typeId]?.displayName ?? typeId.split(".").pop() ?? typeId;
 }

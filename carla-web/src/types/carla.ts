@@ -23,7 +23,7 @@ export interface SpectatorState {
 
 // --- Actors ---
 
-export type ActorType =
+type ActorType =
   | "vehicle"
   | "walker"
   | "sensor"
@@ -139,7 +139,7 @@ export interface SensorConfig {
 
 // --- Blueprints ---
 
-export interface BlueprintAttribute {
+interface BlueprintAttribute {
   id: string;
   type: string;
   value: string;
