@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 1 row ✅, 4 rows ⚠️, 16 rows queued.
+**Summary:** 2 rows ✅, 4 rows ⚠️, 15 rows queued.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -12,7 +12,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 05 | Sky + sun direction parity (Path A) | ⚠️ §6.1 | 15.21 | 0.329 | 19.05 | ~80 min | 41c24f5ae |
 | eng-weather-bp | BP→Sky wiring (C++ DirLight fallback) | ⚠️ §4.3 | 11.93 | 0.626 | 54.92 | ~2 h | 5103f4d86 |
 | 13 | Scene-palette unification (refactor) | ⚠️ ref-instability | 7.00 | 0.515 | 80.66 | ~60 min | 2620646bb |
-| 13-followon | Harness NPC-clear-before-capture | **✅** | 11.04 | 0.220 | 35.89 | ~35 min | (this commit) |
+| 13-followon | Harness NPC-clear-before-capture | **✅** | 11.04 | 0.220 | 35.89 | ~35 min | 79ba51961 |
+| 05-revisit-roi-sky | Harness sky-ROI mode | **✅** | 9.93 | 0.124 | 36.33 | ~35 min | (this commit) |
 
 ## Notes
 

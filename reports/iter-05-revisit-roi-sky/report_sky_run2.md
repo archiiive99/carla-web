@@ -1,0 +1,18 @@
+# Render parity — SKY_RUN2
+
+**Pose**: `street_clear_midday` = (x=118.9, y=55.8, z=1.8, yaw=180.0°, pitch=-8.0°, roll=0.0°)
+**Capture**: 1920×1080 PNG; ROI polygon covers road surface.
+
+## Metrics (road ROI)
+
+| Metric | Value |
+|---|---|
+| PSNR (dB) | 9.93 |
+| SSIM | 0.1245 |
+| Mean ΔE (CIE76) | 36.34 |
+
+## Images
+
+- Reference (CARLA UE5 `sensor.camera.rgb`): `ue5_reference_sky_run2.png`
+- Measured (web shared-scene 3D viewport): `web_render_sky_run2.png`
+- ROI overlay visualization: `roi_overlay_sky_run2.png`

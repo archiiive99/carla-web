@@ -73,6 +73,25 @@ ROAD_ROI = np.array([
     [0.28, 0.95],
 ], dtype=np.float32)
 
+# Sky ROI — top half of the frame. Combined with a per-pixel brightness
+# threshold (sky_brightness_mask) at metric-compute time so rooftops,
+# distant trees, and overhead wires inside the polygon don't pollute
+# what's intended to be a sky-only comparison.
+SKY_ROI = np.array([
+    [0.05, 0.02],
+    [0.95, 0.02],
+    [0.95, 0.50],
+    [0.05, 0.50],
+], dtype=np.float32)
+
+# A pixel is "sky" if its luminance is above this fraction of the bright
+# pixels in the polygon. Adapts to ambient: a midday capture's sky is
+# bright (threshold lifts), a night capture's sky is dim (threshold
+# drops). 0.55 means "anything above 55% of the polygon's 95th
+# percentile luminance" — empirically separates sky from rooftops at the
+# iter-01 test pose without per-pose tuning.
+SKY_BRIGHTNESS_FRAC = 0.55
+
 # Capture resolution. Matches the WebGL framebuffer (DPR-aware on the web
 # side — Playwright viewport is set to this exact size, the browser canvas
 # fills it).
@@ -411,7 +430,7 @@ def write_report(
         "metrics": metrics,
         "images": refs,
         "capture": {"width": CAPTURE_W, "height": CAPTURE_H},
-        "roi_polygon_frac": ROAD_ROI.tolist(),
+        "roi_polygon_frac": (SKY_ROI if metrics.get("roi_mode") == "sky" else ROAD_ROI).tolist(),
     }
     report_json.write_text(json.dumps(data, indent=2))
 
@@ -439,17 +458,33 @@ def write_report(
     report_md.write_text("\n".join(lines))
 
 
-def draw_roi_overlay(out_path: Path, image_path: Path) -> None:
+def draw_roi_overlay(out_path: Path, image_path: Path, roi: np.ndarray) -> None:
     from PIL import ImageDraw
 
     img = Image.open(image_path).convert("RGB")
     w, h = img.size
     draw = ImageDraw.Draw(img, "RGBA")
-    pts = [(float(p[0]) * w, float(p[1]) * h) for p in ROAD_ROI]
+    pts = [(float(p[0]) * w, float(p[1]) * h) for p in roi]
     pts_closed = pts + [pts[0]]
     # Semi-transparent yellow polygon outline so the ROI is easy to eyeball.
     draw.line(pts_closed, fill=(255, 225, 0, 220), width=4)
     img.save(out_path)
+
+
+def sky_brightness_mask(ref: np.ndarray, polygon_mask_arr: np.ndarray) -> np.ndarray:
+    """Within the polygon mask, keep only pixels whose luminance is above
+    SKY_BRIGHTNESS_FRAC * (95th-percentile luminance inside the polygon).
+    Adapts to scene ambient — at midday the sky is bright and the threshold
+    lifts; at night the sky is dim and the threshold drops with it. Removes
+    rooftops/foliage from a too-large rectangular sky polygon.
+    """
+    luma = (0.299 * ref[..., 0] + 0.587 * ref[..., 1] + 0.114 * ref[..., 2])
+    inside = luma[polygon_mask_arr]
+    if inside.size == 0:
+        return polygon_mask_arr
+    p95 = float(np.percentile(inside, 95))
+    threshold = SKY_BRIGHTNESS_FRAC * p95
+    return polygon_mask_arr & (luma >= threshold)
 
 
 # --- Main -----------------------------------------------------------------
@@ -465,6 +500,14 @@ def main() -> int:
         "--label",
         default="run",
         help="Filename suffix for before/after runs (e.g. `before`, `after`).",
+    )
+    parser.add_argument(
+        "--roi",
+        default="road",
+        choices=("road", "sky"),
+        help="ROI to compute metrics over. road=lower-center polygon (default, "
+             "iter-01 baseline); sky=upper rectangle + brightness threshold "
+             "(iter-05-revisit-roi-sky, for sky-parity iterations).",
     )
     args = parser.parse_args()
 
@@ -498,19 +541,25 @@ def main() -> int:
         meas = np.asarray(meas_img)
 
     h, w = ref.shape[:2]
-    mask = polygon_mask(h, w, ROAD_ROI)
+    roi_polygon = SKY_ROI if args.roi == "sky" else ROAD_ROI
+    mask = polygon_mask(h, w, roi_polygon)
+    if args.roi == "sky":
+        # Restrict to actual sky pixels (above ambient-adaptive threshold).
+        mask = sky_brightness_mask(ref, mask)
     metrics = {
         "psnr_db": psnr_masked(ref, meas, mask),
         "ssim": ssim_masked(ref, meas, mask),
         "delta_e_mean": mean_delta_e_masked(ref, meas, mask),
         "roi_pixel_count": int(mask.sum()),
+        "roi_mode": args.roi,
     }
     print(
-        f"[harness] metrics: PSNR={metrics['psnr_db']:.2f} dB  "
-        f"SSIM={metrics['ssim']:.4f}  ΔE={metrics['delta_e_mean']:.2f}"
+        f"[harness] metrics ({args.roi} ROI): PSNR={metrics['psnr_db']:.2f} dB  "
+        f"SSIM={metrics['ssim']:.4f}  ΔE={metrics['delta_e_mean']:.2f}  "
+        f"npix={metrics['roi_pixel_count']}"
     )
 
-    draw_roi_overlay(roi_overlay_path, meas_path)
+    draw_roi_overlay(roi_overlay_path, meas_path, roi_polygon)
     write_report(
         out_dir,
         args.label,
