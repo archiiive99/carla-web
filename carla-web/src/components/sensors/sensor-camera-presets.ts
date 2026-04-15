@@ -1,7 +1,8 @@
-// Camera presets for the multi-view sensor grid. Split from SensorCamera3DView
-// so Vite Fast Refresh can hot-swap the 3D viewport component — mixing a React
-// component with non-component exports (the CAMERA_PRESETS const / type) in
-// one file invalidates HMR on every edit.
+// Camera presets for the multi-view sensor grid (ego-relative offset +
+// rotation pairs). Kept separate from the component that consumes them
+// (SensorCameraView) because mixing a React component with non-component
+// exports (const / type) in a single file invalidates Vite Fast Refresh
+// on every edit.
 
 export const CAMERA_PRESETS = {
   front: { offset: { x: 5, y: 0, z: 2 }, rotation: { pitch: -5, yaw: 0 }, label: "Front" },

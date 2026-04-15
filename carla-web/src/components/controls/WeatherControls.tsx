@@ -27,6 +27,7 @@ import { useSimulationStore, useIsConnected } from "@/stores/simulationStore";
 import type { CarlaWeatherParams } from "@/types/carla";
 import { WEATHER_SLIDER_DEBOUNCE_MS } from "@/constants";
 import { WEATHER_QUICK_PRESETS } from "./weather-quick-presets";
+import { reportError } from "@/lib/utils";
 
 const PRESET_GROUPS = [
   {
@@ -147,7 +148,9 @@ export function WeatherControls() {
                   size="sm"
                   className="gap-1 px-2 text-xs"
                   onClick={() => {
-                    setWeatherPreset(preset).catch(() => {});
+                    setWeatherPreset(preset).catch((e) =>
+                      reportError("Weather preset", e),
+                    );
                   }}
                   aria-label={`Apply ${label} weather preset`}
                 >
@@ -161,7 +164,9 @@ export function WeatherControls() {
 
             <Select
               onValueChange={(v) => {
-                setWeatherPreset(v as Parameters<typeof setWeatherPreset>[0]).catch(() => {});
+                setWeatherPreset(v as Parameters<typeof setWeatherPreset>[0]).catch((e) =>
+                  reportError("Weather preset", e),
+                );
               }}
             >
               <SelectTrigger className="w-full" aria-label="Select weather preset">
@@ -207,7 +212,9 @@ export function WeatherControls() {
                     variant="outline"
                     size="sm"
                     className="w-full gap-1.5 text-xs"
-                    onClick={() => setWeatherPreset("ClearNoon").catch(() => {})}
+                    onClick={() => setWeatherPreset("ClearNoon").catch((e) =>
+                      reportError("Weather preset", e),
+                    )}
                     aria-label="Reset weather to Clear Noon"
                   >
                     <RotateCcw className="size-3" aria-hidden="true" />
