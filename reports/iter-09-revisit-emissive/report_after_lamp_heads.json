@@ -1,0 +1,46 @@
+{
+  "label": "after_lamp_heads",
+  "pose": {
+    "name": "street_clear_night",
+    "x": 118.9,
+    "y": 55.8,
+    "z": 1.8,
+    "yaw": 180.0,
+    "pitch": -8.0,
+    "roll": 0.0
+  },
+  "metrics": {
+    "psnr_db": 40.254666464399065,
+    "ssim": 0.6787108388107619,
+    "delta_e_mean": 0.5910759185043923,
+    "roi_pixel_count": 182736,
+    "roi_mode": "road"
+  },
+  "images": {
+    "reference": "ue5_reference_after_lamp_heads.png",
+    "measured": "web_render_after_lamp_heads.png",
+    "roi_overlay": "roi_overlay_after_lamp_heads.png"
+  },
+  "capture": {
+    "width": 1920,
+    "height": 1080
+  },
+  "roi_polygon_frac": [
+    [
+      0.2800000011920929,
+      0.75
+    ],
+    [
+      0.7200000286102295,
+      0.75
+    ],
+    [
+      0.7200000286102295,
+      0.949999988079071
+    ],
+    [
+      0.2800000011920929,
+      0.949999988079071
+    ]
+  ]
+}

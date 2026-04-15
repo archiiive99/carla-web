@@ -77,6 +77,22 @@ export function NightStreetLights() {
             decay={SPOTLIGHT_DECAY}
             castShadow={false}
           />
+          {/* iter-09-revisit-emissive: small emissive sphere at the lamp
+             head position so the source of the light is visible in the
+             scene — without it the SpotLights just appear as bright
+             cones with nothing emitting them. The CARLA static-prop
+             streetlamp GLBs are dormant in the scene (exported but
+             unused), so this plays the role of the lamp head visual. */}
+          <mesh position={spec.position}>
+            <sphereGeometry args={[0.18, 12, 12]} />
+            <meshStandardMaterial
+              color={HEADLIGHT_BEAM}
+              emissive={HEADLIGHT_BEAM}
+              emissiveIntensity={2.5}
+              roughness={0.5}
+              metalness={0}
+            />
+          </mesh>
         </group>
       ))}
     </>
