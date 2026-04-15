@@ -44,7 +44,11 @@ class _FakeBcast:
 
 
 class _FakeImageData:
-    type_id = "sensor.camera.rgb"
+    # Post single-source migration RGB is client-rendered and the bridge
+    # refuses to encode it, so rate-control tests drive the worker with a
+    # depth-camera packet instead — the subscriber-filtering path we want to
+    # exercise is identical for every broadcast-eligible camera kind.
+    type_id = "sensor.camera.depth"
 
     def __init__(self, frame: int, timestamp: float = 0.0) -> None:
         self.frame = frame
@@ -69,12 +73,12 @@ def _make_manager(native_fps: float = 20.0) -> tuple[SensorManager, _FakeBcast, 
     sid = 7
     sensor_tick = str(1.0 / native_fps)
     sm._sensors[sid] = _FakeSensor(sensor_tick=sensor_tick)         # noqa: SLF001
-    sm._sensor_type_ids[sid] = "sensor.camera.rgb"                 # noqa: SLF001
+    sm._sensor_type_ids[sid] = "sensor.camera.depth"               # noqa: SLF001
     sm._subscriptions[sid] = set()                                  # noqa: SLF001
     sm._frame_counters[sid] = 0                                     # noqa: SLF001
     sm._native_fps[sid] = native_fps                                # noqa: SLF001
     sm._spawn_params[sid] = {                                       # noqa: SLF001
-        "sensor_type": "sensor.camera.rgb",
+        "sensor_type": "sensor.camera.depth",
         "transform": {},
         "parent_id": 0,
         "attributes": {"sensor_tick": sensor_tick, "fov": "100", "image_size_x": "1280"},
