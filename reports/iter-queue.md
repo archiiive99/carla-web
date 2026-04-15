@@ -34,7 +34,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-07  Vegetation — extracted trees / bushes / grass instances  (✅-on-arrival — 12 GLB variants + bucketed InstancedMesh + procedural fallback shipped; LOD applied iter-14-revisit-vegetation-buildings; closed 2026-04-15T10:25+~10min)
 [x] iter-08  Walker silhouettes — extracted skeletal meshes + walk cycle  (✅ pivoted from extraction-blocked scope to articulated procedural placeholder — torso + head + 2 arms + 2 legs; closed 2026-04-15T11:10+~15min)
 [ ] iter-08-extract-glb  Real CARLA walker GLBs (blocked by UE editor)
-[ ] iter-08-walk-cycle  Animate legs/arms with velocity-driven sine swing (~30min web-only)
+[x] iter-08-walk-cycle  Animate legs/arms with velocity-driven sine swing  (✅ — pivot groups at shoulder/hip + useFrame opposing-pair sine swing scaled by walker velocity; closed 2026-04-15T11:17+~25min)
 [x] iter-08-skin-tones  Vary walker body color per actor.id  (✅ — 6 safety-vis hues, actor.id mod 6 deterministic; closed 2026-04-15T11:14+~12min)
 [x] iter-09  Street lights — emissive + point-light contribution at night  (✅ — 4 hardcoded SpotLights near iter-01 intersection, gated isNight; new street_clear_night pose; PSNR 40.23 ✅ ΔE 0.59 ✅ SSIM 0.68 ❌; closed 2026-04-15T09:39+~55min)
 [x] iter-09-revisit-emissive  Recolor lamp-head GLB meshes for night-glow  (✅ — pivoted to emissive-sphere pattern after finding STATIC_STREETLIGHT_MODELS dormant in scene; spheres visible above road in night render; PSNR/SSIM stable vs iter-09 within noise; closed 2026-04-15T09:45+~30min)

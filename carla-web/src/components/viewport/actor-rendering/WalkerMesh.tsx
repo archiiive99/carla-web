@@ -1,4 +1,6 @@
-import { memo, useMemo } from "react";
+import { memo, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 import type { CarlaActor } from "@/types/carla";
 import { carlaToThree } from "./shared";
 import { WALKER_BODY, WALKER_LIMB, WALKER_WARNING } from "../scene-palette";
@@ -33,6 +35,36 @@ export const WalkerMesh = memo(function WalkerMesh({
 }) {
   const pos = carlaToThree(actor.transform.location);
   const bodyColor = useMemo(() => walkerBodyColor(actor.id), [actor.id]);
+
+  // iter-08-walk-cycle: refs to limb pivot groups + a per-walker
+  // walk-phase counter. useFrame increments phase by speed * delta
+  // and applies opposing left/right swing.
+  const leftArmRef = useRef<THREE.Group>(null);
+  const rightArmRef = useRef<THREE.Group>(null);
+  const leftLegRef = useRef<THREE.Group>(null);
+  const rightLegRef = useRef<THREE.Group>(null);
+  const walkPhaseRef = useRef(0);
+  useFrame((_, delta) => {
+    const v = actor.velocity;
+    const speed = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (speed < 0.1) {
+      // Reset to neutral pose
+      if (leftArmRef.current) leftArmRef.current.rotation.x = 0;
+      if (rightArmRef.current) rightArmRef.current.rotation.x = 0;
+      if (leftLegRef.current) leftLegRef.current.rotation.x = 0;
+      if (rightLegRef.current) rightLegRef.current.rotation.x = 0;
+      return;
+    }
+    // Phase increment scaled by speed (faster speed = quicker stride).
+    // 1.8 rad/s/(m/s) ≈ natural human cadence at walking pace.
+    walkPhaseRef.current += delta * speed * 1.8;
+    const swing = Math.sin(walkPhaseRef.current) * 0.45;
+    if (leftArmRef.current) leftArmRef.current.rotation.x = -swing;
+    if (rightArmRef.current) rightArmRef.current.rotation.x = swing;
+    if (leftLegRef.current) leftLegRef.current.rotation.x = swing;
+    if (rightLegRef.current) rightLegRef.current.rotation.x = -swing;
+  });
+
   return (
     <group
       position={[pos.x, pos.y, pos.z]}
@@ -48,15 +80,12 @@ export const WalkerMesh = memo(function WalkerMesh({
         document.body.style.cursor = "auto";
       }}
     >
-      {/* iter-08: anatomically-articulated procedural walker. Still
-          obviously a placeholder (no real GLB), but with separate
-          head/torso/arms/legs the silhouette reads as "person" from a
-          glance — closing the "what is this orange capsule" gap. Real
-          GLB extraction is iter-08-extract-glb (UE editor blocked).
-          Safety-visibility orange + low emissive floor preserved so
-          the figure remains readable at night. castShadow on each
-          piece so the walker settles correctly. */}
-      {/* Torso */}
+      {/* iter-08-walk-cycle: anatomically-articulated walker with
+          shoulder/hip pivot groups so legs + arms swing around the
+          correct anchor instead of tumbling around their geometric
+          centers. useFrame below drives the swing angle from
+          actor.velocity magnitude. */}
+      {/* Torso (unanimated) */}
       <mesh position={[0, 1.05, 0]} castShadow receiveShadow>
         <capsuleGeometry args={[0.18, 0.55, 6, 12]} />
         <meshStandardMaterial
@@ -71,26 +100,34 @@ export const WalkerMesh = memo(function WalkerMesh({
         <sphereGeometry args={[0.13, 12, 12]} />
         <meshStandardMaterial color={WALKER_LIMB} roughness={0.75} />
       </mesh>
-      {/* Left arm */}
-      <mesh position={[-0.22, 1.05, 0]} castShadow receiveShadow>
-        <capsuleGeometry args={[0.06, 0.45, 4, 8]} />
-        <meshStandardMaterial color={bodyColor} roughness={0.8} />
-      </mesh>
+      {/* Left arm — pivot at shoulder y=1.30, mesh offset down */}
+      <group ref={leftArmRef} position={[-0.22, 1.30, 0]}>
+        <mesh position={[0, -0.25, 0]} castShadow receiveShadow>
+          <capsuleGeometry args={[0.06, 0.45, 4, 8]} />
+          <meshStandardMaterial color={bodyColor} roughness={0.8} />
+        </mesh>
+      </group>
       {/* Right arm */}
-      <mesh position={[0.22, 1.05, 0]} castShadow receiveShadow>
-        <capsuleGeometry args={[0.06, 0.45, 4, 8]} />
-        <meshStandardMaterial color={bodyColor} roughness={0.8} />
-      </mesh>
-      {/* Left leg */}
-      <mesh position={[-0.09, 0.45, 0]} castShadow receiveShadow>
-        <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
-        <meshStandardMaterial color={bodyColor} roughness={0.8} />
-      </mesh>
+      <group ref={rightArmRef} position={[0.22, 1.30, 0]}>
+        <mesh position={[0, -0.25, 0]} castShadow receiveShadow>
+          <capsuleGeometry args={[0.06, 0.45, 4, 8]} />
+          <meshStandardMaterial color={bodyColor} roughness={0.8} />
+        </mesh>
+      </group>
+      {/* Left leg — pivot at hip y=0.78, mesh offset down */}
+      <group ref={leftLegRef} position={[-0.09, 0.78, 0]}>
+        <mesh position={[0, -0.33, 0]} castShadow receiveShadow>
+          <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
+          <meshStandardMaterial color={bodyColor} roughness={0.8} />
+        </mesh>
+      </group>
       {/* Right leg */}
-      <mesh position={[0.09, 0.45, 0]} castShadow receiveShadow>
-        <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
-        <meshStandardMaterial color={bodyColor} roughness={0.8} />
-      </mesh>
+      <group ref={rightLegRef} position={[0.09, 0.78, 0]}>
+        <mesh position={[0, -0.33, 0]} castShadow receiveShadow>
+          <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
+          <meshStandardMaterial color={bodyColor} roughness={0.8} />
+        </mesh>
+      </group>
       {isSelected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
           <ringGeometry args={[1.0, 1.2, 24]} />
