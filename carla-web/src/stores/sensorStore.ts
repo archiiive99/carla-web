@@ -69,7 +69,26 @@ export const useSensorStore = create<SensorState>((set, get) => ({
   },
 
   spawnSensor: async (config) => {
-    const sensor = await carlaApi.spawnSensor(config);
+    // The bridge's POST /api/actors/spawn/sensor returns a minimal
+    // {id, type, parent_id} payload (see routes/actors.py:215). Fill
+    // in the rest from the request we just sent so the store's
+    // SensorConfig invariant (transform + attributes always present)
+    // holds — readers like SensorExtrinsicController otherwise crash
+    // on undefined transform. Attribute values are coerced to strings
+    // since that's what the bridge stores and re-emits via GET
+    // /api/sensors/:id/config.
+    const minimal = await carlaApi.spawnSensor(config);
+    const attributes: Record<string, string> = {};
+    for (const [k, v] of Object.entries(config.attributes)) {
+      attributes[k] = String(v);
+    }
+    const sensor: SensorConfig = {
+      id: minimal.id,
+      type: minimal.type,
+      parent_id: minimal.parent_id,
+      transform: config.transform,
+      attributes,
+    };
     set((state) => {
       const sensors = new Map(state.sensors);
       sensors.set(sensor.id, sensor);
