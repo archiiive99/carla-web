@@ -372,34 +372,26 @@ def test_adopted_camera_with_drifted_config_is_rejected(manager, carla_stub, sen
     assert drifted_camera.destroyed is True
 
 
-# --- B3b: invalid pose handling --------------------------------------------
+# --- adoption policy: any managed leftover is destroyed (post migration) ---
+#
+# Three prior tests (below-map / no-waypoint / far-from-surface) exercised
+# the now-removed _vehicle_pose_valid helper. Since the manager switched
+# to a blanket "destroy + respawn" adoption policy, all three collapse to
+# the same assertion: any pre-existing managed vehicle is destroyed and
+# adoption returns None, regardless of where the vehicle happened to be.
+# Kept a single parametrized case that documents the behaviour in words
+# those earlier tests used to cover.
 
 
-def test_adopted_vehicle_below_map_is_abandoned(manager, carla_stub):
-    vehicle = _Actor(1001, transform=_Transform(_Loc(z=-50.0)))
-    carla_stub._actors[1001] = vehicle
-    result = manager._adopt_orphan_managed_vehicle_sync()
-    # Abandon: adoption returns None, vehicle is destroyed to clean up.
-    assert result is None
-    assert vehicle.destroyed is True
-
-
-def test_adopted_vehicle_without_waypoint_is_abandoned(sensor_stub):
-    carla_stub = _StubCarlaClient(carla_map=_StubMap(waypoint_missing=True))
-    sensor_stub.bind_carla(carla_stub)
-    manager = RealtimeSessionManager(carla_stub, sensor_stub)
-    vehicle = _Actor(1001, transform=_Transform(_Loc(z=1.0)))
-    carla_stub._actors[1001] = vehicle
-    result = manager._adopt_orphan_managed_vehicle_sync()
-    assert result is None
-    assert vehicle.destroyed is True
-
-
-def test_adopted_vehicle_far_from_surface_is_abandoned(sensor_stub):
-    carla_stub = _StubCarlaClient(carla_map=_StubMap(waypoint_z=0.0))
-    sensor_stub.bind_carla(carla_stub)
-    manager = RealtimeSessionManager(carla_stub, sensor_stub)
-    vehicle = _Actor(1001, transform=_Transform(_Loc(z=25.0)))
+@pytest.mark.parametrize(
+    "z",
+    [-50.0, 1.0, 25.0],
+    ids=["below-map", "on-surface", "far-above-surface"],
+)
+def test_adopt_destroys_any_managed_leftover_regardless_of_pose(
+    manager, carla_stub, z
+):
+    vehicle = _Actor(1001, transform=_Transform(_Loc(z=z)))
     carla_stub._actors[1001] = vehicle
     result = manager._adopt_orphan_managed_vehicle_sync()
     assert result is None
