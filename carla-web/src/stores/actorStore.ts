@@ -1,7 +1,7 @@
 import { reportError } from "@/lib/utils";
 import { create } from "zustand";
 import { toast } from "sonner";
-import type { CarlaActor, VehicleControl } from "@/types/carla";
+import type { CarlaActor } from "@/types/carla";
 import type { ActorTransform } from "@/types/ws";
 import type { SpawnVehicleRequest, SpawnWalkerRequest } from "@/types/api";
 import { carlaApi } from "@/lib/carla-api";
@@ -27,7 +27,6 @@ interface ActorState {
   spawnVehicle: (config: SpawnVehicleRequest) => Promise<CarlaActor>;
   spawnWalker: (config: SpawnWalkerRequest) => Promise<CarlaActor>;
   destroyActor: (id: number) => Promise<void>;
-  applyControl: (id: number, control: VehicleControl) => Promise<void>;
   setAutopilot: (id: number, enabled: boolean) => Promise<void>;
   spawnMultipleVehicles: (count: number, blueprint?: string) => Promise<CarlaActor[]>;
   refreshActors: () => Promise<void>;
@@ -161,10 +160,6 @@ export const useActorStore = create<ActorState>((set, get) => ({
         actorsByType: classifyActors(actors),
       };
     });
-  },
-
-  applyControl: async (id, control) => {
-    await carlaApi.applyControl(id, control);
   },
 
   setAutopilot: async (id, enabled) => {
