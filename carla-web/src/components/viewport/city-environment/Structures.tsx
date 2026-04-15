@@ -31,7 +31,13 @@ export function Poles({ objects }: { objects: EnvObj[] }) {
   if (objects.length === 0) return null
   return (
     <Suspense fallback={<ProceduralPoles objects={objects} />}>
-      <GltfInstanced path={POLE_ELECTRIC_MODEL} objects={objects} scale={{ mode: "pole" }} />
+      <GltfInstanced
+        path={POLE_ELECTRIC_MODEL}
+        objects={objects}
+        scale={{ mode: "pole" }}
+        maxDistance={300}
+        referencePoint={[118.9, 55.8, 1.8]}
+      />
     </Suspense>
   )
 }
@@ -88,7 +94,13 @@ export function Fences({ objects }: { objects: EnvObj[] }) {
   if (objects.length === 0) return null
   return (
     <Suspense fallback={<ProceduralFences objects={objects} />}>
-      <GltfInstanced path={FENCE_WIRED_MODEL} objects={objects} scale={{ mode: "fit-bbox" }} />
+      <GltfInstanced
+        path={FENCE_WIRED_MODEL}
+        objects={objects}
+        scale={{ mode: "fit-bbox" }}
+        maxDistance={300}
+        referencePoint={[118.9, 55.8, 1.8]}
+      />
     </Suspense>
   )
 }
@@ -108,7 +120,13 @@ export function Rocks({ objects }: { objects: EnvObj[] }) {
   if (objects.length === 0) return null
   return (
     <Suspense fallback={<ProceduralRocks objects={objects} />}>
-      <GltfInstanced path={ROCK_MODEL} objects={objects} scale={{ mode: "fit-bbox" }} />
+      <GltfInstanced
+        path={ROCK_MODEL}
+        objects={objects}
+        scale={{ mode: "fit-bbox" }}
+        maxDistance={300}
+        referencePoint={[118.9, 55.8, 1.8]}
+      />
     </Suspense>
   )
 }
@@ -128,7 +146,13 @@ export function GuardRails({ objects }: { objects: EnvObj[] }) {
   if (objects.length === 0) return null
   return (
     <Suspense fallback={<ProceduralGuardRails objects={objects} />}>
-      <GltfInstanced path={GUARD_RAIL_MODEL} objects={objects} scale={{ mode: "fit-bbox" }} />
+      <GltfInstanced
+        path={GUARD_RAIL_MODEL}
+        objects={objects}
+        scale={{ mode: "fit-bbox" }}
+        maxDistance={300}
+        referencePoint={[118.9, 55.8, 1.8]}
+      />
     </Suspense>
   )
 }
