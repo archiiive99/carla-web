@@ -115,6 +115,10 @@ def capture_carla_reference(
     world = client.get_world()
 
     # Force clear/midday so the measured pair is under identical lighting.
+    # iter-12 wetness override (default 0.0): when set non-zero, drives the
+    # web RoadMesh's uWetness uniform via the bridge's weather broadcast,
+    # producing a visibly wetter asphalt (lower roughness, glossier
+    # specular). Used to verify the existing wet-surface binding.
     weather = carla.WeatherParameters(
         cloudiness=10.0,
         precipitation=0.0,
@@ -125,7 +129,7 @@ def capture_carla_reference(
         fog_density=0.0,
         fog_distance=0.0,
         fog_falloff=0.0,
-        wetness=0.0,
+        wetness=getattr(pose, "wetness", 0.0),
     )
     world.set_weather(weather)
     # iter-05 finding: the prior 10-tick wait was insufficient — histogram
@@ -509,12 +513,23 @@ def main() -> int:
              "iter-01 baseline); sky=upper rectangle + brightness threshold "
              "(iter-05-revisit-roi-sky, for sky-parity iterations).",
     )
+    parser.add_argument(
+        "--weather-wetness",
+        type=float,
+        default=0.0,
+        help="iter-12 — override the CARLA weather wetness param [0..100]. "
+             "Bridge picks this up and broadcasts it; the web RoadMesh's "
+             "uWetness uniform drives lower roughness (wet asphalt).",
+    )
     args = parser.parse_args()
 
     pose = POSES.get(args.pose)
     if pose is None:
         print(f"unknown pose: {args.pose}. known: {list(POSES)}", file=sys.stderr)
         return 2
+    # iter-12: stash the wetness override on the pose so capture_carla_reference
+    # can read it without a second arg-passing path.
+    setattr(pose, "wetness", float(args.weather_wetness))
 
     out_dir = Path(args.out).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
