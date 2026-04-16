@@ -32,9 +32,16 @@ export const useSensorStore = create<SensorState>((set, get) => ({
     // terminate the worker this closure captured at subscribe time, so
     // posting to a stale reference would throw an uncaught InvalidStateError
     // a full second after any user action.
+    //
+    // Retries fire *unconditionally* (not gated on `initialWorker`): if
+    // the worker isn't mounted yet when subscribe is called, the store
+    // flag flips to "Subscribed" but the worker's desiredSubscriptions
+    // stays empty forever — the user sees Subscribed in the UI while
+    // no frames flow. Scheduling the retries regardless lets a late-
+    // arriving worker pick up the subscription on one of the ticks.
+    const msg = { type: "subscribe", data: { sensorId } };
     const initialWorker = getGlobalWsWorker();
     if (initialWorker) {
-      const msg = { type: "subscribe", data: { sensorId } };
       try {
         initialWorker.postMessage(msg);
       } catch {
@@ -42,19 +49,19 @@ export const useSensorStore = create<SensorState>((set, get) => ({
         // postMessage (bridge URL race) — swallow and rely on the next
         // worker's reconnect to re-arm subscriptions.
       }
-      const retryIfStillSubscribed = () => {
-        if (!get().subscriptions.has(sensorId)) return;
-        const current = getGlobalWsWorker();
-        if (!current) return;
-        try {
-          current.postMessage(msg);
-        } catch {
-          // Same terminated-worker case — silent.
-        }
-      };
-      setTimeout(retryIfStillSubscribed, 500);
-      setTimeout(retryIfStillSubscribed, 1500);
     }
+    const retryIfStillSubscribed = () => {
+      if (!get().subscriptions.has(sensorId)) return;
+      const current = getGlobalWsWorker();
+      if (!current) return;
+      try {
+        current.postMessage(msg);
+      } catch {
+        // Same terminated-worker case — silent.
+      }
+    };
+    setTimeout(retryIfStillSubscribed, 500);
+    setTimeout(retryIfStillSubscribed, 1500);
     set((state) => {
       const subs = new Set(state.subscriptions);
       subs.add(sensorId);
