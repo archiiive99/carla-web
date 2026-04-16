@@ -135,15 +135,19 @@ function GltfVegetation({ objects }: { objects: EnvObj[] }) {
               `
               #include <begin_vertex>
               // Height-weighted wind sway: only upper foliage sways,
-              // trunk base stays fixed. World-XZ-offset in sin() so
-              // neighboring trees don't all sway in lockstep.
+              // trunk base stays fixed. Phase seeded by per-instance
+              // world XZ (instanceMatrix[3].xz) instead of vertex-local
+              // position.xz — within a bucket all instances share geometry
+              // so local position doesn't vary across trees; instance
+              // translation does.
+              vec2 instXZ = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
               float windAmp = uWindIntensity * max(transformed.y * 0.06, 0.0);
-              transformed.x += sin(uTime * 1.3 + position.x * 0.08 + position.z * 0.08) * windAmp;
-              transformed.z += cos(uTime * 0.9 + position.x * 0.08) * windAmp * 0.55;
+              transformed.x += sin(uTime * 1.3 + instXZ.x * 0.08 + instXZ.y * 0.08) * windAmp;
+              transformed.z += cos(uTime * 0.9 + instXZ.x * 0.08) * windAmp * 0.55;
               `,
             )
         }
-        mat.customProgramCacheKey = () => "vegetation-wind-v1"
+        mat.customProgramCacheKey = () => "vegetation-wind-v2"
 
         const mesh = new THREE.InstancedMesh(part.geometry, mat, bucket.length)
 

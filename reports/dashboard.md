@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 45 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
+**Summary:** 46 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -60,6 +60,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 10-revisit-bulb-sun-drive | TL bulb emissive ramped by sun altitude | **✅** | 11.02 | 0.2122 | 35.94 | ~20 min | 26fb9bc04 |
 | 06-revisit-ground-bounce-altitude | Hemisphere ground-bounce altitude ramp | **✅** | 16.71 | 0.3062 | 21.86 | ~15 min | 073c99bb6 |
 | 08-revisit-swing-amp-split | Split arm (0.35) vs leg (0.55) swing | **✅** | 16.73 | 0.3060 | 21.86 | ~12 min | da6492256 |
+| 07-revisit-wind-per-instance | Per-instance wind-sway phase | **✅** | 16.71 | 0.3063 | 21.87 | ~15 min | (this commit) |
 
 ## Notes
 
