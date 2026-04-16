@@ -152,10 +152,15 @@ export default function GnssView({ sensorId, className }: GnssViewProps) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const observer = new ResizeObserver(() => {
-      drawTrail();
-    });
-    observer.observe(canvas.parentElement!);
+    // ResizeObserver.observe() throws if the target is null; the previous
+    // `canvas.parentElement!` non-null assertion relied on DOM structure
+    // that's not enforced by TypeScript. A null-check is cheap and avoids
+    // crashing the component if the canvas is ever rendered without a
+    // parent (e.g. during a Suspense boundary transition).
+    const parent = canvas.parentElement;
+    if (!parent) return;
+    const observer = new ResizeObserver(() => drawTrail());
+    observer.observe(parent);
     return () => observer.disconnect();
   }, [drawTrail]);
 

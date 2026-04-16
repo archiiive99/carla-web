@@ -133,10 +133,13 @@ export default function RadarView({ sensorId, className }: RadarViewProps) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const observer = new ResizeObserver(() => {
-      drawGrid();
-    });
-    observer.observe(canvas.parentElement!);
+    // Null-guard the parent instead of the previous `!` assertion — see
+    // GnssView for the rationale (Suspense-transition canvases may briefly
+    // have no parent, and ResizeObserver.observe(null) throws).
+    const parent = canvas.parentElement;
+    if (!parent) return;
+    const observer = new ResizeObserver(() => drawGrid());
+    observer.observe(parent);
     return () => observer.disconnect();
   }, [drawGrid]);
 
