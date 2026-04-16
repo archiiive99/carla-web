@@ -76,7 +76,19 @@ export const useSensorStore = create<SensorState>((set, get) => ({
 
   unsubscribe: (sensorId) => {
     const worker = getGlobalWsWorker();
-    worker?.postMessage({ type: "unsubscribe", data: { sensorId } });
+    if (worker) {
+      try {
+        worker.postMessage({ type: "unsubscribe", data: { sensorId } });
+      } catch {
+        // Worker may have been terminated between getGlobalWsWorker and
+        // postMessage (bridge URL race) — matches the try/catch shape in
+        // `subscribe` above. Without this, an InvalidStateError from the
+        // terminated-worker post took down the whole unsubscribe call
+        // and left the store / bridge out of sync. The new worker's
+        // desiredSubscriptions starts empty, so the unsub is implicitly
+        // applied.
+      }
+    }
     set((state) => {
       const subs = new Set(state.subscriptions);
       subs.delete(sensorId);
@@ -127,7 +139,16 @@ export const useSensorStore = create<SensorState>((set, get) => ({
     // caller without having touched the worker's subscription state.
     await carlaApi.destroyActor(sensorId);
     const worker = getGlobalWsWorker();
-    worker?.postMessage({ type: "unsubscribe", data: { sensorId } });
+    if (worker) {
+      try {
+        worker.postMessage({ type: "unsubscribe", data: { sensorId } });
+      } catch {
+        // Same terminated-worker race as subscribe/unsubscribe —
+        // swallow so the store cleanup below still runs. The sensor is
+        // already destroyed on the bridge at this point; keeping the
+        // local store in sync is what matters.
+      }
+    }
     set((state) => {
       const sensors = new Map(state.sensors);
       sensors.delete(sensorId);
