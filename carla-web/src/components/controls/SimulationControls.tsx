@@ -141,13 +141,21 @@ export function SimulationControls() {
                 // Clamp defensively; falls back to the middle step (1×).
                 const multiplier = SPEED_STEPS[idx] ?? 1;
                 setSpeedIdx(idx);
+                // sim-time advance per real second = (1 / bridge tick period)
+                // × fixed_delta. The bridge's `_world_tick_loop` ticks at a
+                // fixed WORLD_TICK_INTERVAL=0.05s real, so sim speed
+                // multiplier = fixed_delta / 0.05 ⇒ fixed_delta = 0.05 * M.
+                // Previously this divided by M, inverting the mapping:
+                // selecting "10x" sent fixed_delta=0.005 → 0.1× sim speed,
+                // and "0.5x" sent 0.1 → 2× speed. Multiply so the slider
+                // label matches the simulated rate.
                 // Slider drags fire onValueChange per step; silent-swallow
                 // follows the same pattern as VehicleDetails / TrafficManager
                 // so a transient bridge hiccup doesn't spam speed-change
                 // toasts while the user is dragging.
                 carlaApi.setSettings({
                   sync_mode: true,
-                  fixed_delta: 0.05 / multiplier,
+                  fixed_delta: 0.05 * multiplier,
                 }).catch(() => {});
               }}
             />
