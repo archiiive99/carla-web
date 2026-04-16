@@ -9,6 +9,37 @@ import { useEventStore } from "@/stores/eventStore";
 import { useSensorStore } from "@/stores/sensorStore";
 import { SPAWN_NO_POINTS_MSG, BRIDGE_EGO_ROLE } from "@/constants";
 
+// CARLA renames vehicle blueprints across releases — "vehicle.tesla.model3"
+// exists in 0.9.x but was removed in 0.10. The quick-spawn buttons and
+// CommandPalette scenarios hardcoded that id and silently failed with
+// "Blueprint not found" on 0.10 builds. Resolve against the live blueprint
+// list and try common fallbacks so the buttons work regardless of build.
+const PREFERRED_VEHICLE_BLUEPRINTS = [
+  "vehicle.tesla.model3",
+  "vehicle.lincoln.mkz_2020",
+  "vehicle.audi.a2",
+  "vehicle.lincoln.mkz",
+  "vehicle.dodge.charger",
+];
+
+export async function resolveVehicleBlueprint(
+  hint?: string,
+): Promise<string | null> {
+  try {
+    const blueprints = await carlaApi.getVehicleBlueprints();
+    const ids = new Set(blueprints.map((bp) => bp.id));
+    if (hint && ids.has(hint)) return hint;
+    for (const preferred of PREFERRED_VEHICLE_BLUEPRINTS) {
+      if (ids.has(preferred)) return preferred;
+    }
+    return blueprints[0]?.id ?? null;
+  } catch {
+    // Getter failed — fall back to the hint so the spawn-vehicle error
+    // path still surfaces a meaningful toast rather than a silent noop.
+    return hint ?? null;
+  }
+}
+
 interface ActorsByType {
   vehicles: number[];
   walkers: number[];
@@ -194,8 +225,13 @@ export const useActorStore = create<ActorState>((set, get) => ({
     // comparison. Just let the optimistic set stand on success.
   },
 
-  spawnMultipleVehicles: async (count: number, blueprint = "vehicle.tesla.model3") => {
+  spawnMultipleVehicles: async (count: number, blueprint?: string) => {
     const spawned: CarlaActor[] = [];
+    const resolved = await resolveVehicleBlueprint(blueprint);
+    if (!resolved) {
+      toast.error("No vehicle blueprint available in this CARLA build");
+      return spawned;
+    }
     const spawnPoints = await carlaApi.getSpawnPoints();
     if (!spawnPoints.length) {
       toast.error(SPAWN_NO_POINTS_MSG);
@@ -206,7 +242,7 @@ export const useActorStore = create<ActorState>((set, get) => ({
       if (!transform) continue;
       try {
         const actor = await carlaApi.spawnVehicle({
-          blueprint,
+          blueprint: resolved,
           transform,
           autopilot: true,
         });
@@ -224,7 +260,7 @@ export const useActorStore = create<ActorState>((set, get) => ({
       toast.success(`Spawned ${spawned.length} vehicle${spawned.length === 1 ? "" : "s"}`);
       useEventStore
         .getState()
-        .addEvent("spawn", `Bulk-spawned ${spawned.length} ${blueprint.split(".").pop() ?? "vehicles"}`);
+        .addEvent("spawn", `Bulk-spawned ${spawned.length} ${resolved.split(".").pop() ?? "vehicles"}`);
     } else {
       toast.error("Could not spawn any vehicles (all spawn points occupied?)");
     }

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Car, PersonStanding, Users, Trash2 } from "lucide-react";
 import { SpawnPanel } from "@/components/controls/SpawnPanel";
-import { useActorStore } from "@/stores/actorStore";
+import { resolveVehicleBlueprint, useActorStore } from "@/stores/actorStore";
 import { useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
 import { reportError } from "@/lib/utils";
@@ -30,6 +30,15 @@ export function ActorLifecycleFooter() {
 
   const quickSpawnVehicle = useCallback(async () => {
     try {
+      // Resolve against the live blueprint list so this works regardless
+      // of CARLA version — "vehicle.tesla.model3" exists in 0.9.x but was
+      // removed in 0.10, where hardcoding it made this button 400 every
+      // click. See resolveVehicleBlueprint for the fallback order.
+      const blueprint = await resolveVehicleBlueprint();
+      if (!blueprint) {
+        toast.error("No vehicle blueprint available in this CARLA build");
+        return;
+      }
       const points = await carlaApi.getSpawnPoints();
       // Math.floor(Math.random() * n) is in-bounds when n>0 but
       // `arr[i]` under noUncheckedIndexedAccess is T|undefined — guard
@@ -41,7 +50,7 @@ export function ActorLifecycleFooter() {
         return;
       }
       await useActorStore.getState().spawnVehicle({
-        blueprint: "vehicle.tesla.model3",
+        blueprint,
         transform: pt,
         autopilot: true,
       });
@@ -69,7 +78,11 @@ export function ActorLifecycleFooter() {
 
   const quickSpawnTenVehicles = useCallback(async () => {
     try {
-      await useActorStore.getState().spawnMultipleVehicles(10, "vehicle.tesla.model3");
+      // Omit the blueprint hint — spawnMultipleVehicles resolves against
+      // the live blueprint list with common fallbacks, so the "+10"
+      // button works across CARLA versions without hardcoding an id
+      // that may not exist in this build.
+      await useActorStore.getState().spawnMultipleVehicles(10);
     } catch (e) {
       reportError("Spawn", e);
     }

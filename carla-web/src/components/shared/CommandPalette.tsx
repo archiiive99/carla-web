@@ -177,7 +177,9 @@ export function CommandPalette() {
               onSelect={() =>
                 run(async () => {
                   await setWeatherPreset("ClearNoon");
-                  await spawnMultipleVehicles(10, "vehicle.tesla.model3");
+                  // Omit the hint — spawnMultipleVehicles resolves against
+                  // the live blueprint list with version fallbacks.
+                  await spawnMultipleVehicles(10);
                 }, "Traffic Burst — 10 vehicles", { silent: true })
               }
               disabled={!isConnected}
@@ -219,7 +221,9 @@ export function CommandPalette() {
               onSelect={() =>
                 run(async () => {
                   await setWeatherPreset("HardRainNight");
-                  await spawnMultipleVehicles(10, "vehicle.tesla.model3");
+                  // Omit the hint — spawnMultipleVehicles resolves against
+                  // the live blueprint list with version fallbacks.
+                  await spawnMultipleVehicles(10);
                 }, "Rainy Night Traffic", { silent: true })
               }
               disabled={!isConnected}
