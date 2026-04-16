@@ -17,6 +17,27 @@ interface LaneInvasionLogProps {
   className?: string;
 }
 
+// CARLA's LaneMarking::Type enum (LibCarla/source/carla/road/element/
+// LaneMarking.h). The sensor emits integer codes; render names so the
+// log reads as "Solid / Broken" instead of the cryptic "2 / 1".
+const LANE_MARKING_NAMES: Record<number, string> = {
+  0: "Other",
+  1: "Broken",
+  2: "Solid",
+  3: "SolidSolid",
+  4: "SolidBroken",
+  5: "BrokenSolid",
+  6: "BrokenBroken",
+  7: "BottsDots",
+  8: "Grass",
+  9: "Curb",
+  10: "None",
+};
+
+function markingTypeName(code: number): string {
+  return LANE_MARKING_NAMES[code] ?? String(code);
+}
+
 export default function LaneInvasionLog({
   sensorId,
   className,
@@ -40,7 +61,7 @@ export default function LaneInvasionLog({
           .reverse()
           .map((event) => ({
             timestamp: event.timestamp,
-            markingTypes: event.markingTypes.map(String),
+            markingTypes: event.markingTypes.map(markingTypeName),
           })),
       );
     }, 100);
