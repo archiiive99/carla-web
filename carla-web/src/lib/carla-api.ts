@@ -215,8 +215,17 @@ export class CarlaApi {
     });
   }
 
-  async spawnSensor(config: SpawnSensorRequest): Promise<SensorConfig> {
-    return request<SensorConfig>(this.url("/api/actors/spawn/sensor"), {
+  /** POST /api/actors/spawn/sensor returns the minimal acknowledgment the
+   *  bridge sends back (routes/actors.py:223): only id + type + parent_id.
+   *  Transform + attributes are NOT in the response — callers that need a
+   *  full `SensorConfig` (e.g. sensorStore.spawnSensor) reconstruct those
+   *  fields from the request they just sent. Typing this as full
+   *  SensorConfig was a lie that let future callers read .transform /
+   *  .attributes and get undefined at runtime. */
+  async spawnSensor(
+    config: SpawnSensorRequest,
+  ): Promise<Pick<SensorConfig, "id" | "type" | "parent_id">> {
+    return request(this.url("/api/actors/spawn/sensor"), {
       method: "POST",
       body: JSON.stringify(config),
     });
