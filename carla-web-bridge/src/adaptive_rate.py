@@ -46,6 +46,19 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+def _finite_or_zero(value: Any) -> float:
+    """Coerce a stats value to a finite float, returning 0.0 for
+    None / non-numeric / NaN / Infinity inputs. Stats from a hostile or
+    buggy WS client could otherwise inject NaN into the rate controller's
+    thresholds — NaN > x is always False so downgrade never fires and
+    the controller silently degrades."""
+    try:
+        result = float(value) if value is not None else 0.0
+    except (TypeError, ValueError):
+        return 0.0
+    return result if math.isfinite(result) else 0.0
+
+
 @dataclass(slots=True)
 class SubscriberRate:
     target_fps: float
@@ -254,11 +267,18 @@ class RateController:
             except (TypeError, ValueError):
                 continue
 
+            # Non-finite stat values (NaN / Infinity from a buggy or
+            # hostile client) would silently degrade the rate controller:
+            # backlog > threshold is False for NaN, so downgrade never
+            # fires and the client stays on effective_fps=target while
+            # actually unable to keep up. Coerce non-finite to 0 so the
+            # rate controller just treats the reading as "zero backlog"
+            # (healthy) — same shape as the missing-key fallback.
             parsed_stats = {
-                "queue_backlog": float(stats.get("queue_backlog", 0.0) or 0.0),
-                "decode_lag_ms": float(stats.get("decode_lag_ms", 0.0) or 0.0),
-                "frames_dropped": float(stats.get("frames_dropped", 0.0) or 0.0),
-                "frames_received": float(stats.get("frames_received", 0.0) or 0.0),
+                "queue_backlog": _finite_or_zero(stats.get("queue_backlog", 0.0)),
+                "decode_lag_ms": _finite_or_zero(stats.get("decode_lag_ms", 0.0)),
+                "frames_dropped": _finite_or_zero(stats.get("frames_dropped", 0.0)),
+                "frames_received": _finite_or_zero(stats.get("frames_received", 0.0)),
             }
             sample = ClientStatsSample(
                 ts_monotonic_server=now_monotonic,
