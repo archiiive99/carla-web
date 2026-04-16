@@ -4,6 +4,7 @@ import sys
 import json
 from types import SimpleNamespace
 
+import pytest
 from fastapi.testclient import TestClient
 
 from src.main import app, sensor_manager
@@ -313,6 +314,56 @@ def test_tm_set_ignore_rejects_non_vehicle(monkeypatch):
     resp = client.post("/api/traffic/vehicle/5/ignore", json={"lights": 0.0})
     assert resp.status_code == 400
     assert resp.json()["detail"] == "Actor is not a vehicle"
+
+
+def test_spawn_sensor_fails_loud_when_parent_gone(monkeypatch):
+    """sensor_manager._spawn_sync raises RuntimeError (→ 400 via route)
+    when the user's parent_id resolves to None — instead of silently
+    spawning world-attached and echoing a stale parent_id."""
+    import src.sensor_manager as sm_mod
+
+    carla_stub = SimpleNamespace(Transform=lambda *_a, **_kw: None, Location=SimpleNamespace, Rotation=SimpleNamespace)
+
+    class _BpLib:
+        def find(self, type_id: str):
+            return SimpleNamespace(
+                has_attribute=lambda _k: False,
+                set_attribute=lambda _k, _v: None,
+            )
+
+    class _World:
+        def get_blueprint_library(self):
+            return _BpLib()
+
+    class _FakeCarlaMgr:
+        is_connected = True
+        def refresh_world(self):
+            return _World()
+        def get_actor(self, _aid: int):
+            # Parent lookup returns None — this is the "parent destroyed
+            # between the UI pick and this spawn" case the fix protects
+            # against.
+            return None
+        def track_actor(self, _aid: int): ...
+        def untrack_actor(self, _aid: int): ...
+
+    # Build a manager bound to our stub so we can call _spawn_sync directly.
+    from src.sensor_manager import SensorManager
+    mgr = SensorManager(_FakeCarlaMgr(), broadcaster=SimpleNamespace())
+
+    monkeypatch.setitem(sys.modules, "carla", carla_stub)
+
+    with pytest.raises(RuntimeError) as exc:
+        mgr._spawn_sync(  # noqa: SLF001
+            "sensor.other.gnss",
+            {"location": {"x": 0, "y": 0, "z": 0}, "rotation": {"pitch": 0, "yaw": 0, "roll": 0}},
+            parent_id=99999,
+            attributes={},
+        )
+    assert "Parent actor 99999 not found" in str(exc.value)
+    # Ensure we didn't silently proceed: the string should flag the
+    # user-facing cause so the toast is meaningful.
+    assert "destroyed" in str(exc.value)
 
 
 def test_blueprints_vehicles_requires_connection():
