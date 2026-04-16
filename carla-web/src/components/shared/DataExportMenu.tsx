@@ -52,7 +52,13 @@ export function DataExportMenu() {
       return;
     }
     canvas.toBlob((blob) => {
-      if (!blob) return;
+      if (!blob) {
+        // toBlob returns null if the canvas is tainted (cross-origin texture
+        // without CORS) or if encoding fails. Silent failure used to leave
+        // the user staring at an unchanged UI with no explanation.
+        toast.error("Screenshot failed — the viewport canvas may be tainted");
+        return;
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
