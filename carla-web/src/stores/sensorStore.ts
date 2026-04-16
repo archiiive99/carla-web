@@ -28,12 +28,29 @@ export const useSensorStore = create<SensorState>((set, get) => ({
     // hasn't finished connecting when the first subscribe lands. Each retry
     // re-checks `subscriptions` so a quick unsubscribe() immediately after
     // subscribe() isn't undone by the later retries landing on the bridge.
-    const worker = getGlobalWsWorker();
-    if (worker) {
+    // Re-fetch the worker ref inside the retry — bridge URL changes
+    // terminate the worker this closure captured at subscribe time, so
+    // posting to a stale reference would throw an uncaught InvalidStateError
+    // a full second after any user action.
+    const initialWorker = getGlobalWsWorker();
+    if (initialWorker) {
       const msg = { type: "subscribe", data: { sensorId } };
-      worker.postMessage(msg);
+      try {
+        initialWorker.postMessage(msg);
+      } catch {
+        // Worker may have been terminated between getGlobalWsWorker and
+        // postMessage (bridge URL race) — swallow and rely on the next
+        // worker's reconnect to re-arm subscriptions.
+      }
       const retryIfStillSubscribed = () => {
-        if (get().subscriptions.has(sensorId)) worker.postMessage(msg);
+        if (!get().subscriptions.has(sensorId)) return;
+        const current = getGlobalWsWorker();
+        if (!current) return;
+        try {
+          current.postMessage(msg);
+        } catch {
+          // Same terminated-worker case — silent.
+        }
       };
       setTimeout(retryIfStillSubscribed, 500);
       setTimeout(retryIfStillSubscribed, 1500);
