@@ -132,6 +132,29 @@ def test_maps_requires_connection():
     assert resp.status_code == 503
 
 
+def test_should_skip_actor_filters_fixtures_and_scenery():
+    """_should_skip_actor keeps interactable types (vehicle/walker/sensor/
+    traffic_light) and drops CARLA map fixtures (traffic signs, static
+    props) so /api/actors stays uncluttered."""
+    from src.routes.actors import _should_skip_actor
+
+    # Kept
+    assert _should_skip_actor("vehicle.tesla.model3") is False
+    assert _should_skip_actor("walker.pedestrian.0043") is False
+    assert _should_skip_actor("sensor.camera.rgb") is False
+    assert _should_skip_actor("traffic.traffic_light") is False
+    assert _should_skip_actor("spectator") is False
+
+    # Dropped — traffic signs
+    assert _should_skip_actor("traffic.speed_limit.30") is True
+    assert _should_skip_actor("traffic.stop") is True
+    assert _should_skip_actor("traffic.yield") is True
+
+    # Dropped — static scenery
+    assert _should_skip_actor("static.prop.mesh") is True
+    assert _should_skip_actor("static.prop.trashcan01") is True
+
+
 def test_maps_filters_templates_and_town15_sublevels(monkeypatch):
     """The /api/world/maps endpoint skips CARLA-internal templates and
     Town15 streaming sublevels so the frontend dropdown only surfaces
