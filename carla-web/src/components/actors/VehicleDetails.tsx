@@ -35,15 +35,18 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
   const isEgo = egoVehicleId === actorId;
   const [control, setControl] = useState({ throttle: 0, steer: 0, brake: 0 });
   const [lightState, setLightState] = useState(0);
-  // Reset local light state when switching to a different vehicle — the
-  // bridge doesn't expose light read-back, so without this the new actor
-  // inherits the previous actor's toggles. Using the React-19 idiom
-  // "adjust state during render" (Dan Abramov, "You Might Not Need an
-  // Effect") instead of a useEffect that sets state synchronously.
+  // Reset local state when switching to a different vehicle. lightState
+  // resets because the bridge doesn't expose light read-back; control
+  // resets because without it, the throttle/steer/brake sliders briefly
+  // flash the OLD actor's values until the 500ms poll below refreshes
+  // them. Use the React-19 idiom "adjust state during render" (Dan
+  // Abramov, "You Might Not Need an Effect") so both resets land in the
+  // same render as the actorId change instead of one-render-late.
   const [lastActorId, setLastActorId] = useState(actorId);
   if (lastActorId !== actorId) {
     setLastActorId(actorId);
     setLightState(0);
+    setControl({ throttle: 0, steer: 0, brake: 0 });
   }
 
   const toggleLightBit = useCallback(
