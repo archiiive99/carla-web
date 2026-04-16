@@ -159,31 +159,44 @@ async def list_weather_presets() -> dict[str, Any]:
 @router.get("/spectator")
 async def get_spectator() -> dict[str, Any]:
     _require_connection()
-    try:
-        spec = carla_manager.world.get_spectator()
-        return {"transform": carla_transform_to_dict(spec.get_transform()).model_dump()}
-    except RuntimeError as e:
-        raise HTTPException(
-            status_code=501,
-            detail="Spectator API unavailable in current CARLA runtime",
-        ) from e
+
+    # Match every other route in this file: CARLA RPC runs off the event
+    # loop so a slow round-trip doesn't stall WS broadcasts / health polls.
+    # Previously this awaited nothing and executed synchronously on the
+    # loop thread, which showed up as brief tick-rate dips whenever the
+    # ActorDetails mount-time probe fired.
+    def _get() -> dict[str, Any]:
+        try:
+            spec = carla_manager.world.get_spectator()
+            return {"transform": carla_transform_to_dict(spec.get_transform()).model_dump()}
+        except RuntimeError as e:
+            raise HTTPException(
+                status_code=501,
+                detail="Spectator API unavailable in current CARLA runtime",
+            ) from e
+
+    return await asyncio.to_thread(_get)
 
 
 @router.post("/spectator")
 async def set_spectator(req: Transform) -> dict[str, Any]:
     _require_connection()
-    try:
-        spec = carla_manager.world.get_spectator()
-        t = dict_to_carla_transform(req)
-        spec.set_transform(t)
-        return {"status": "ok"}
-    except RuntimeError as e:
-        raise HTTPException(
-            status_code=501,
-            detail="Spectator API unavailable in current CARLA runtime",
-        ) from e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+
+    def _set() -> dict[str, Any]:
+        try:
+            spec = carla_manager.world.get_spectator()
+            t = dict_to_carla_transform(req)
+            spec.set_transform(t)
+            return {"status": "ok"}
+        except RuntimeError as e:
+            raise HTTPException(
+                status_code=501,
+                detail="Spectator API unavailable in current CARLA runtime",
+            ) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
+
+    return await asyncio.to_thread(_set)
 
 
 @router.get("/spawn-points")
