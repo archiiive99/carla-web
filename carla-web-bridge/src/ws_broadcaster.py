@@ -307,8 +307,20 @@ class WebSocketBroadcaster:
             return
 
         if active_conn.on_unsubscribe:
+            # Guard each callback so one failure doesn't skip the rest —
+            # otherwise a sensor_manager.unsubscribe that raised (e.g. an
+            # internal assertion, a carla_module late-import failure) would
+            # leave later sids still in active_conn.subscriptions and the
+            # ws.close() below un-run, orphaning the client's subscription
+            # entries in sensor_manager._subscriptions forever.
             for sid in tuple(active_conn.subscriptions):
-                active_conn.on_unsubscribe(sid, client_id)
+                try:
+                    active_conn.on_unsubscribe(sid, client_id)
+                except Exception as exc:
+                    logger.warning(
+                        "on_unsubscribe failed for client %s sensor %s: %s",
+                        client_id, sid, exc,
+                    )
                 active_conn.subscriptions.discard(sid)
 
         with contextlib.suppress(Exception):
