@@ -132,9 +132,18 @@ export function SensorPanel({ className }: { className?: string }) {
     setCells((prev) => {
       const next = [...prev];
       while (next.length < newTotal) next.push(null);
+      // Shrinking the grid (e.g. 3x3 → 1x1) silently dropped the truncated
+      // cells, leaking every sensor subscription they held. The bridge kept
+      // streaming those frames until the tab reloaded. Unsubscribe here
+      // like removeCell does — 3D-preset cells have no subscription to
+      // clear, so skip them.
+      for (let i = newTotal; i < next.length; i++) {
+        const dropped = next[i];
+        if (dropped && !dropped.preset3d) unsubscribe(dropped.sensorId);
+      }
       return next.slice(0, newTotal);
     });
-  }, []);
+  }, [unsubscribe]);
 
   const addSensorToCell = useCallback((index: number, sensorId: number, typeId: string) => {
     subscribe(sensorId);
@@ -183,11 +192,20 @@ export function SensorPanel({ className }: { className?: string }) {
   // the same default the user first opened the app with, not an empty 2x2
   // scaffold that requires extra clicks before anything renders.
   const resetGrid = useCallback(() => {
+    setCells((prev) => {
+      // Unsubscribe every real sensor the grid currently holds — otherwise
+      // "Reset grid" silently leaked subscriptions the same way the grid-
+      // shrink path did before. Auto-populate re-subscribes the ego RGB
+      // cam after this fires.
+      for (const cell of prev) {
+        if (cell && !cell.preset3d) unsubscribe(cell.sensorId);
+      }
+      return Array(2).fill(null);
+    });
     setGridSize("2x1");
-    setCells(Array(2).fill(null));
     autoPopulatedRef.current = false;
     setMaximizedSensor(null);
-  }, [setMaximizedSensor]);
+  }, [setMaximizedSensor, unsubscribe]);
 
   // If the maximized sensor no longer has a cell (destroyed / bridge reload),
   // clear the flag in an effect — not during render — to avoid React warnings.
