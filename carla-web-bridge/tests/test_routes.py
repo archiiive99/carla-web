@@ -333,6 +333,69 @@ def test_patch_sensor_attributes_rejects_unknown(monkeypatch):
         _clear_sensor()
 
 
+def _install_destroy_guard_stubs(monkeypatch, type_id: str) -> list:
+    """Shared stub harness for the destroy_actor CARLA-fixture guard.
+
+    Returns the `events` sink so each caller can assert "no destroy
+    reached the actor" after the 400 is issued. A live destroy()/
+    invalidate() call would be a regression of the guard.
+    """
+    import src.main as main_mod
+    import src.routes.actors as actors_routes
+
+    events: list[tuple[str, object]] = []
+
+    class _Actor:
+        def __init__(self, tid: str) -> None:
+            self.type_id = tid
+
+        def destroy(self) -> None:
+            events.append(("destroy", self.type_id))
+
+    class _World:
+        def get_actor(self, _aid: int):
+            return _Actor(type_id)
+
+    fake_manager = SimpleNamespace(
+        is_connected=True,
+        world=_World(),
+        get_actor=lambda _aid: _Actor(type_id),
+        untrack_actor=lambda _aid: events.append(("untrack", _aid)),
+    )
+    monkeypatch.setattr(actors_routes, "carla_manager", fake_manager)
+
+    class _RealtimeSession:
+        async def invalidate_actor(self, _aid: int, reason: str | None = None) -> None:
+            events.append(("invalidate", _aid))
+
+    monkeypatch.setattr(main_mod, "realtime_session", _RealtimeSession())
+    return events
+
+
+def test_destroy_actor_rejects_spectator(monkeypatch):
+    events = _install_destroy_guard_stubs(monkeypatch, "spectator")
+    resp = client.delete("/api/actors/1")
+    assert resp.status_code == 400
+    assert "CARLA map fixture" in resp.json()["detail"]
+    assert events == []  # no destroy / invalidate slipped through
+
+
+def test_destroy_actor_rejects_traffic_light(monkeypatch):
+    events = _install_destroy_guard_stubs(monkeypatch, "traffic.traffic_light")
+    resp = client.delete("/api/actors/58")
+    assert resp.status_code == 400
+    assert "CARLA map fixture" in resp.json()["detail"]
+    assert events == []
+
+
+def test_destroy_actor_rejects_traffic_sign(monkeypatch):
+    events = _install_destroy_guard_stubs(monkeypatch, "traffic.speed_limit.30")
+    resp = client.delete("/api/actors/77")
+    assert resp.status_code == 400
+    assert "CARLA map fixture" in resp.json()["detail"]
+    assert events == []
+
+
 def test_destroy_actor_calls_realtime_session_invalidate(monkeypatch):
     import src.main as main_mod
     import src.routes.actors as actors_routes
