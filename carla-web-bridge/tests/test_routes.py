@@ -85,6 +85,39 @@ def test_simulation_status_disconnected():
     assert data["connected"] is False
 
 
+def test_simulation_status_does_not_leak_exception_into_server_version(monkeypatch):
+    """My earlier fix (6de2e633f) stopped /api/simulation/status from
+    packing str(exc) into the SimulationStatus.server_version field —
+    that field is user-visible as the CARLA build label and stack traces
+    showing up in "Server: TimeoutError(...)" was a confusing UI state.
+    Pin behavior: any exception inside _get returns a clean connected=
+    False with an empty server_version string."""
+    import src.routes.simulation as sim_routes
+
+    class _ExplodingWorld:
+        def get_settings(self):
+            raise RuntimeError("simulated carla rpc timeout")
+
+    monkeypatch.setattr(
+        sim_routes,
+        "carla_manager",
+        SimpleNamespace(
+            is_connected=True,
+            world=_ExplodingWorld(),
+            server_version="0.10.0",
+        ),
+    )
+
+    resp = client.get("/api/simulation/status")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["connected"] is False
+    # Critical: the exception message must NOT surface in server_version.
+    assert data["server_version"] == ""
+    assert "timeout" not in (data.get("server_version") or "")
+    assert "RuntimeError" not in (data.get("server_version") or "")
+
+
 def test_simulation_play_requires_connection():
     resp = client.post("/api/simulation/play")
     assert resp.status_code == 503
