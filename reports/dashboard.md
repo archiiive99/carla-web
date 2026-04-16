@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 29 rows ✅, 6 rows ⚠️, 13 rows queued. §6.5 raise still active.
+**Summary:** 30 rows ✅, 6 rows ⚠️, 12 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -42,7 +42,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 08-walk-cycle | Walker leg/arm sine swing | **✅** | 10.97 | 0.2102 | 36.07 | ~25 min | 771e439e4 |
 | 06 | Shadows from sun (✅-on-arrival) | **✅** | 11.03 (re-cited) | 0.213 | 35.89 | ~15 min | 078620de2 |
 | 11 | Post-process (ExposureDriver, weather-driven) | **✅** | 11.02/30.67 | 0.2122/0.4586 | 35.95/1.71 | ~40 min | a4175cc67 |
-| 11-revisit-smoothing | Exposure lerp 0.4/s | **✅** | 11.01/30.67 | 0.2122/0.4585 | 35.95/1.71 | ~20 min | (this commit) |
+| 11-revisit-smoothing | Exposure lerp 0.4/s | **✅** | 11.01/30.67 | 0.2122/0.4585 | 35.95/1.71 | ~20 min | 0a96e172c |
+| 08-clothes-pattern | Pants color separate from shirt | **✅** | 11.02 | 0.2125 | 35.93 | ~15 min | (this commit) |
 
 ## Notes
 

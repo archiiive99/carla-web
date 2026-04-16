@@ -7,6 +7,7 @@ import {
   WALKER_BODY_VARIATIONS,
   WALKER_EMISSIVE,
   WALKER_LIMB,
+  WALKER_PANTS_VARIATIONS,
   WALKER_WARNING,
 } from "../scene-palette";
 
@@ -17,6 +18,14 @@ import {
 function walkerBodyColor(actorId: number): string {
   return WALKER_BODY_VARIATIONS[
     Math.abs(actorId) % WALKER_BODY_VARIATIONS.length
+  ];
+}
+
+// iter-08-clothes-pattern: pants color distinct from shirt. Uses a
+// different prime multiplier so pants don't always track with shirt.
+function walkerPantsColor(actorId: number): string {
+  return WALKER_PANTS_VARIATIONS[
+    Math.abs(actorId * 7 + 3) % WALKER_PANTS_VARIATIONS.length
   ];
 }
 
@@ -31,6 +40,7 @@ export const WalkerMesh = memo(function WalkerMesh({
 }) {
   const pos = carlaToThree(actor.transform.location);
   const bodyColor = useMemo(() => walkerBodyColor(actor.id), [actor.id]);
+  const pantsColor = useMemo(() => walkerPantsColor(actor.id), [actor.id]);
 
   // iter-08-walk-cycle: refs to limb pivot groups + a per-walker
   // walk-phase counter. useFrame increments phase by speed * delta
@@ -110,18 +120,20 @@ export const WalkerMesh = memo(function WalkerMesh({
           <meshStandardMaterial color={bodyColor} roughness={0.8} />
         </mesh>
       </group>
-      {/* Left leg — pivot at hip y=0.78, mesh offset down */}
+      {/* Left leg — iter-08-clothes-pattern uses pantsColor (distinct
+          from shirt/arms bodyColor) so the silhouette shows a clear
+          shirt/pants split. pivot at hip y=0.78, mesh offset down. */}
       <group ref={leftLegRef} position={[-0.09, 0.78, 0]}>
         <mesh position={[0, -0.33, 0]} castShadow receiveShadow>
           <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
-          <meshStandardMaterial color={bodyColor} roughness={0.8} />
+          <meshStandardMaterial color={pantsColor} roughness={0.85} />
         </mesh>
       </group>
       {/* Right leg */}
       <group ref={rightLegRef} position={[0.09, 0.78, 0]}>
         <mesh position={[0, -0.33, 0]} castShadow receiveShadow>
           <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
-          <meshStandardMaterial color={bodyColor} roughness={0.8} />
+          <meshStandardMaterial color={pantsColor} roughness={0.85} />
         </mesh>
       </group>
       {isSelected && (

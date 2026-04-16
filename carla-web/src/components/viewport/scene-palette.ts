@@ -103,6 +103,20 @@ export const WALKER_BODY_VARIATIONS = [
   "#dc2626",   // red-orange
 ] as const;
 
+/** iter-08-clothes-pattern: pants-layer color variations for walker
+ *  legs. Darker neutral-to-deep palette so the shirt/pants separation
+ *  reads as clothing instead of uniform body-color. Picked with a
+ *  different modulus (actor.id % length × prime) so pants don't
+ *  always track with shirt color. */
+export const WALKER_PANTS_VARIATIONS = [
+  "#1e293b",   // slate navy (jeans)
+  "#292524",   // warm black
+  "#44403c",   // brown-gray
+  "#78716c",   // khaki gray
+  "#374151",   // charcoal
+  "#422006",   // deep brown
+] as const;
+
 // ──────────────────────────────────────────────────────────────────────
 // Traffic lights
 // ──────────────────────────────────────────────────────────────────────
