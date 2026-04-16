@@ -102,6 +102,20 @@ export function NightStreetLights() {
               metalness={0}
             />
           </mesh>
+          {/* iter-09-revisit-lamp-halo: larger transparent additive sphere
+             so the lamp head reads as glowing against the dim night sky
+             without needing EffectComposer bloom (which broke the
+             multi-camera WorldCanvas composition in v1/v2 attempts). */}
+          <mesh position={spec.position}>
+            <sphereGeometry args={[0.4, 16, 16]} />
+            <meshBasicMaterial
+              color={HEADLIGHT_BEAM}
+              transparent
+              opacity={0.35}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+            />
+          </mesh>
         </group>
       ))}
     </>

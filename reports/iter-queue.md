@@ -80,6 +80,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-06-revisit-ground-bounce-altitude  Hemisphere ground-bounce color ramp  (✅ — lerp #7a4c30→#5a4f44 on altFactor; reuses existing altFactor; midday byte-identical; closed 2026-04-16T10:04:00Z+~15min)
 [x] iter-08-revisit-swing-amp-split  Split arm vs leg swing amplitudes  (✅ — arms 0.35, legs 0.55 (was 0.45 shared); byte-identical midday; closed 2026-04-16T10:14:00Z+~12min)
 [x] iter-07-revisit-wind-per-instance  Per-instance wind-sway phase  (✅ — phase seeded by instanceMatrix[3].xz; cacheKey v1→v2; byte-identical at midday wind=0; closed 2026-04-16T10:24:00Z+~15min)
+[x] iter-09-revisit-lamp-halo  Additive-blend halo sphere around lamp heads  (✅ — radius 0.4 + additive + opacity 0.35 + depthWrite:false; fakes bloom without EffectComposer; byte-identical at midday since rig returns null; closed 2026-04-16T10:34:00Z+~18min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 
