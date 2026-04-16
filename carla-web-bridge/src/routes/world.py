@@ -116,11 +116,33 @@ async def set_weather(req: SetWeatherRequest) -> Any:
             import carla
 
             world = carla_manager.world
-            if req.preset and req.preset in WEATHER_PRESETS:
+            if req.preset:
+                if req.preset not in WEATHER_PRESETS:
+                    # Reject unknown preset names up front so the user sees
+                    # "Unknown weather preset: ..." instead of falling through
+                    # to the generic "Provide preset or params" error — which
+                    # was misleading because the user DID provide a preset,
+                    # it just wasn't in the bridge's allow-list.
+                    raise HTTPException(
+                        status_code=400,
+                        detail=(
+                            f"Unknown weather preset: {req.preset}. "
+                            f"Valid: {', '.join(WEATHER_PRESETS)}"
+                        ),
+                    )
                 weather = getattr(carla.WeatherParameters, req.preset, None)
-                if weather:
-                    world.set_weather(weather)
-                    return {"status": "preset_applied", "preset": req.preset}
+                if weather is None:
+                    # Accepted by the bridge's allow-list but missing from the
+                    # running CARLA build — e.g., we added a preset to
+                    # WEATHER_PRESETS that only exists on a newer CARLA. 501
+                    # "not implemented" flags it as a server-side gap rather
+                    # than masking it as a bad request.
+                    raise HTTPException(
+                        status_code=501,
+                        detail=f"Weather preset {req.preset} not available in this CARLA build",
+                    )
+                world.set_weather(weather)
+                return {"status": "preset_applied", "preset": req.preset}
             if req.params:
                 w = carla.WeatherParameters(
                     cloudiness=req.params.cloudiness,
