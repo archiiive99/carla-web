@@ -6,6 +6,7 @@ import type { ActorTransform } from "@/types/ws";
 import type { SpawnVehicleRequest, SpawnWalkerRequest } from "@/types/api";
 import { carlaApi } from "@/lib/carla-api";
 import { useEventStore } from "@/stores/eventStore";
+import { useSensorStore } from "@/stores/sensorStore";
 import { SPAWN_NO_POINTS_MSG, BRIDGE_EGO_ROLE } from "@/constants";
 
 interface ActorsByType {
@@ -262,6 +263,13 @@ export const useActorStore = create<ActorState>((set, get) => ({
           egoVehicleId: null,
         };
       });
+      // sensorStore.sensors is derived from actorStore; without an explicit
+      // sync the sensor grid kept showing ghost cells with frozen last
+      // frames until the next 2s refreshActors poll caught up. refreshSensors
+      // also prunes stale subscription/pending entries via the invariant
+      // check added in its recent refactor, which is important here because
+      // /api/actors/all destroyed every spawned sensor on the bridge.
+      useSensorStore.getState().refreshSensors();
       toast.success(`Destroyed ${result.count} actor${result.count === 1 ? "" : "s"}`);
       useEventStore
         .getState()
