@@ -117,6 +117,11 @@ export const useSensorStore = create<SensorState>((set, get) => ({
     try {
       const actors = await carlaApi.getActors();
       const sensors = new Map<number, SensorConfig>();
+      // getActors() doesn't include sensor attributes (fov / image_size_x /
+      // image_size_y etc.) — merge those from the existing store so the
+      // 2s background poll doesn't clobber values that MainCameraController
+      // and SensorExtrinsicController need to compute camera intrinsics.
+      const previous = get().sensors;
       for (const a of actors) {
         if (a.type === "sensor") {
           sensors.set(a.id, {
@@ -124,7 +129,7 @@ export const useSensorStore = create<SensorState>((set, get) => ({
             type: a.type_id,
             parent_id: a.parent_id ?? 0,
             transform: a.transform,
-            attributes: {},
+            attributes: previous.get(a.id)?.attributes ?? {},
           });
         }
       }
