@@ -16,41 +16,24 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useSimulationStore } from "@/stores/simulationStore";
 import { CarlaApi } from "@/lib/carla-api";
-import {
-  APP_SETTINGS_KEY,
-  BRIDGE_URL_DEFAULT,
-} from "@/constants";
 import { normalizeBridgeUrl } from "@/lib/bridge-url";
 
 interface AppSettings {
   bridgeUrl: string;
 }
 
-const DEFAULT_SETTINGS: AppSettings = {
-  bridgeUrl: BRIDGE_URL_DEFAULT,
-};
-
-function loadSettings(): AppSettings {
-  if (typeof window === "undefined") return DEFAULT_SETTINGS;
-  try {
-    const saved = localStorage.getItem(APP_SETTINGS_KEY);
-    if (saved) {
-      const parsed = { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } as AppSettings;
-      parsed.bridgeUrl = normalizeBridgeUrl(parsed.bridgeUrl);
-      return parsed;
-    }
-  } catch { /* ignore */ }
-  return DEFAULT_SETTINGS;
-}
-
-function saveSettings(settings: AppSettings) {
-  try {
-    localStorage.setItem(APP_SETTINGS_KEY, JSON.stringify(settings));
-  } catch { /* ignore */ }
-}
-
 export default function SettingsPage() {
-  const [settings, setSettings] = useState<AppSettings>(loadSettings);
+  // Seed the editable fields from the zustand store, which mirrors the
+  // authoritative BRIDGE_URL_KEY. Previously an APP_SETTINGS_KEY localStorage
+  // entry shadowed this: every keystroke wrote to APP_SETTINGS_KEY and
+  // loadSettings() read from it on mount, but `carlaApi` only ever consulted
+  // BRIDGE_URL_KEY. Editing + reloading without "Save & Connect" left the
+  // field showing a URL the app wasn't actually using. The draft stays
+  // in-memory only now; on reload the field reflects what's in effect.
+  const storeBridgeUrl = useSimulationStore((s) => s.bridgeUrl);
+  const [settings, setSettings] = useState<AppSettings>(() => ({
+    bridgeUrl: storeBridgeUrl,
+  }));
   const [testResult, setTestResult] = useState<"idle" | "ok" | "fail">("idle");
   const connectionStatus = useSimulationStore((s) => s.connectionStatus);
   const serverVersion = useSimulationStore((s) => s.serverVersion);
@@ -58,11 +41,7 @@ export default function SettingsPage() {
   const connect = useSimulationStore((s) => s.connect);
 
   const update = useCallback((patch: Partial<AppSettings>) => {
-    setSettings((prev) => {
-      const next = { ...prev, ...patch };
-      saveSettings(next);
-      return next;
-    });
+    setSettings((prev) => ({ ...prev, ...patch }));
     // A successful / failed result is bound to the URL that was tested
     // — when the user edits the URL, the icon next to Test Connection
     // would otherwise linger as a green checkmark for a different URL
@@ -101,8 +80,9 @@ export default function SettingsPage() {
   const handleResetLayout = useCallback(() => {
     // Layout keys are versioned (carla-layout-h-v<N>, carla-layout-v-v<N>);
     // remove every key that starts with "carla-layout" to cover current and
-    // any stale versions. Do NOT touch APP_SETTINGS_KEY — the user's bridge
-    // URL and perf prefs should survive a layout reset.
+    // any stale versions. The bridge URL lives in BRIDGE_URL_KEY and the
+    // UI prefs in UI_STATE_KEY — both survive a layout reset because the
+    // narrow startsWith filter leaves them alone.
     for (const key of Object.keys(localStorage)) {
       if (key.startsWith("carla-layout")) {
         localStorage.removeItem(key);

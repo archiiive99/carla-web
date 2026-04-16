@@ -6,11 +6,6 @@ export const BRIDGE_URL_DEFAULT = getDefaultBridgeUrl();
 // both root-level config files that can't easily `import` from src/. A duplicate
 // export here would just be an out-of-sync liability.
 
-/** localStorage key for the SettingsPage AppSettings blob. Exported so the
- *  SettingsPage writer and any future config readers share one source of
- *  truth — renaming the key won't silently break one side. */
-export const APP_SETTINGS_KEY = "carla-web-settings";
-
 /** localStorage key where the normalized bridge URL is cached. Shared by the
  *  SimulationStore writer, the CarlaApi initializer (lib/carla-api.ts), and
  *  the SimulationPage unmount cleanup — centralized so a rename touches one
