@@ -194,7 +194,13 @@ export function RecordingControls() {
                 variant="outline"
                 size="icon-xs"
                 onClick={() => (replaying ? handleStopReplay() : handleStartReplay())}
-                disabled={!selectedRecording}
+                // Stop must always be actionable while replaying — if
+                // selectedRecording vanishes mid-replay (reconcile effect
+                // cleared it, user deselected), keeping `!selectedRecording`
+                // as the only gate disabled the Stop button and left the
+                // user unable to stop the in-progress replay. Only gate
+                // on the selection for the START direction.
+                disabled={!replaying && !selectedRecording}
                 title={replaying ? "Stop replay" : "Start replay of selected file"}
                 aria-label={replaying ? "Stop replay" : "Start replay"}
               >
