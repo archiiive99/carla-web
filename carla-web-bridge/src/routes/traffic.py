@@ -55,8 +55,6 @@ async def set_vehicle_speed(vehicle_id: int, req: VehicleSpeedRequest):
 
     def _set():
         try:
-            import carla
-
             actor = carla_manager.world.get_actor(vehicle_id)
             if actor is None:
                 raise HTTPException(status_code=404, detail=f"Vehicle {vehicle_id} not found")

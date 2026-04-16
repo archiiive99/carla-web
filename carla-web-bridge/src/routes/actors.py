@@ -131,8 +131,6 @@ async def spawn_vehicle(req: SpawnVehicleRequest):
 
     def _spawn():
         try:
-            import carla
-
             world = carla_manager.world
             bp_lib = world.get_blueprint_library()
             try:
@@ -174,8 +172,6 @@ async def spawn_walker(req: SpawnWalkerRequest):
 
     def _spawn():
         try:
-            import carla
-
             world = carla_manager.world
             bp_lib = world.get_blueprint_library()
             try:
