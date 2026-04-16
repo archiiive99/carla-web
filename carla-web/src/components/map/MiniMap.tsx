@@ -20,6 +20,12 @@ export function MiniMap({ className }: MiniMapProps) {
   const viewRef = useRef({ cx: 0, cy: 0, zoom: MINIMAP_DEFAULT_ZOOM });
   const draggingRef = useRef(false);
   const lastMouseRef = useRef({ x: 0, y: 0 });
+  // Cumulative pixels moved since mousedown — used to distinguish a pan
+  // from a select. Panning always fires onClick at the mouseup position
+  // (browser DOM guarantees that), so without this the release location
+  // accidentally selected the nearest actor after every drag. 4px matches
+  // the browser's own click-vs-drag threshold for double-clicks.
+  const dragDistanceRef = useRef(0);
   // Cache last-seen CSS rect + devicePixelRatio so the 60Hz rAF draw
   // only reassigns canvas.width/height when any of them change. DPR is
   // included because browser zoom flips it without changing the CSS
@@ -227,6 +233,7 @@ export function MiniMap({ className }: MiniMapProps) {
     if (e.button === 0) {
       draggingRef.current = true;
       lastMouseRef.current = { x: e.clientX, y: e.clientY };
+      dragDistanceRef.current = 0;
     }
   }, []);
 
@@ -234,6 +241,7 @@ export function MiniMap({ className }: MiniMapProps) {
     if (!draggingRef.current) return;
     const dx = e.clientX - lastMouseRef.current.x;
     const dy = e.clientY - lastMouseRef.current.y;
+    dragDistanceRef.current += Math.abs(dx) + Math.abs(dy);
     viewRef.current.cx -= dx / viewRef.current.zoom;
     viewRef.current.cy -= dy / viewRef.current.zoom;
     lastMouseRef.current = { x: e.clientX, y: e.clientY };
@@ -260,6 +268,14 @@ export function MiniMap({ className }: MiniMapProps) {
   // Click to select actor
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
+      // A drag-to-pan gesture fires mousedown → mousemove × N → mouseup,
+      // and the browser still issues a synthetic click on the release
+      // target. Suppress selection when the cumulative motion looks like
+      // a pan, not a tap — 4px matches the default click-slop threshold.
+      if (dragDistanceRef.current > 4) {
+        dragDistanceRef.current = 0;
+        return;
+      }
       const canvas = canvasRef.current;
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
