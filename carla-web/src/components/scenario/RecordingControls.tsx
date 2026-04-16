@@ -50,6 +50,19 @@ export function RecordingControls() {
     carlaApi.getRecordings().then(setRecordings).catch(() => {});
   }, [isConnected, refreshKey]);
 
+  // Clear selectedRecording if the file it pointed to is no longer in the
+  // listing (user deleted it externally, map reload wiped the dir, etc.).
+  // Without this, clicking Replay after the file vanished would POST the
+  // stale filename and the bridge would 400 with "file not found" — the
+  // disabled-state `!selectedRecording` guard would have otherwise stayed
+  // enabled because the local string state still held the name.
+  useEffect(() => {
+    if (!selectedRecording) return;
+    if (!listedRecordings.includes(selectedRecording)) {
+      setSelectedRecording("");
+    }
+  }, [listedRecordings, selectedRecording]);
+
   const handleStartRecording = useCallback(async () => {
     try {
       await carlaApi.startRecording(filename);
