@@ -109,7 +109,14 @@ export const useSensorStore = create<SensorState>((set, get) => ({
       sensors.delete(sensorId);
       const subs = new Set(state.subscriptions);
       subs.delete(sensorId);
-      return { sensors, subscriptions: subs };
+      // Also prune pendingSubscriptions — if the user spawned with
+      // auto-subscribe and destroyed inside the 2s pending window, the
+      // pending entry would linger as dead state until its own timer
+      // fired. Keep the "sensor gone" invariant tight: neither set has
+      // the id once the sensor is destroyed.
+      const pending = new Set(state.pendingSubscriptions);
+      pending.delete(sensorId);
+      return { sensors, subscriptions: subs, pendingSubscriptions: pending };
     });
     toast.success(`Sensor #${sensorId} destroyed`);
   },
