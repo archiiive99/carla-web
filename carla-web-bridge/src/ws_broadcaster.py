@@ -19,6 +19,30 @@ from src.ws.protocol import decode_frame, encode_frame
 logger = logging.getLogger(__name__)
 
 
+def _coerce_sensor_id(raw: object) -> int | None:
+    """Coerce a JSON-decoded sensor_id to int, or None if it isn't convertible.
+
+    The wire protocol documents sensor_id as an integer, but a buggy/hostile
+    client could send "5" (string), True (bool), or a list. The CONTROL/set_rate
+    branch below already runs this via try/except int(...); subscribe and
+    unsubscribe used a bare `is not None` check, so a string id landed in
+    `conn.subscriptions` and the sensor_manager callback, where the dict-keyed
+    int lookup silently failed. Returning None on coercion failure makes all
+    three protocol branches share the same defensive behavior.
+    """
+    if raw is None:
+        return None
+    # Exclude bool explicitly — bool is a subclass of int, so `int(True)` == 1
+    # and would silently match sensor id 1. None of our protocol fields should
+    # carry bool in the sensor_id slot.
+    if isinstance(raw, bool):
+        return None
+    try:
+        return int(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+
+
 class ClientConnection:
     """Tracks a single WebSocket client."""
 
@@ -115,7 +139,7 @@ class WebSocketBroadcaster:
             return
 
         action = msg.get("action")
-        sensor_id = msg.get("sensor_id")
+        sensor_id = _coerce_sensor_id(msg.get("sensor_id"))
 
         if action == "subscribe" and sensor_id is not None:
             conn.subscriptions.add(sensor_id)
@@ -134,14 +158,14 @@ class WebSocketBroadcaster:
             if target is None or on_set_rate is None:
                 return
             try:
-                applied = on_set_rate(int(sensor_id), conn.client_id, float(target))
+                applied = on_set_rate(sensor_id, conn.client_id, float(target))
             except (TypeError, ValueError) as exc:
                 logger.debug("set_rate ignored for client %s: %s", conn.client_id, exc)
                 return
             with contextlib.suppress(Exception):
                 await conn.ws.send_text(json.dumps({
                     "type": "rate_ack",
-                    "sensor_id": int(sensor_id),
+                    "sensor_id": sensor_id,
                     "target_fps": applied,
                 }))
 
@@ -167,7 +191,7 @@ class WebSocketBroadcaster:
             # with isinstance — do the same here.
             if not isinstance(msg, dict):
                 return
-            sensor_id = msg.get("sensor_id")
+            sensor_id = _coerce_sensor_id(msg.get("sensor_id"))
             if sensor_id is not None:
                 conn.subscriptions.add(sensor_id)
                 if on_subscribe:
@@ -179,7 +203,7 @@ class WebSocketBroadcaster:
                 return
             if not isinstance(msg, dict):
                 return
-            sensor_id = msg.get("sensor_id")
+            sensor_id = _coerce_sensor_id(msg.get("sensor_id"))
             if sensor_id is not None:
                 conn.subscriptions.discard(sensor_id)
                 if on_unsubscribe:
@@ -201,19 +225,19 @@ class WebSocketBroadcaster:
                 return
             if msg.get("action") != "set_rate" or on_set_rate is None:
                 return
-            sensor_id = msg.get("sensor_id")
+            sensor_id = _coerce_sensor_id(msg.get("sensor_id"))
             target = msg.get("target_fps")
             if sensor_id is None or target is None:
                 return
             try:
-                applied = on_set_rate(int(sensor_id), conn.client_id, float(target))
+                applied = on_set_rate(sensor_id, conn.client_id, float(target))
             except (TypeError, ValueError) as exc:
                 logger.debug("binary set_rate ignored for client %s: %s", conn.client_id, exc)
                 return
             try:
                 ack = json.dumps({
                     "type": "rate_ack",
-                    "sensor_id": int(sensor_id),
+                    "sensor_id": sensor_id,
                     "target_fps": applied,
                 }).encode("utf-8")
                 await conn.ws.send_bytes(encode_frame(Channel.CONTROL, ack))
