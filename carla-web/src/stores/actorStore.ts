@@ -139,6 +139,7 @@ export const useActorStore = create<ActorState>((set, get) => ({
 
   destroyActor: async (id) => {
     const actor = get().actors.get(id);
+    const wasSensor = actor?.type === "sensor";
     const label = actor
       ? `${actor.type} #${id}`
       : `actor #${id}`;
@@ -159,6 +160,15 @@ export const useActorStore = create<ActorState>((set, get) => ({
         actorsByType: classifyActors(actors),
       };
     });
+    // sensorStore.sensors is derived from actorStore; if the destroyed
+    // actor was a sensor, sync sensorStore inline so the sensor grid's
+    // ghost-cell window (up to 2s until the next refreshActors poll)
+    // collapses to zero. Same pattern as destroyAll's sync call.
+    // refreshSensors also prunes stale subscription/pending entries via
+    // the invariant it maintains.
+    if (wasSensor) {
+      useSensorStore.getState().refreshSensors();
+    }
   },
 
   setAutopilot: async (id, enabled) => {
