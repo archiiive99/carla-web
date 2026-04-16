@@ -65,6 +65,15 @@ export function RecordingControls() {
       await carlaApi.stopRecording();
       setRecording(false);
       setRefreshKey((value) => value + 1);
+      // Regenerate the default filename so the next recording doesn't
+      // overwrite this one. Only when the filename still looks auto-
+      // generated (`recording_<digits>`) — a user-typed name like
+      // "my-scenario" is preserved so iterative runs keep their intent.
+      // Without this, every click of Start Record after the first wrote
+      // to the same filename from mount time, clobbering earlier takes.
+      setFilename((prev) =>
+        /^recording_\d+$/.test(prev) ? `recording_${Date.now()}` : prev,
+      );
       toast.success("Recording stopped");
     } catch (e) {
       reportError("Stop recording", e);
