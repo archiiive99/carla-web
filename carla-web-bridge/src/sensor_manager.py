@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 from src.adaptive_rate import RateController
+from src.compression.image import image_compressor
 from src.config import (
     ADAPTIVE_MAX_FPS,
     JPEG_QUALITY,
@@ -28,7 +29,6 @@ from src.config import (
     SENSOR_QUEUE_MAX_RADAR,
     SENSOR_QUEUE_MAX_SEMANTIC_LIDAR,
 )
-from src.compression.image import image_compressor
 from src.ws.channels import Channel
 from src.ws.protocol import (
     encode_camera_payload,
@@ -288,7 +288,7 @@ class SensorManager:
         self,
         sensor_id: int,
         attribute_overrides: dict[str, Any],
-        on_announce: "Callable[[int, int, dict, set[str]], Awaitable[None]] | None" = None,
+        on_announce: Callable[[int, int, dict, set[str]], Awaitable[None]] | None = None,
     ) -> tuple[int, dict[str, Any]]:
         """D3: destroy + respawn `sensor_id` with merged attributes.
 

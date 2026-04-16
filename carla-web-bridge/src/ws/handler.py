@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, WebSocket
 from typing import Any
+
+from fastapi import APIRouter, WebSocket
 
 from src.ws_broadcaster import ws_broadcaster
 

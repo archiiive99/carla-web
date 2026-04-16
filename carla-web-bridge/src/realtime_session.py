@@ -9,8 +9,8 @@ from enum import Enum, auto
 from typing import TYPE_CHECKING, Any
 
 from src.config import (
-    SESSION_ARM_DELAY_SECONDS,
     CAMERA_ARM_DELAY_SECONDS,
+    SESSION_ARM_DELAY_SECONDS,
 )
 
 if TYPE_CHECKING:
@@ -419,7 +419,7 @@ class RealtimeSessionManager:
             all_actors = list(world.get_actors())
         except Exception as exc:
             logger.debug("Could not query world for orphan adoption: %s", exc)
-            return None
+            return
 
         managed_vehicles: list[Any] = []
         for actor in all_actors:
@@ -436,7 +436,7 @@ class RealtimeSessionManager:
                 continue
 
         if not managed_vehicles:
-            return None
+            return
 
         managed_vehicles.sort(key=lambda a: int(a.id))
         attached_cameras: dict[int, list[Any]] = {int(v.id): [] for v in managed_vehicles}
@@ -459,7 +459,7 @@ class RealtimeSessionManager:
         stale_ids = [int(vehicle.id) for vehicle in managed_vehicles]
         logger.info("Destroying stale managed leftovers before fresh respawn: %s", stale_ids)
         self._destroy_all_managed(managed_vehicles, attached_cameras)
-        return None
+        return
 
     def _destroy_all_managed(
         self,

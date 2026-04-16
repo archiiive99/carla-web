@@ -54,7 +54,7 @@ _jpeg_subsampling: int = JPEG_SUBSAMPLING
 _turbojpeg_subsample = None
 
 try:
-    from turbojpeg import TurboJPEG, TJFLAG_FASTDCT, TJPF_BGRA
+    from turbojpeg import TJFLAG_FASTDCT, TJPF_BGRA, TurboJPEG
 
     _turbojpeg = TurboJPEG()
     _turbojpeg_available = True
@@ -66,7 +66,7 @@ try:
     # constants aren't available (older binding), leave it at None and let
     # the library pick its default (4:2:0).
     try:
-        from turbojpeg import TJSAMP_444, TJSAMP_422, TJSAMP_420
+        from turbojpeg import TJSAMP_420, TJSAMP_422, TJSAMP_444
 
         _turbojpeg_subsample = {
             0: TJSAMP_444,

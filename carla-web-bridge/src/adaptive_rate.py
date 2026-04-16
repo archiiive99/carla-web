@@ -14,10 +14,10 @@ import asyncio
 import json
 import logging
 import time
-
 from collections import deque
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Deque, Mapping
+from typing import TYPE_CHECKING, Any
 
 from src.config import (
     ADAPTIVE_BACKLOG_HEALTHY,
@@ -82,7 +82,7 @@ class RateController:
     history_size: int = ADAPTIVE_STATS_HISTORY
     sample_hz: float = ADAPTIVE_SAMPLE_HZ
     _state: dict[tuple[str, int], SubscriberRate] = field(default_factory=dict)
-    _samples: dict[tuple[str, int], Deque[ClientStatsSample]] = field(default_factory=dict)
+    _samples: dict[tuple[str, int], deque[ClientStatsSample]] = field(default_factory=dict)
     _last_stats_token: dict[str, str] = field(default_factory=dict)
     _logged_unknown_native: set[tuple[str, int]] = field(default_factory=set)
 
@@ -262,7 +262,7 @@ class RateController:
 
     def refresh_stats_from_connections(
         self,
-        clients: Mapping[str, "ClientConnection"],
+        clients: Mapping[str, ClientConnection],
         *,
         now_monotonic: float | None = None,
     ) -> None:
@@ -278,7 +278,7 @@ class RateController:
 
     def tick(
         self,
-        clients: Mapping[str, "ClientConnection"] | None = None,
+        clients: Mapping[str, ClientConnection] | None = None,
         *,
         now_monotonic: float | None = None,
     ) -> list[RateAdjustment]:
@@ -484,7 +484,7 @@ class RateController:
 
     def _is_backlog_rising(
         self,
-        samples: Deque[ClientStatsSample],
+        samples: deque[ClientStatsSample],
         sensor_id: int,
     ) -> bool:
         if len(samples) < ADAPTIVE_BACKLOG_TREND_SAMPLES:
@@ -495,7 +495,7 @@ class RateController:
 
     def _is_healthy(
         self,
-        samples: Deque[ClientStatsSample],
+        samples: deque[ClientStatsSample],
         sensor_id: int,
     ) -> bool:
         if len(samples) < ADAPTIVE_HEALTHY_SAMPLE_WINDOW:
@@ -514,8 +514,8 @@ class AdaptiveRateController:
 
     def __init__(
         self,
-        sensor_manager: "SensorManager",
-        broadcaster: "WebSocketBroadcaster",
+        sensor_manager: SensorManager,
+        broadcaster: WebSocketBroadcaster,
         sample_hz: float = ADAPTIVE_SAMPLE_HZ,
     ) -> None:
         self.sensor_manager = sensor_manager

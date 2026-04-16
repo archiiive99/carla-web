@@ -6,12 +6,9 @@ import asyncio
 import logging
 import os
 import time
-from typing import Any
-
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
-
-from collections.abc import Awaitable, Callable
+from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -66,8 +63,8 @@ async def _world_tick_loop() -> None:
     reported paused=True but the sim kept advancing at 20 Hz because
     this loop ticked unconditionally.
     """
-    from src.utils.serialization import encode_world_tick
     from src.routes import simulation as simulation_routes
+    from src.utils.serialization import encode_world_tick
 
     while True:
         await asyncio.sleep(WORLD_TICK_INTERVAL)
