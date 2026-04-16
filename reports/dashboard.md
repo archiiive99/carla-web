@@ -90,7 +90,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09-revisit-cone-fog | Cone opacity lifts with fog-density | **✅** | 15.10 | 0.2949 | 23.24 | ~8 min | 268edb22a |
 | 06-revisit-sun-kelvin-precip | Precipitation cools sun Kelvin | **✅** | 16.71 | 0.3056 | 21.79 | ~12 min | eeb17b9e0 |
 | 12-revisit-wetness-active-rain | Live rain feeds wetness driver | **✅** | 11.08 | 0.2137 | 35.78 | ~10 min | d4807ddc3 |
-| 11-revisit-exposure-deep-night | Deep-night exposure ramp (1.6→2.0) | **✅** | 11.08 | 0.2137 | 35.77 | ~15 min | (this commit) |
+| 11-revisit-exposure-deep-night | Deep-night exposure ramp (1.6→2.0) | **✅** | 11.08 | 0.2137 | 35.77 | ~15 min | 2e490f29c |
 
 ## Notes
 
