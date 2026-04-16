@@ -67,7 +67,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09-revisit-lamp-pole | Visible pole cylinder ground→lamp head | **✅** | 16.71 | 0.3063 | 21.87 | ~20 min | bd00bc0c9 |
 | 09-revisit-lamp-arm | Horizontal arm + head at outboard end | **✅** | 16.72 | 0.3063 | 21.87 | ~25 min | be828da02 |
 | 06-revisit-shadow-softness-cloudiness | Shadow radius cloudiness ramp | **✅** | 16.71 | 0.3063 | 21.86 | ~12 min | b97f0cbbc |
-| 03-revisit-windshield-tint | Tinted glass on vehicle window mats | **✅** | 16.71 | 0.3064 | 21.87 | ~15 min | (this commit) |
+| 03-revisit-windshield-tint | Tinted glass on vehicle window mats | **✅** | 16.71 | 0.3064 | 21.87 | ~15 min | ec6fd34d5 |
 
 ## Notes
 
