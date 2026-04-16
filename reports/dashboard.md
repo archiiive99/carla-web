@@ -81,7 +81,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 04-revisit-stripe-brightness | Brighter white stripe paint (+6-7%) | **✅** | 15.36 | 0.2972 | 22.95 | ~10 min | 9ff5dbaf4 |
 | 04-revisit-wear-softer | Grunge wear depth 0.65→0.50 | **✅** | 15.36 | 0.2973 | 22.96 | ~12 min | 8c1be6496 |
 | 04-revisit-asphalt-brightness | Asphalt final mult 0.72→0.78 | **✅** | 15.36 | 0.2974 | 22.96 | ~10 min | 621f64a72 |
-| 06-revisit-hemi-sky-fog | Hemisphere sky-color fog-density ramp | **✅** | 15.34 | 0.2975 | 22.98 | ~10 min | (this commit) |
+| 06-revisit-hemi-sky-fog | Hemisphere sky-color fog-density ramp | **✅** | 15.34 | 0.2975 | 22.98 | ~10 min | 3aafc520d |
 
 ## Notes
 
