@@ -59,6 +59,8 @@ async def set_vehicle_speed(vehicle_id: int, req: VehicleSpeedRequest) -> Any:
             actor = carla_manager.world.get_actor(vehicle_id)
             if actor is None:
                 raise HTTPException(status_code=404, detail=f"Vehicle {vehicle_id} not found")
+            if not getattr(actor, "type_id", "").startswith("vehicle."):
+                raise HTTPException(status_code=400, detail="Actor is not a vehicle")
             tm = carla_manager.get_traffic_manager()
             tm.vehicle_percentage_speed_difference(actor, req.speed_diff)
             return {"status": "speed_set", "id": vehicle_id}
@@ -81,6 +83,8 @@ async def set_lane_behavior(vehicle_id: int, req: LaneChangeRequest) -> Any:
             actor = carla_manager.world.get_actor(vehicle_id)
             if actor is None:
                 raise HTTPException(status_code=404, detail=f"Vehicle {vehicle_id} not found")
+            if not getattr(actor, "type_id", "").startswith("vehicle."):
+                raise HTTPException(status_code=400, detail="Actor is not a vehicle")
             tm = carla_manager.get_traffic_manager()
             tm.auto_lane_change(actor, req.auto_lane_change)
             if req.force_lane_change:
@@ -113,6 +117,8 @@ async def set_ignore(vehicle_id: int, req: IgnoreRequest) -> Any:
             actor = carla_manager.world.get_actor(vehicle_id)
             if actor is None:
                 raise HTTPException(status_code=404, detail=f"Vehicle {vehicle_id} not found")
+            if not getattr(actor, "type_id", "").startswith("vehicle."):
+                raise HTTPException(status_code=400, detail="Actor is not a vehicle")
             tm = carla_manager.get_traffic_manager()
             tm.ignore_lights_percentage(actor, req.lights)
             tm.ignore_signs_percentage(actor, req.signs)
@@ -140,6 +146,8 @@ async def set_route(vehicle_id: int, req: RouteRequest) -> Any:
             actor = carla_manager.world.get_actor(vehicle_id)
             if actor is None:
                 raise HTTPException(status_code=404, detail=f"Vehicle {vehicle_id} not found")
+            if not getattr(actor, "type_id", "").startswith("vehicle."):
+                raise HTTPException(status_code=400, detail="Actor is not a vehicle")
             tm = carla_manager.get_traffic_manager()
             locs = [carla.Location(x=w.x, y=w.y, z=w.z) for w in req.waypoints]
             tm.set_path(actor, locs)
