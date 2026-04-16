@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { saveJson } from "@/lib/data-export";
 import { useActorStore } from "@/stores/actorStore";
 import { carlaApi } from "@/lib/carla-api";
+import { reportError } from "@/lib/utils";
 
 export function DataExportMenu() {
   const actors = useActorStore((s) => s.actors);
@@ -40,8 +41,12 @@ export function DataExportMenu() {
       const weather = await carlaApi.getWeather();
       saveJson(weather, `weather_${Date.now()}.json`);
       toast.success("Weather exported");
-    } catch {
-      toast.error("Export weather failed");
+    } catch (e) {
+      // Route through reportError so the toast shows WHY it failed
+      // (bridge unreachable, 503 not connected, 500 server error, …)
+      // instead of the previous generic "Export weather failed" that
+      // left the user guessing whether to retry or check the bridge.
+      reportError("Weather export", e);
     }
   };
 
