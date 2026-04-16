@@ -49,6 +49,10 @@ export const WalkerMesh = memo(function WalkerMesh({
   const rightArmRef = useRef<THREE.Group>(null);
   const leftLegRef = useRef<THREE.Group>(null);
   const rightLegRef = useRef<THREE.Group>(null);
+  // iter-08-knee-bend: knee pivot groups nested inside the hip pivot.
+  // Knee bends during forward swing (leg lifts to clear ground).
+  const leftKneeRef = useRef<THREE.Group>(null);
+  const rightKneeRef = useRef<THREE.Group>(null);
   const bodyGroupRef = useRef<THREE.Group>(null);
   const walkPhaseRef = useRef(0);
   const currentYawRef = useRef<number | null>(null);
@@ -86,6 +90,8 @@ export const WalkerMesh = memo(function WalkerMesh({
       if (rightArmRef.current) rightArmRef.current.rotation.x = 0;
       if (leftLegRef.current) leftLegRef.current.rotation.x = 0;
       if (rightLegRef.current) rightLegRef.current.rotation.x = 0;
+      if (leftKneeRef.current) leftKneeRef.current.rotation.x = 0;
+      if (rightKneeRef.current) rightKneeRef.current.rotation.x = 0;
       return;
     }
     // Phase increment scaled by speed (faster speed = quicker stride).
@@ -96,6 +102,14 @@ export const WalkerMesh = memo(function WalkerMesh({
     if (rightArmRef.current) rightArmRef.current.rotation.x = swing;
     if (leftLegRef.current) leftLegRef.current.rotation.x = swing;
     if (rightLegRef.current) rightLegRef.current.rotation.x = -swing;
+    // iter-08-knee-bend: knee bends during forward half of swing
+    // (leg moving forward through air). Left leg phase = walkPhase;
+    // right leg = walkPhase + π. Knee angle clamps to zero during
+    // stance (no hyperextension).
+    const leftKneeBend = Math.max(0, Math.sin(walkPhaseRef.current)) * 0.8;
+    const rightKneeBend = Math.max(0, Math.sin(walkPhaseRef.current + Math.PI)) * 0.8;
+    if (leftKneeRef.current) leftKneeRef.current.rotation.x = leftKneeBend;
+    if (rightKneeRef.current) rightKneeRef.current.rotation.x = rightKneeBend;
   });
 
   return (
@@ -148,21 +162,41 @@ export const WalkerMesh = memo(function WalkerMesh({
           <meshStandardMaterial color={bodyColor} roughness={0.8} />
         </mesh>
       </group>
-      {/* Left leg — iter-08-clothes-pattern uses pantsColor (distinct
-          from shirt/arms bodyColor) so the silhouette shows a clear
-          shirt/pants split. pivot at hip y=0.78, mesh offset down. */}
+      {/* Left leg — iter-08-knee-bend nests knee pivot inside hip.
+          Thigh (top half of leg) rotates with hip swing; shin (bottom
+          half) additionally rotates with knee bend. Hip pivot at
+          y=0.78; knee pivot at y=-0.28 relative to hip (absolute
+          y=0.50) = top of shin. Thigh mesh at y=-0.15 (center of top
+          half); shin mesh inside knee-group at y=-0.15 (center of
+          shin below knee). */}
       <group ref={leftLegRef} position={[-0.09, 0.78, 0]}>
-        <mesh position={[0, -0.33, 0]} castShadow receiveShadow>
-          <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
+        {/* Thigh (moves with hip swing only) */}
+        <mesh position={[0, -0.15, 0]} castShadow receiveShadow>
+          <capsuleGeometry args={[0.08, 0.22, 4, 8]} />
           <meshStandardMaterial color={pantsColor} roughness={0.85} />
         </mesh>
+        {/* Knee pivot — rotations applied here bend the shin under
+            the thigh. Position at knee joint (bottom of thigh). */}
+        <group ref={leftKneeRef} position={[0, -0.28, 0]}>
+          {/* Shin */}
+          <mesh position={[0, -0.15, 0]} castShadow receiveShadow>
+            <capsuleGeometry args={[0.07, 0.22, 4, 8]} />
+            <meshStandardMaterial color={pantsColor} roughness={0.85} />
+          </mesh>
+        </group>
       </group>
-      {/* Right leg */}
+      {/* Right leg (mirror of left) */}
       <group ref={rightLegRef} position={[0.09, 0.78, 0]}>
-        <mesh position={[0, -0.33, 0]} castShadow receiveShadow>
-          <capsuleGeometry args={[0.08, 0.55, 4, 8]} />
+        <mesh position={[0, -0.15, 0]} castShadow receiveShadow>
+          <capsuleGeometry args={[0.08, 0.22, 4, 8]} />
           <meshStandardMaterial color={pantsColor} roughness={0.85} />
         </mesh>
+        <group ref={rightKneeRef} position={[0, -0.28, 0]}>
+          <mesh position={[0, -0.15, 0]} castShadow receiveShadow>
+            <capsuleGeometry args={[0.07, 0.22, 4, 8]} />
+            <meshStandardMaterial color={pantsColor} roughness={0.85} />
+          </mesh>
+        </group>
       </group>
       {isSelected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
