@@ -96,6 +96,16 @@ export function NightStreetLights() {
               <cylinderGeometry args={[0.04, 0.04, 0.5, 8]} />
               <meshStandardMaterial color="#2a2a30" roughness={0.7} metalness={0.4} />
             </mesh>
+            {/* iter-09-revisit-shield: reflector hood disc above the lamp
+               head. Always visible. Same material family as pole/arm. */}
+            <mesh
+              position={[spec.headPosition[0], spec.headPosition[1] + 0.18, spec.headPosition[2]]}
+              castShadow
+              receiveShadow
+            >
+              <cylinderGeometry args={[0.32, 0.32, 0.06, 16]} />
+              <meshStandardMaterial color="#2a2a30" roughness={0.7} metalness={0.4} />
+            </mesh>
             {isNight && (
               <>
                 {/* Anchor the target object in the scene so the spotLight has
