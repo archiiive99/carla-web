@@ -19,7 +19,16 @@ from src.config import BRIDGE_HOST, BRIDGE_PORT, CORS_ORIGINS, WORLD_TICK_INTERV
 from src.control_helpers import apply_vehicle_control
 from src.models.schemas import VehicleControl
 from src.realtime_session import RealtimeSessionManager
+from src.routes.actors import router as actors_router
+from src.routes.blueprints import router as blueprints_router
+from src.routes.navigation import router as navigation_router
+from src.routes.recording import router as recording_router
+from src.routes.sensors import router as sensors_router
+from src.routes.simulation import router as simulation_router
+from src.routes.traffic import router as traffic_router
+from src.routes.world import router as world_router
 from src.sensor_manager import SensorManager
+from src.ws.handler import router as ws_router
 from src.ws_broadcaster import ws_broadcaster
 
 logging.basicConfig(
@@ -158,16 +167,8 @@ app.add_middleware(
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# Register REST API routes
-from src.routes.simulation import router as simulation_router
-from src.routes.world import router as world_router
-from src.routes.actors import router as actors_router
-from src.routes.sensors import router as sensors_router
-from src.routes.traffic import router as traffic_router
-from src.routes.blueprints import router as blueprints_router
-from src.routes.recording import router as recording_router
-from src.routes.navigation import router as navigation_router
-
+# Register REST API + WebSocket routes. Routers are imported at module
+# top (see block above) so ruff E402 doesn't fire on late imports here.
 app.include_router(simulation_router)
 app.include_router(world_router)
 app.include_router(actors_router)
@@ -176,10 +177,6 @@ app.include_router(traffic_router)
 app.include_router(blueprints_router)
 app.include_router(recording_router)
 app.include_router(navigation_router)
-
-# Register WebSocket endpoint
-from src.ws.handler import router as ws_router
-
 app.include_router(ws_router)
 
 

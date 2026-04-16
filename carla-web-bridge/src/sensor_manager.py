@@ -6,6 +6,7 @@ import asyncio
 import logging
 import struct
 import time
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
