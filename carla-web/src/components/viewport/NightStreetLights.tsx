@@ -158,6 +158,25 @@ export function NightStreetLights() {
                     depthWrite={false}
                   />
                 </mesh>
+                {/* iter-09-revisit-light-cone: transparent beam-volume cone
+                   from lamp head toward target. Cone default apex is at
+                   +y; rotate by π around x so the apex sits at the mesh
+                   position (head) and the base extends downward. Height
+                   = lamp y (6 m); bottom radius 1.5 m. */}
+                <mesh
+                  position={[spec.headPosition[0], spec.headPosition[1] / 2, spec.headPosition[2]]}
+                  rotation={[Math.PI, 0, 0]}
+                >
+                  <coneGeometry args={[1.5, spec.headPosition[1], 24, 1, true]} />
+                  <meshBasicMaterial
+                    color={STREETLAMP_BEAM}
+                    transparent
+                    opacity={haloOpacity * 0.4}
+                    blending={THREE.AdditiveBlending}
+                    depthWrite={false}
+                    side={THREE.DoubleSide}
+                  />
+                </mesh>
               </>
             )}
           </group>

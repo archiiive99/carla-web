@@ -105,6 +105,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-06-revisit-hemi-ground-fog  Hemisphere ground-color fog lerp  (✅ — chained second lerp toward #6a6565 on fogFactor after altitude lerp; midday byte-identical; closed 2026-04-16T13:47:00Z+~8min)
 [x] iter-08-revisit-arm-stride-speed  Arm swing amp scales with walker speed  (✅ — armScale 0.7-1.2 by speed clamped 2.5 m/s; leg swing unchanged (phase already speed-coupled); midday byte-identical; closed 2026-04-16T13:52:00Z+~8min)
 [x] iter-08-revisit-body-hash-spread  Prime-hash walker body color  (✅ — (actorId*13+5)%6 scatter; uncorrelated from pants hash; midday byte-identical; closed 2026-04-16T13:57:00Z+~6min)
+[x] iter-09-revisit-light-cone  Beam-volume cone mesh under lamp  (✅ — open-ended cone apex at head, base radius 1.5m, additive + DoubleSide + haloOpacity*0.4; night-gated; midday byte-identical; closed 2026-04-16T14:03:00Z+~12min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 
