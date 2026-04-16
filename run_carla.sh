@@ -138,7 +138,7 @@ run_with_auto_restart() {
 
 # Background mode
 if [ "$BG" = true ]; then
-  nohup bash -c "$(declare -f start_carla run_with_auto_restart); GPU_ID=$GPU_ID CARLA_PORT=$CARLA_PORT UE5_DIR=$UE5_DIR SCRIPT_DIR=$SCRIPT_DIR LOG_FILE=$LOG_FILE PID_FILE=$PID_FILE MAX_RESTARTS=$MAX_RESTARTS run_with_auto_restart" > /tmp/carla-watchdog.log 2>&1 &
+  nohup bash -c "$(declare -f start_carla run_with_auto_restart); GPU_ID=$GPU_ID CARLA_PORT=$CARLA_PORT UE5_DIR=$UE5_DIR SCRIPT_DIR=$SCRIPT_DIR UPROJECT_PATH=$UPROJECT_PATH ENGINE_PROJECT_LINK=$ENGINE_PROJECT_LINK LOG_FILE=$LOG_FILE PID_FILE=$PID_FILE MAX_RESTARTS=$MAX_RESTARTS run_with_auto_restart" > /tmp/carla-watchdog.log 2>&1 &
   disown $!
   echo "CARLA watchdog started in background (PID: $!)"
   echo "Logs: tail -f $LOG_FILE"

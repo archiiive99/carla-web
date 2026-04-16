@@ -23,6 +23,10 @@ export const NIGHT_SKY_GLOW = "#6a7a9c";
 /** Headlight beam tint — warm tungsten ~3500K. */
 export const HEADLIGHT_BEAM = "#fff4d0";
 
+/** Streetlamp beam tint — HPS amber ~2200K, distinct from vehicle
+ *  low-beam so the two read as different light sources at night. */
+export const STREETLAMP_BEAM = "#ffb063";
+
 // ──────────────────────────────────────────────────────────────────────
 // Ground / surface
 // ──────────────────────────────────────────────────────────────────────

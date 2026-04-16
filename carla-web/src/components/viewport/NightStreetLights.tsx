@@ -1,7 +1,7 @@
 import { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useSimulationStore } from "@/stores/simulationStore";
-import { HEADLIGHT_BEAM } from "./scene-palette";
+import { STREETLAMP_BEAM } from "./scene-palette";
 import { BLOOM_LAYER } from "./bloom-layer";
 
 // CARLA-coords positions of street-lamp anchors near the iter-01 test
@@ -104,7 +104,7 @@ export function NightStreetLights() {
                 <spotLight
                   position={spec.headPosition}
                   target={targetRefs.current[i]}
-                  color={HEADLIGHT_BEAM}
+                  color={STREETLAMP_BEAM}
                   intensity={SPOTLIGHT_INTENSITY}
                   distance={SPOTLIGHT_DISTANCE}
                   angle={SPOTLIGHT_ANGLE}
@@ -123,8 +123,8 @@ export function NightStreetLights() {
                 >
                   <sphereGeometry args={[0.18, 12, 12]} />
                   <meshStandardMaterial
-                    color={HEADLIGHT_BEAM}
-                    emissive={HEADLIGHT_BEAM}
+                    color={STREETLAMP_BEAM}
+                    emissive={STREETLAMP_BEAM}
                     emissiveIntensity={2.5}
                     roughness={0.5}
                     metalness={0}
@@ -137,7 +137,7 @@ export function NightStreetLights() {
                 <mesh position={spec.headPosition}>
                   <sphereGeometry args={[0.4, 16, 16]} />
                   <meshBasicMaterial
-                    color={HEADLIGHT_BEAM}
+                    color={STREETLAMP_BEAM}
                     transparent
                     opacity={haloOpacity}
                     blending={THREE.AdditiveBlending}
