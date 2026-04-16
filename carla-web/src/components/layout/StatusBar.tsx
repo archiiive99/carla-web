@@ -43,6 +43,19 @@ export function StatusBar() {
   const connectionStatus = useSimulationStore((s) => s.connectionStatus);
   const actorsByType = useActorStore((s) => s.actorsByType);
 
+  // Pure state reset uses the React-19 "adjust state during render" idiom
+  // (matches VehicleDetails, SegmentationView, CameraView). The previous
+  // setState inside useEffect triggered a cascading render warning.
+  const [lastConnectionStatus, setLastConnectionStatus] = useState(connectionStatus);
+  if (lastConnectionStatus !== connectionStatus) {
+    setLastConnectionStatus(connectionStatus);
+    if (connectionStatus !== "connected") {
+      setUptime("");
+    }
+  }
+  // Ref mutations still need an effect because `connectedAtRef.current` reads
+  // are not timing-safe during render — performance.now() is impure and the
+  // refs only settle to their new value after commit.
   useEffect(() => {
     if (connectionStatus === "connected") {
       if (connectedAtRef.current === null) {
@@ -52,7 +65,6 @@ export function StatusBar() {
       }
     } else {
       connectedAtRef.current = null;
-      setUptime("");
     }
   }, [connectionStatus]);
 
