@@ -204,6 +204,16 @@ class RateController:
             return True
 
         effective_fps = max(MIN_CLIENT_FPS, min(state.effective_fps, state.target_fps, sensor_native_fps))
+        # MIN_CLIENT_FPS is the floor, but it's env-configurable and an
+        # operator could set it to 0 — combined with a client-requested
+        # target_fps=0 this would propagate to effective_fps=0 and the
+        # ratio division below would ZeroDivisionError every frame,
+        # spamming the worker-error log and gating every subsequent
+        # packet. "Send every frame" is the safe fallback shape, matching
+        # the sensor_native_fps <= 0 branch just above.
+        if effective_fps <= 0:
+            state.frames_since_send = 0
+            return True
         ratio = sensor_native_fps / effective_fps
         if ratio <= 1.0:
             state.frames_since_send = 0
