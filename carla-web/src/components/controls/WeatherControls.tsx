@@ -108,12 +108,22 @@ export function WeatherControls() {
   const isConnected = useIsConnected();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Accumulate pending slider changes instead of overwriting. Resetting the
+  // debounce with a single {key,value} threw away earlier changes whenever
+  // the user touched a second slider within the 300ms window — release
+  // slider A, grab slider B, and A's final value never reached the bridge.
+  // Batching accumulates all keys changed during the window into one
+  // setWeather call (setWeather merges Partial<CarlaWeatherParams>).
+  const pendingParamsRef = useRef<Partial<CarlaWeatherParams>>({});
 
   const handleParamChange = useCallback(
     (key: keyof CarlaWeatherParams, value: number) => {
+      pendingParamsRef.current[key] = value;
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
-        setWeather({ [key]: value }).catch(() => {});
+        const batch = pendingParamsRef.current;
+        pendingParamsRef.current = {};
+        setWeather(batch).catch(() => {});
       }, WEATHER_SLIDER_DEBOUNCE_MS);
     },
     [setWeather],
