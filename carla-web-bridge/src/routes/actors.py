@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -87,13 +88,24 @@ async def destroy_all_actors() -> Any:
         try:
             world = carla_manager.world
             destroyed = 0
+            # Per-actor guard so a single actor that's already dead
+            # (e.g. destroyed externally between sensor_manager.destroy_all
+            # and this call) doesn't abort the whole batch. Previously a
+            # RuntimeError reading actor.type_id on a stale reference bubbled
+            # up as a 500 and left the rest of the tracked actors alive.
             for actor_id in list(carla_manager.tracked_actor_ids):
-                actor = world.get_actor(actor_id)
-                if actor:
+                try:
+                    actor = world.get_actor(actor_id)
+                    if actor is None:
+                        continue
                     if actor.type_id.startswith("sensor."):
                         actor.stop()
                     actor.destroy()
                     destroyed += 1
+                except Exception:
+                    # Per-actor failure is expected on stale references;
+                    # the frontend just wants a best-effort sweep.
+                    pass
             carla_manager.clear_tracked_actors()
             return {"status": "destroyed", "count": destroyed}
         except Exception as e:
@@ -152,10 +164,9 @@ async def spawn_vehicle(req: SpawnVehicleRequest) -> Any:
                 raise HTTPException(status_code=400, detail="Could not spawn vehicle (all positions occupied)")
             carla_manager.track_actor(vehicle.id)
             if req.autopilot:
-                try:
+                # Traffic Manager may not be available — silent no-op if not.
+                with contextlib.suppress(Exception):
                     vehicle.set_autopilot(True)
-                except Exception:
-                    pass  # Traffic Manager may not be available
             return serialize_actor(vehicle).model_dump()
         except HTTPException:
             raise
