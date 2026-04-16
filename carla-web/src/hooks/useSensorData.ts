@@ -264,7 +264,12 @@ export function useLaneInvasionData(sensorId: number) {
       const ts = v.getFloat64(8, true);
       const count = v.getUint32(16, true);
       const types: number[] = [];
-      for (let i = 0; i < count && 20 + i * 4 < payload.byteLength; i++) {
+      // Each marking type is a 4-byte uint32 starting at offset 20; the
+      // guard must check that ALL FOUR bytes are readable (start + 4 ≤
+      // byteLength), not just the start offset. getUint32 throws
+      // RangeError on a partial read, which would crash the whole
+      // ws-receiver message handler on any truncated lane-invasion frame.
+      for (let i = 0; i < count && 20 + (i + 1) * 4 <= payload.byteLength; i++) {
         types.push(v.getUint32(20 + i * 4, true));
       }
       eventsRef.current.push({ timestamp: ts, markingTypes: types });
