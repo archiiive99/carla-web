@@ -46,8 +46,18 @@ export function useConnectionHealth() {
               currentMap: status.map,
               serverVersion: status.server_version,
             });
-            const weather = await carlaApi.getWeather();
-            useSimulationStore.setState({ weather });
+            // Weather changes only happen via explicit user actions
+            // (setWeather / setWeatherPreset already update the store)
+            // or on map load (simulationStore.loadMap calls refreshActors
+            // but weather flows through setWeatherPreset separately).
+            // Fetch only on transition to connected so the initial store
+            // value is real, not the DEFAULT_WEATHER constant.
+            if (lastStatusRef.current !== "connected") {
+              try {
+                const weather = await carlaApi.getWeather();
+                useSimulationStore.setState({ weather });
+              } catch { /* optional */ }
+            }
             // Resolve ego vehicle from bridge realtime session if not yet set
             if (useActorStore.getState().egoVehicleId === null) {
               const session = await carlaApi.getRealtimeSession();
