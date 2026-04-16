@@ -41,11 +41,18 @@ class SimulationStatus(BaseModel):
 
 class SimulationSettings(BaseModel):
     sync_mode: bool | None = None
-    fixed_delta: float | None = None
+    # CARLA's physics are only stable within ~(0.001, 1.0) seconds per
+    # tick. Accepting anything outside that range silently configures an
+    # unusable sim — fixed_delta=999.0 passes through to apply_settings
+    # and leaves physics completely broken. Clamp at the boundary of
+    # "theoretically usable" rather than "recommended" (which is 0.01-0.1),
+    # so front-ends with a wider UI range still work but a typoed
+    # mega-value trips 422 at the schema.
+    fixed_delta: float | None = Field(None, gt=0.0, le=1.0)
     no_rendering: bool | None = None
     substepping: bool | None = None
-    max_substep_delta: float | None = None
-    max_substeps: int | None = None
+    max_substep_delta: float | None = Field(None, gt=0.0, le=1.0)
+    max_substeps: int | None = Field(None, ge=1, le=100)
 
 
 # --- Weather ---
