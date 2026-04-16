@@ -85,16 +85,27 @@ class WebSocketBroadcaster:
         on_unsubscribe: Callable | None = None,
         on_set_rate: Callable | None = None,
     ) -> None:
-        if len(self._clients) >= MAX_CLIENTS:
-            await ws.close(code=1013, reason="Max clients reached")
-            return
-
         await ws.accept()
         client_id = str(uuid.uuid4())[:8]
         conn = ClientConnection(ws, client_id, on_unsubscribe)
 
+        # Check-and-add under the lock so simultaneous connections can't
+        # each observe len(self._clients) < MAX_CLIENTS and both take a slot.
+        # Previously the limit check ran outside the lock and before
+        # ws.accept() — during accept's await, another WS handshake arriving
+        # would read the same pre-registration count, and both would register
+        # even if MAX_CLIENTS was supposed to bar the second. Close happens
+        # after the lock is released so we're not holding it across a network
+        # round-trip.
         async with self._lock:
-            self._clients[client_id] = conn
+            over_capacity = len(self._clients) >= MAX_CLIENTS
+            if not over_capacity:
+                self._clients[client_id] = conn
+
+        if over_capacity:
+            with contextlib.suppress(Exception):
+                await ws.close(code=1013, reason="Max clients reached")
+            return
 
         logger.info("Client %s connected (%d total)", client_id, len(self._clients))
 
