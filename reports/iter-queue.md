@@ -96,6 +96,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-08-revisit-bob  Vertical head/torso bob at 2× step rate  (✅ — |sin(2φ)|*0.03 upward-only bob on bodyGroupRef.position.y; compare.py client timeout 10→30s; post-restart reference drift (6.61/0.0627/49.24); edit unreachable at midday no-walker ROI; closed 2026-04-16T12:48:00Z+~70min including recovery)
 [x] iter-06-revisit-ambient-fog  Ambient fill lifts with fog-density  (✅ — + fogFactor*0.04 term; midday byte-identical (fog_density=0); closed 2026-04-16T12:56:00Z+~12min)
 [x] iter-06-revisit-sun-precip  Direct sun attenuated by precipitation  (✅ — +precipFactor*0.25 attenuation, floored; midday byte-identical (precip=0); closed 2026-04-16T13:02:00Z+~10min)
+[x] iter-11-revisit-exposure-precip  Exposure target lifts with precipitation  (✅ — +precipitation*0.0010 (smaller coef than cloudiness since directIntensity already rain-attenuated); midday byte-identical (precip=0); closed 2026-04-16T13:08:00Z+~8min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 

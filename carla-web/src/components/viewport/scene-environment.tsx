@@ -105,7 +105,11 @@ export function ExposureDriver() {
         : EXPOSURE_MIDDAY +
           (EXPOSURE_DUSK_NIGHT - EXPOSURE_MIDDAY) *
             (1 - Math.min(Math.max(sunAlt, 0), 60) / 60);
-    const target = base + cloudiness * 0.0015;
+    // iter-11-revisit-exposure-precip: precipitation lifts exposure target
+    // by +0.10 at full rain. Smaller coefficient than cloudiness since
+    // direct sun already attenuated by iter-06-revisit-sun-precip.
+    const precipitation = weather.precipitation ?? 0;
+    const target = base + cloudiness * 0.0015 + precipitation * 0.0010;
     // First-frame seed: start AT target (no transient on mount).
     if (currentExposure.current === null) {
       currentExposure.current = target;
