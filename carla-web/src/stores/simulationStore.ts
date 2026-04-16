@@ -5,6 +5,7 @@ import type { CarlaWeatherParams, WeatherPreset } from "@/types/carla";
 import { carlaApi } from "@/lib/carla-api";
 import { BRIDGE_URL_DEFAULT, BRIDGE_URL_KEY } from "@/constants";
 import { normalizeBridgeUrl } from "@/lib/bridge-url";
+import { invalidateTopologyCache } from "@/lib/topology-cache";
 import { useEventStore } from "@/stores/eventStore";
 import { useActorStore } from "@/stores/actorStore";
 import { useSensorStore } from "@/stores/sensorStore";
@@ -164,6 +165,10 @@ export const useSimulationStore = create<SimulationState>((set) => ({
       reportError("Map load", e);
       throw e;
     }
+    // Invalidate topology cache — even if the target map happens to
+    // equal currentMap, CARLA has rebuilt the world so stale edges
+    // from the prior session would mislead Roads/Minimap consumers.
+    invalidateTopologyCache();
     set({ currentMap: name });
     const short = formatMapName(name) || name;
     toast.success(`Map loaded: ${short}`);

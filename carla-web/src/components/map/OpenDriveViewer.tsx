@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { carlaApi } from "@/lib/carla-api";
+import { getTopologyCached } from "@/lib/topology-cache";
 import type { TopologyEdge } from "@/types/carla";
 import { themeColors } from "@/lib/theme-colors";
 import { useAnimationFrame } from "@/hooks/useAnimationFrame";
@@ -37,21 +37,22 @@ export function OpenDriveViewer({ className }: OpenDriveViewerProps) {
   const draggingRef = useRef(false);
   const lastMouseRef = useRef({ x: 0, y: 0 });
 
+  const currentMap = useSimulationStore((s) => s.currentMap);
+  const isConnected = useIsConnected();
+
   const fetchTopology = useCallback(async () => {
     setLoading(true);
     try {
-      const edges = await carlaApi.getTopology();
+      const edges = await getTopologyCached(currentMap);
       setTopology(edges);
     } catch {
       // Not connected
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentMap]);
 
   // Auto-load topology on mount and whenever the active map changes.
-  const currentMap = useSimulationStore((s) => s.currentMap);
-  const isConnected = useIsConnected();
   useEffect(() => {
     setTopology([]);
     if (isConnected) fetchTopology();

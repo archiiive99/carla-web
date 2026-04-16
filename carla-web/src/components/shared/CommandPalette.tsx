@@ -41,6 +41,7 @@ import { useActorStore } from "@/stores/actorStore";
 import { useSensorStore } from "@/stores/sensorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { carlaApi } from "@/lib/carla-api";
+import { invalidateTopologyCache } from "@/lib/topology-cache";
 import { toast } from "sonner";
 import { WEATHER_QUICK_PRESETS } from "@/components/controls/weather-quick-presets";
 
@@ -119,6 +120,10 @@ export function CommandPalette() {
                   // Bridge resets the world → existing actor/sensor IDs are
                   // stale. Refresh proactively to avoid ghost rows.
                   // Sensors are derived from actorStore, so chain the calls.
+                  // Also drop the cached topology — the world rebuild may
+                  // regenerate the OpenDRIVE graph even if the map name
+                  // stays the same.
+                  invalidateTopologyCache();
                   await useActorStore.getState().refreshActors();
                   useSensorStore.getState().refreshSensors();
                 }, "Reload Map")

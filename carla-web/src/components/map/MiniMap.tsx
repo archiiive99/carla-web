@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useActorStore } from "@/stores/actorStore";
 import { useSimulationStore } from "@/stores/simulationStore";
-import { carlaApi } from "@/lib/carla-api";
+import { getTopologyCached } from "@/lib/topology-cache";
 import type { TopologyEdge } from "@/types/carla";
 import { MINIMAP_DEFAULT_ZOOM, MINIMAP_MIN_ZOOM, MINIMAP_MAX_ZOOM, BRIDGE_EGO_ROLE } from "@/constants";
 import { useAnimationFrame } from "@/hooks/useAnimationFrame";
@@ -41,7 +41,9 @@ export function MiniMap({ className }: MiniMapProps) {
   }
   useEffect(() => {
     let cancelled = false;
-    carlaApi.getTopology().then((data) => { if (!cancelled) setTopology(data); }).catch(() => {});
+    getTopologyCached(currentMap)
+      .then((data) => { if (!cancelled) setTopology(data); })
+      .catch(() => {});
     return () => { cancelled = true; };
   }, [currentMap]);
 
