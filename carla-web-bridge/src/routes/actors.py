@@ -32,6 +32,26 @@ def _require_connection() -> None:
         raise HTTPException(status_code=503, detail="Not connected to CARLA server")
 
 
+def _should_skip_actor(type_id: str) -> bool:
+    """Filter actors that are noise for the frontend's actor list.
+
+    Skips:
+      * traffic.* without "light" (speed limits, stops, yields — 30-50
+        entries per map, all read-only map fixtures, no UI interactions
+        exist for them).
+      * static.* (static.prop.mesh — typically 100+ per CARLA map, pure
+        scenery: light poles, trees, trash cans, decorative props. They
+        have no lifecycle the user can drive, but the old list included
+        them in the frontend's "Other" group where they drowned the
+        actionable actors and 4x'd the /api/actors payload.)
+    """
+    if type_id.startswith("traffic.") and "light" not in type_id:
+        return True
+    if type_id.startswith("static."):
+        return True
+    return False
+
+
 @router.get("/count")
 async def count_actors() -> Any:
     _require_connection()
@@ -60,7 +80,7 @@ async def list_actors() -> Any:
             # panel even when most actors were fine. Matches the managed-
             # actors loop below.
             try:
-                if a.type_id.startswith("traffic.") and "light" not in a.type_id:
+                if _should_skip_actor(a.type_id):
                     continue
                 seen_ids.add(a.id)
                 result.append(serialize_actor(a).model_dump())
@@ -76,7 +96,7 @@ async def list_actors() -> Any:
             try:
                 managed = world.get_actor(actor_id)
                 if managed is not None and getattr(managed, "is_alive", False):
-                    if managed.type_id.startswith("traffic.") and "light" not in managed.type_id:
+                    if _should_skip_actor(managed.type_id):
                         continue
                     result.append(serialize_actor(managed).model_dump())
             except Exception:
