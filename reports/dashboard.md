@@ -70,7 +70,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 03-revisit-windshield-tint | Tinted glass on vehicle window mats | **✅** | 16.71 | 0.3064 | 21.87 | ~15 min | ec6fd34d5 |
 | 09-revisit-halo-opacity-altitude | Halo opacity ramps by night-depth | **✅** | 16.71 | 0.3063 | 21.87 | ~10 min | 6e8d3165f |
 | 09-revisit-beam-halogen | STREETLAMP_BEAM distinct from HEADLIGHT_BEAM | **✅** | 12.29 | 0.2803 | 27.85 | ~45 min | 1470ea525 |
-| 09-revisit-shield | Disc reflector shield above lamp head | **✅** | 10.97 | 0.2109 | 36.10 | ~15 min | (this commit) |
+| 09-revisit-shield | Disc reflector shield above lamp head | **✅** | 10.97 | 0.2109 | 36.10 | ~15 min | bf22b0a62 |
 
 ## Notes
 
