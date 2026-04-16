@@ -23,13 +23,17 @@ export function useConnectionHealth() {
         if (health.carla_connected) {
           useSimulationStore.setState({ connectionStatus: "connected" });
           if (lastStatusRef.current !== "connected") {
-            toast.success("Reconnected to CARLA bridge");
-            useEventStore.getState().addEvent(
-              "connection",
+            // Toast + event log used to diverge: the event log correctly
+            // distinguished first-time "Connected" from post-error
+            // "Reconnected", but the toast always said "Reconnected" —
+            // so a user opening the page for the first time was told
+            // the bridge had "Reconnected" as if it had dropped earlier.
+            const message =
               lastStatusRef.current === "disconnected"
                 ? "Connected to CARLA bridge"
-                : "Reconnected to CARLA bridge",
-            );
+                : "Reconnected to CARLA bridge";
+            toast.success(message);
+            useEventStore.getState().addEvent("connection", message);
           }
           try {
             const status = await carlaApi.getStatus();
