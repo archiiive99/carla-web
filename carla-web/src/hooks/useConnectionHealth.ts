@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { useSimulationStore } from "@/stores/simulationStore";
-import { useActorStore } from "@/stores/actorStore";
 import { carlaApi } from "@/lib/carla-api";
 import { toast } from "sonner";
 import { usePerformanceStore } from "@/stores/performanceStore";
@@ -58,13 +57,11 @@ export function useConnectionHealth() {
                 useSimulationStore.setState({ weather });
               } catch { /* optional */ }
             }
-            // Resolve ego vehicle from bridge realtime session if not yet set
-            if (useActorStore.getState().egoVehicleId === null) {
-              const session = await carlaApi.getRealtimeSession();
-              if (session.default_vehicle_id) {
-                useActorStore.getState().setEgoVehicleId(session.default_vehicle_id);
-              }
-            }
+            // Ego vehicle resolution is handled by the dedicated
+            // useEgoVehicleResolution hook (mounted on MainViewport) with
+            // its own 1s polling loop. Previously we duplicated the
+            // /api/realtime/session call here every 2s until ego was set,
+            // meaning two hooks raced for the same resolution.
           } catch { /* optional */ }
           if (store.connectionStatus !== "connected") {
             usePerformanceStore.getState().markConnected();
