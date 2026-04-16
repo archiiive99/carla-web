@@ -203,9 +203,14 @@ export function ActorDetails() {
               : "Teleport Spectator Here"}
           </Button>
 
-          {/* Traffic lights are part of the map and can't be destroyed via the
-              python client — hiding the button avoids a noisy failure toast. */}
-          {actor.type !== "traffic_light" && actor.type !== "traffic_sign" && (
+          {/* Traffic lights / signs and the spectator can't be destroyed via
+              the python client — hiding the button avoids a noisy failure
+              toast. The spectator is a single CARLA-managed actor (id=1,
+              type_id="spectator") that represents the native viewport
+              camera, not a lifecycle-managed entity. */}
+          {actor.type !== "traffic_light" &&
+            actor.type !== "traffic_sign" &&
+            actor.type_id !== "spectator" && (
           <>
           <Separator className="my-0.5" />
           <AlertDialog>
