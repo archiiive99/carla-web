@@ -149,10 +149,22 @@ export function SensorPanel({ className }: { className?: string }) {
     subscribe(sensorId);
     setCells((prev) => {
       const next = [...prev];
+      // Every other cell-swap path in this component (removeCell,
+      // handleGridChange's shrink branch, resetGrid, focusManagedRgb, the
+      // sensor-panel:open handler) unsubscribes the old cell's sensor on
+      // eviction. Today the UI only calls addSensorToCell from an
+      // EmptyCell click — so prev[index] is null and the guard is a
+      // no-op — but enforcing the invariant in the function itself means
+      // a future caller that points at an occupied cell won't silently
+      // leak a bridge subscription forever.
+      const evicted = next[index];
+      if (evicted && !evicted.preset3d && evicted.sensorId !== sensorId) {
+        unsubscribe(evicted.sensorId);
+      }
       next[index] = { sensorId, typeId };
       return next;
     });
-  }, [subscribe]);
+  }, [subscribe, unsubscribe]);
 
   const removeCell = useCallback((index: number) => {
     setCells((prev) => {
@@ -170,10 +182,17 @@ export function SensorPanel({ className }: { className?: string }) {
   const add3DToCell = useCallback((index: number, preset: CameraPresetKey) => {
     setCells((prev) => {
       const next = [...prev];
+      // Parallel eviction guard to addSensorToCell — if a real-sensor cell
+      // is being replaced by a 3D preset (future caller path), unsubscribe
+      // the bridge sensor first so we don't leak the subscription.
+      const evicted = next[index];
+      if (evicted && !evicted.preset3d) {
+        unsubscribe(evicted.sensorId);
+      }
       next[index] = { sensorId: -(index + 1), typeId: `3d.${preset}`, preset3d: preset };
       return next;
     });
-  }, []);
+  }, [unsubscribe]);
 
   // "Quick compare" button was removed — it produced the same 2x1 compare
   // layout the panel now defaults to, which `resetGrid` below also restores
