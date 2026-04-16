@@ -170,8 +170,9 @@ export const useSimulationStore = create<SimulationState>((set) => ({
     useEventStore.getState().addEvent("map", `Loaded ${short}`);
     // Proactively refresh actor + sensor stores — the backend rebuilds the
     // world so every actor id from the previous map is now stale. Waiting
-    // for the 2s poll tick would briefly show ghost vehicles.
-    useActorStore.getState().refreshActors();
+    // for the 2s poll tick would briefly show ghost vehicles. sensorStore
+    // derives from actorStore, so chain the calls.
+    await useActorStore.getState().refreshActors();
     useSensorStore.getState().refreshSensors();
   },
 

@@ -35,8 +35,10 @@ export default function SimulationPage() {
 
   useEffect(() => {
     if (connectionStatus === "connected") {
-      refreshActors();
-      refreshSensors();
+      // refreshSensors now derives from actorStore rather than its own
+      // GET /api/actors call (see sensorStore.ts), so it must run after
+      // refreshActors finishes populating the actor map.
+      refreshActors().then(() => refreshSensors());
     }
   }, [connectionStatus, refreshActors, refreshSensors]);
 
@@ -52,8 +54,11 @@ export default function SimulationPage() {
     if (connectionStatus !== "connected") return;
     const tick = () => {
       if (document.visibilityState === "hidden") return;
-      useActorStore.getState().refreshActors();
-      useSensorStore.getState().refreshSensors();
+      // Chain sensor refresh after the actor fetch — sensorStore derives
+      // from actorStore and needs a fresh actor map to read from.
+      useActorStore.getState().refreshActors().then(() =>
+        useSensorStore.getState().refreshSensors(),
+      );
     };
     const interval = setInterval(tick, 2000);
     const unsubscribeVisibility = subscribeVisible(tick);

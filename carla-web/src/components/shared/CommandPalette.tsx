@@ -118,7 +118,8 @@ export function CommandPalette() {
                   await carlaApi.reload();
                   // Bridge resets the world → existing actor/sensor IDs are
                   // stale. Refresh proactively to avoid ghost rows.
-                  useActorStore.getState().refreshActors();
+                  // Sensors are derived from actorStore, so chain the calls.
+                  await useActorStore.getState().refreshActors();
                   useSensorStore.getState().refreshSensors();
                 }, "Reload Map")
               }
