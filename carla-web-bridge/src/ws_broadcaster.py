@@ -19,6 +19,30 @@ from src.ws.protocol import decode_frame, encode_frame
 logger = logging.getLogger(__name__)
 
 
+def _invoke_callback(
+    fn: Callable,
+    name: str,
+    client_id: str,
+    sensor_id: int,
+) -> None:
+    """Guarded invocation for on_subscribe / on_unsubscribe handlers.
+
+    The sensor_manager-backed callbacks can raise if CARLA's actor.listen
+    / sensor.stop / stale-actor state bubbles up. Without this guard the
+    exception propagated to _handle_*_message's caller (handle_connection)
+    — whose generic except would log "Client <id> error" and tear down the
+    whole WS connection as a side effect. A bad callback shouldn't
+    disconnect the client; log + skip + keep the connection alive.
+    """
+    try:
+        fn(sensor_id, client_id)
+    except Exception as exc:
+        logger.warning(
+            "%s callback failed for client %s sensor %s: %s",
+            name, client_id, sensor_id, exc,
+        )
+
+
 def _coerce_sensor_id(raw: object) -> int | None:
     """Coerce a JSON-decoded sensor_id to int, or None if it isn't convertible.
 
@@ -155,11 +179,11 @@ class WebSocketBroadcaster:
         if action == "subscribe" and sensor_id is not None:
             conn.subscriptions.add(sensor_id)
             if on_subscribe:
-                on_subscribe(sensor_id, conn.client_id)
+                _invoke_callback(on_subscribe, "on_subscribe", conn.client_id, sensor_id)
         elif action == "unsubscribe" and sensor_id is not None:
             conn.subscriptions.discard(sensor_id)
             if on_unsubscribe:
-                on_unsubscribe(sensor_id, conn.client_id)
+                _invoke_callback(on_unsubscribe, "on_unsubscribe", conn.client_id, sensor_id)
         elif action == "stats":
             # Server-stamped arrival time (not `setdefault` — the `_` prefix
             # marks this as bridge-internal metadata; a buggy or hostile
@@ -209,7 +233,7 @@ class WebSocketBroadcaster:
             if sensor_id is not None:
                 conn.subscriptions.add(sensor_id)
                 if on_subscribe:
-                    on_subscribe(sensor_id, conn.client_id)
+                    _invoke_callback(on_subscribe, "on_subscribe", conn.client_id, sensor_id)
         elif channel == Channel.UNSUBSCRIBE:
             try:
                 msg = json.loads(payload)
@@ -221,7 +245,7 @@ class WebSocketBroadcaster:
             if sensor_id is not None:
                 conn.subscriptions.discard(sensor_id)
                 if on_unsubscribe:
-                    on_unsubscribe(sensor_id, conn.client_id)
+                    _invoke_callback(on_unsubscribe, "on_unsubscribe", conn.client_id, sensor_id)
         elif channel == Channel.CLIENT_STATS:
             try:
                 parsed = json.loads(payload)
