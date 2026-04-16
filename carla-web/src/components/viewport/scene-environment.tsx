@@ -246,7 +246,12 @@ export function WeatherLighting({
   const isNight = sunAlt < 0;
   const nightFactor = Math.max(0, Math.min(1, -sunAlt / (Math.PI / 4)));
   const fillBoost = 0.12 + cloudFactor * 0.28 + nightFactor * 0.06;
-  const ambientBase = 0.02 + cloudFactor * 0.05 + nightFactor * 0.03;
+  // iter-06-revisit-ambient-fog: fog scatters direct sunlight into
+  // diffuse ambient — lift the floor a touch so foggy scenes don't
+  // read with deep un-lit shadow pockets.
+  const fogFactor = Math.max(0, Math.min(1, (weather.fog_density ?? 0) / 100));
+  const ambientBase =
+    0.02 + cloudFactor * 0.05 + nightFactor * 0.03 + fogFactor * 0.04;
   // iter-05 Path A: bumped turbidity floor dilutes Preetham's
   // saturated mid-altitude blue toward UE5 SkyAtmosphere output.
   //
