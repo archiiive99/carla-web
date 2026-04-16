@@ -216,7 +216,12 @@ class IgnoreRequest(BaseModel):
 
 
 class RouteRequest(BaseModel):
-    waypoints: list[Vector3]
+    # Cap the waypoint list at a generous-but-sane length. Every real route
+    # lives in the hundreds (the global planner emits ~1 waypoint per 2m
+    # sampling_resolution, so a 50km cross-Town route caps at ~25k). 10k
+    # is comfortably beyond legitimate use and keeps a hostile 1M-waypoint
+    # payload from OOM'ing the bridge or stalling tm.set_path for minutes.
+    waypoints: list[Vector3] = Field(..., max_length=10_000)
 
 
 # --- Blueprints ---

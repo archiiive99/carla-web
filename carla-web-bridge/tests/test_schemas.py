@@ -16,10 +16,12 @@ from src.models.schemas import (
     LightStateRequest,
     LoadMapRequest,
     MapLayerRequest,
+    RouteRequest,
     SimulationSettings,
     SpawnSensorRequest,
     StartRecordingRequest,
     StartReplayRequest,
+    Vector3,
     VehicleControl,
     VehicleSpeedRequest,
 )
@@ -262,3 +264,26 @@ def test_vehicle_speed_accepts_percentage_range() -> None:
     assert VehicleSpeedRequest(speed_diff=-100.0).speed_diff == -100.0
     assert VehicleSpeedRequest(speed_diff=0.0).speed_diff == 0.0
     assert VehicleSpeedRequest(speed_diff=100.0).speed_diff == 100.0
+
+
+# --- RouteRequest waypoints cap ------------------------------------------
+
+
+def test_route_request_rejects_over_sized_waypoint_list() -> None:
+    # 10,001 waypoints trips 422 before the route runs — a hostile caller
+    # can't OOM the bridge by shipping 1M waypoints that then get converted
+    # to carla.Location objects and passed to tm.set_path.
+    huge = [Vector3(x=0, y=0, z=0) for _ in range(10_001)]
+    with pytest.raises(ValidationError):
+        RouteRequest(waypoints=huge)
+
+
+def test_route_request_accepts_realistic_waypoint_counts() -> None:
+    # A typical global-planner route has ≤ a few hundred waypoints. 5000
+    # exercises the upper-half of the allowed range.
+    small = [Vector3(x=float(i), y=0, z=0) for i in range(5)]
+    big = [Vector3(x=float(i), y=0, z=0) for i in range(5_000)]
+    assert len(RouteRequest(waypoints=small).waypoints) == 5
+    assert len(RouteRequest(waypoints=big).waypoints) == 5_000
+    # Edge: empty list is legal — tm.set_path([]) is the route-clear call.
+    assert RouteRequest(waypoints=[]).waypoints == []
