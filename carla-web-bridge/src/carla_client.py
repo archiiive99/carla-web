@@ -92,9 +92,18 @@ class CarlaClientManager:
                     CARLA_PORT,
                 )
                 delay = 1.0
-                # Cancel old heartbeat if any
-                if self._heartbeat_task and not self._heartbeat_task.done():
-                    self._heartbeat_task.cancel()
+                # Cancel old heartbeat if any, and await it so a still-running
+                # task doesn't linger as a pending cancel when we start the
+                # new one.
+                old_hb = self._heartbeat_task
+                if old_hb and not old_hb.done():
+                    old_hb.cancel()
+                    try:
+                        await old_hb
+                    except asyncio.CancelledError:
+                        pass
+                    except Exception as exc:
+                        logger.debug("Old heartbeat exited with exception: %s", exc)
                 self._heartbeat_task = asyncio.create_task(self._heartbeat_loop())
                 return
             except Exception as exc:
@@ -120,9 +129,19 @@ class CarlaClientManager:
 
     async def disconnect(self) -> None:
         self._should_run = False
-        if self._heartbeat_task:
-            self._heartbeat_task.cancel()
-            self._heartbeat_task = None
+        task = self._heartbeat_task
+        self._heartbeat_task = None
+        if task:
+            # Await the cancelled task so asyncio doesn't log
+            # "Task was destroyed but it is pending!" on shutdown
+            # and any unobserved exception is collected here.
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+            except Exception as exc:
+                logger.debug("Heartbeat task exited with exception: %s", exc)
 
         # Hot reload / reconnect must not destroy live CARLA actors. Bridge-side
         # state is rebuilt from the simulator on the next connection.
