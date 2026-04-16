@@ -29,14 +29,20 @@ export function RoadMesh() {
   const [waypoints, setWaypoints] = useState<RoadWaypoint[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // Wet-road coupling: combine CARLA's wetness and precipitation_deposits
-  // (both 0–100) into a normalized 0–1 wetness factor for the road shader.
-  // Static deposits matter even after rain stops, so both terms count.
+  // Wet-road coupling: combine CARLA's wetness, precipitation_deposits,
+  // and live precipitation (0-100 each) into a normalized 0-1 wetness
+  // factor for the road shader. Static deposits matter after rain stops;
+  // live precipitation (iter-12-revisit-wetness-active-rain) adds a 50%
+  // weighted term so a fresh-rain state reads wet even before deposits
+  // accumulate.
   const wetness = useSimulationStore(
     (s) =>
       Math.min(
         1,
-        ((s.weather?.wetness ?? 0) + (s.weather?.precipitation_deposits ?? 0)) / 200,
+        ((s.weather?.wetness ?? 0) +
+          (s.weather?.precipitation_deposits ?? 0) +
+          (s.weather?.precipitation ?? 0) * 0.5) /
+          200,
       ),
   )
   useEffect(() => {
