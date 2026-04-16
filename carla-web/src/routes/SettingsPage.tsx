@@ -63,6 +63,13 @@ export default function SettingsPage() {
       saveSettings(next);
       return next;
     });
+    // A successful / failed result is bound to the URL that was tested
+    // — when the user edits the URL, the icon next to Test Connection
+    // would otherwise linger as a green checkmark for a different URL
+    // (or a red X for one they've since corrected).
+    if (patch.bridgeUrl !== undefined) {
+      setTestResult("idle");
+    }
   }, []);
 
   const handleTestConnection = useCallback(async () => {
