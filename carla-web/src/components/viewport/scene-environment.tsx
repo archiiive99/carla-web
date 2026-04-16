@@ -291,6 +291,12 @@ export function WeatherLighting({
             0.00001
         }
         shadow-normalBias={0.02}
+        // iter-06-revisit-csm-v2: soften shadow penumbra. Canvas uses
+        // shadows="soft" (PCFSoftShadowMap); without a radius the
+        // filter kernel is 1 texel = hard edge. Radius 2.5 adds
+        // subtle penumbra matching UE5 SkyAtmosphere's soft-shadow
+        // default and hides aliasing at close range.
+        shadow-radius={2.5}
         shadow-camera-far={900}
         shadow-camera-left={-350}
         shadow-camera-right={350}
