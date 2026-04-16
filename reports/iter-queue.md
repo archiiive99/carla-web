@@ -91,6 +91,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-09-revisit-beam-halogen  Separate STREETLAMP_BEAM palette color  (✅ — HPS-amber #ffb063 distinct from HEADLIGHT_BEAM #fff4d0; wired through emissive/halo/spot; post-restart reference drift but web edit unreachable at midday pose; closed 2026-04-16T11:56:00Z+~45min including §4.5 restart recovery)
 [x] iter-09-revisit-shield  Disc reflector shield above lamp head  (✅ — radius 0.32, thick 0.06 disc 0.18m above head; #2a2a30 metal; always-visible; byte-identical at midday (above road ROI); closed 2026-04-16T12:05:00Z+~15min)
 [x] iter-09-revisit-emissive-depth  Emissive intensity ramps by night-depth  (✅ — 1.2 + nightDepth*2.3; pairs with halo-opacity curve; midday byte-identical (sphere unmounted); closed 2026-04-16T12:12:00Z+~10min)
+[x] iter-07-revisit-trunk-vary  Per-instance trunk color variation  (✅ — ±15% value perturbation on TREE_TRUNK in procedural fallback; byte-identical at midday (GltfVegetation primary); closed 2026-04-16T12:19:00Z+~15min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 

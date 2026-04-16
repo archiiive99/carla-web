@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 57 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
+**Summary:** 58 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -72,6 +72,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09-revisit-beam-halogen | STREETLAMP_BEAM distinct from HEADLIGHT_BEAM | **✅** | 12.29 | 0.2803 | 27.85 | ~45 min | 1470ea525 |
 | 09-revisit-shield | Disc reflector shield above lamp head | **✅** | 10.97 | 0.2109 | 36.10 | ~15 min | bf22b0a62 |
 | 09-revisit-emissive-depth | Emissive intensity ramps by night-depth | **✅** | 10.97 | 0.2109 | 36.10 | ~10 min | dbf86f64c |
+| 07-revisit-trunk-vary | Per-instance trunk color variation | **✅** | 16.76 | 0.3057 | 21.84 | ~15 min | (this commit) |
 
 ## Notes
 

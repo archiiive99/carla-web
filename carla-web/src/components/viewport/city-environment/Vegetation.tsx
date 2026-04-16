@@ -262,6 +262,15 @@ function ProceduralVegetation({ objects }: { objects: EnvObj[] }) {
       dummy.scale.set(w * 0.08, trunkH, w * 0.08)
       dummy.updateMatrix()
       trunkMesh.setMatrixAt(i, dummy.matrix)
+      // iter-07-revisit-trunk-vary: ±15% value perturbation on the
+      // TREE_TRUNK base so adjacent trees don't read as identical
+      // bark slabs. rand() in [0,1] → factor in [0.85, 1.15].
+      const trunkV = 0.85 + rand() * 0.30
+      const baseTrunk = new THREE.Color(TREE_TRUNK)
+      trunkMesh.setColorAt(
+        i,
+        new THREE.Color(baseTrunk.r * trunkV, baseTrunk.g * trunkV, baseTrunk.b * trunkV),
+      )
 
       const canopyY = pos.y + trunkH + h * 0.25
       const canopyR = w * 0.35
@@ -285,6 +294,7 @@ function ProceduralVegetation({ objects }: { objects: EnvObj[] }) {
     trunkMesh.instanceMatrix.needsUpdate = true
     canopyMesh.instanceMatrix.needsUpdate = true
     if (canopyMesh.instanceColor) canopyMesh.instanceColor.needsUpdate = true
+    if (trunkMesh.instanceColor) trunkMesh.instanceColor.needsUpdate = true
     trunkMesh.castShadow = true
     canopyMesh.castShadow = true
     g.add(trunkMesh)
