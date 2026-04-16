@@ -23,6 +23,14 @@ export function DataExportMenu() {
       transform: a.transform,
       velocity: a.velocity,
     }));
+    // Surface the empty-export case instead of silently writing "[]" and
+    // toasting "Exported 0 actors" — matches EventLog.exportEvents and
+    // LidarView.handleExport so every export button signals "nothing here
+    // yet" the same way.
+    if (data.length === 0) {
+      toast.error("No actors to export");
+      return;
+    }
     saveJson(data, `actors_${Date.now()}.json`);
     toast.success(`Exported ${data.length} actors`);
   };
