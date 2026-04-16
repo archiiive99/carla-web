@@ -129,6 +129,13 @@ class SensorManager:
         # sensor — sensor_tick & friends are baked at spawn time).
         self._spawn_params: dict[int, dict[str, Any]] = {}
 
+        # Serialize spawn_sensor so the MAX_SENSORS check stays atomic with
+        # the actual insert. Previously two concurrent spawn requests could
+        # each read `len(self._sensors) < MAX_SENSORS` before either finished
+        # `_spawn_sync`, overshooting the cap by the number of in-flight
+        # spawns. Same pattern as the WS broadcaster's MAX_CLIENTS lock.
+        self._spawn_lock = asyncio.Lock()
+
     def set_loop(self, loop: asyncio.AbstractEventLoop) -> None:
         self._loop = loop
 
@@ -141,29 +148,35 @@ class SensorManager:
         parent_id: int,
         attributes: dict[str, Any],
     ) -> int:
-        if len(self._sensors) >= MAX_SENSORS:
-            raise RuntimeError(f"Maximum sensors ({MAX_SENSORS}) reached")
+        # Hold the lock across the to_thread await so the MAX_SENSORS check
+        # and the self._sensors[sensor_id] = sensor insert are a single
+        # critical section — otherwise N simultaneous spawns each see
+        # `len(self._sensors) < MAX_SENSORS` before any have completed the
+        # sync spawn, all land, and the cap is overshot by N-1.
+        async with self._spawn_lock:
+            if len(self._sensors) >= MAX_SENSORS:
+                raise RuntimeError(f"Maximum sensors ({MAX_SENSORS}) reached")
 
-        sensor = await asyncio.to_thread(
-            self._spawn_sync, sensor_type, transform, parent_id, attributes
-        )
-        sensor_id = sensor.id
-        self._sensors[sensor_id] = sensor
-        self._sensor_type_ids[sensor_id] = sensor.type_id
-        self._subscriptions[sensor_id] = set()
-        self._frame_counters[sensor_id] = 0
-        self._native_fps[sensor_id] = self._extract_native_fps(sensor)
-        self._spawn_params[sensor_id] = {
-            "sensor_type": sensor_type,
-            "transform": transform,
-            "parent_id": parent_id,
-            "attributes": dict(attributes),
-        }
-        self._carla.track_actor(sensor_id)
-        self._register_sensor_pipeline(sensor_id, sensor.type_id)
+            sensor = await asyncio.to_thread(
+                self._spawn_sync, sensor_type, transform, parent_id, attributes
+            )
+            sensor_id = sensor.id
+            self._sensors[sensor_id] = sensor
+            self._sensor_type_ids[sensor_id] = sensor.type_id
+            self._subscriptions[sensor_id] = set()
+            self._frame_counters[sensor_id] = 0
+            self._native_fps[sensor_id] = self._extract_native_fps(sensor)
+            self._spawn_params[sensor_id] = {
+                "sensor_type": sensor_type,
+                "transform": transform,
+                "parent_id": parent_id,
+                "attributes": dict(attributes),
+            }
+            self._carla.track_actor(sensor_id)
+            self._register_sensor_pipeline(sensor_id, sensor.type_id)
 
-        logger.info("Spawned sensor %s (id=%d)", sensor_type, sensor_id)
-        return sensor_id
+            logger.info("Spawned sensor %s (id=%d)", sensor_type, sensor_id)
+            return sensor_id
 
     async def destroy_sensor(self, sensor_id: int) -> None:
         task = self._sensor_tasks.pop(sensor_id, None)
