@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from enum import Enum, auto
@@ -483,8 +484,15 @@ class RealtimeSessionManager:
         for vehicle in managed_vehicles:
             vid = int(vehicle.id)
             for cam in attached_cameras.get(vid, []):
-                try:
+                # Separate stop() and destroy() so a failing stop() doesn't
+                # skip destroy() — otherwise a transient CARLA-side error on
+                # stop would leave the sensor actor alive but unlistened,
+                # which is exactly the orphan state this function was
+                # supposed to clean up. stop() is best-effort (the listener
+                # unregister), destroy() must run.
+                with contextlib.suppress(Exception):
                     cam.stop()
+                try:
                     cam.destroy()
                 except Exception as exc:
                     logger.debug("Could not destroy managed camera: %s", exc)
