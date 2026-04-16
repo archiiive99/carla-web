@@ -43,7 +43,10 @@ async def get_status():
             map=world.get_map().name,
             sync_mode=settings.synchronous_mode,
             fixed_delta=settings.fixed_delta_seconds,
-            server_version=carla_manager.client.get_server_version(),
+            # Cached at connect — avoids an RPC round-trip on every 2s
+            # status poll. Reset on disconnect so a reconnect to a
+            # different CARLA build reflects the new version.
+            server_version=carla_manager.server_version,
         )
 
     try:

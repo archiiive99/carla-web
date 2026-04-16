@@ -35,6 +35,12 @@ class CarlaClientManager:
         self._should_run = False
         self._rpc_lock = threading.RLock()
         self._connected_at_monotonic: float | None = None
+        # Cache the CARLA server version at connect-time. Previously every
+        # GET /api/simulation/status call (polled every 2s by the frontend)
+        # round-tripped client.get_server_version() even though the value
+        # never changes while a connection is live. Reset on disconnect so
+        # a reconnect to a different build surfaces the new version.
+        self._server_version: str = ""
 
     @property
     def is_connected(self) -> bool:
@@ -51,6 +57,10 @@ class CarlaClientManager:
         if not self._connected or self._connected_at_monotonic is None:
             return 0.0
         return max(0.0, time.monotonic() - self._connected_at_monotonic)
+
+    @property
+    def server_version(self) -> str:
+        return self._server_version
 
     @property
     def world(self) -> carla.World:
@@ -85,9 +95,12 @@ class CarlaClientManager:
                 # simulation runs deterministically at 20 Hz regardless of
                 # UE5's offscreen render rate.
                 await asyncio.to_thread(self._ensure_sync_mode)
+                self._server_version = await asyncio.to_thread(
+                    self._client.get_server_version
+                )
                 logger.info(
                     "Connected to CARLA %s at %s:%d (sync mode forced)",
-                    await asyncio.to_thread(self._client.get_server_version),
+                    self._server_version,
                     CARLA_HOST,
                     CARLA_PORT,
                 )
@@ -151,6 +164,7 @@ class CarlaClientManager:
         self._connected_at_monotonic = None
         self._client = None
         self._world = None
+        self._server_version = ""
         logger.info("Disconnected from CARLA")
 
     def track_actor(self, actor_id: int) -> None:
