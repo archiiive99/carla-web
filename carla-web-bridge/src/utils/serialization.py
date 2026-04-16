@@ -74,7 +74,14 @@ def classify_actor(type_id: str) -> str:
         return "sensor"
     if "traffic_light" in type_id:
         return "traffic_light"
-    if "traffic.speed_limit" in type_id or "traffic" in type_id:
+    # Any non-light traffic fixture — speed limits, stop/yield signs — all
+    # share the `traffic.` prefix. The previous
+    # `"traffic.speed_limit" in type_id or "traffic" in type_id` had the
+    # first branch fully subsumed by the second (any string containing
+    # "traffic.speed_limit" also contains "traffic"); use the prefix check
+    # for clarity and to avoid matching an unrelated type_id that happens
+    # to contain "traffic" as a substring.
+    if type_id.startswith("traffic."):
         return "traffic_sign"
     return "other"
 
