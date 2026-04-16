@@ -84,6 +84,14 @@ function connect() {
       postStatus("connected");
       reconnectDelay = RECONNECT_INITIAL_MS;
       lastFrameTime = performance.now();
+      // Reset the world-tick sequence tracker on every (re)connect. Without
+      // this, lastTickFrame kept its pre-disconnect value, and if the bridge
+      // kept ticking during the dropout (or was restarted to a higher frame),
+      // the first post-reconnect tick `frame=2000` compared against a stale
+      // `lastTickFrame=1000` and reported ~999 spurious dropped frames — which
+      // then propagated to the TelemetryPanel "dropped frames" counter and
+      // made every reconnect look like a catastrophic streaming failure.
+      lastTickFrame = -1;
       clearReconnectTimer();
       for (const sensorId of desiredSubscriptions) {
         ws?.send(JSON.stringify({ action: "subscribe", sensor_id: sensorId }));
