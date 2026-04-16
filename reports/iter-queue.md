@@ -46,6 +46,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-09-revisit-bloom-v2  SelectiveBloom layer-mask attempt  (⚠️ §6.3 — also failed (scene blackout); root cause is architectural — EffectComposer incompatible with WorldCanvas's multi-camera SceneCompositor; reverted; layer-tag infra retained for v3+; closed 2026-04-15T10:32+~50min)
 [x] iter-08-clothes-pattern  Pants color distinct from shirt  (✅ — WALKER_PANTS_VARIATIONS added; leg meshes use pantsColor driven by actor.id*7+3; closed 2026-04-16T05:19:56Z)
 [x] iter-08-walk-yaw-from-velocity  Walker body faces direction of travel  (✅ — atan2 target yaw + 6 rad/s shortest-path lerp; closed 2026-04-16T07:18:55Z)
+[x] iter-08-knee-bend  Thigh + shin with knee pivot  (✅ — knee bends sin(phase) × 0.8 during forward-swing; closed 2026-04-16T07:34:28Z)
 [ ] iter-09-revisit-bloom-v3  Per-viewport bloom mounting (~3-4h, refactor multi-viewport renderer)
 [ ] iter-09-revisit-bloom-v4  Custom render loop with manual bloom pass (~3-4h)
 [ ] iter-09-revisit-extracted-positions  Real lamp coords from Town01 static-prop dump (long iteration, needs UE5 commandlet or XODR parser)
