@@ -136,7 +136,6 @@ export function SensorPanel({ className }: { className?: string }) {
     });
   }, []);
 
-  // 35. Add sensor to cell
   const addSensorToCell = useCallback((index: number, sensorId: number, typeId: string) => {
     subscribe(sensorId);
     setCells((prev) => {
@@ -146,7 +145,6 @@ export function SensorPanel({ className }: { className?: string }) {
     });
   }, [subscribe]);
 
-  // 37. Remove sensor from cell
   const removeCell = useCallback((index: number) => {
     setCells((prev) => {
       const next = [...prev];
@@ -191,7 +189,6 @@ export function SensorPanel({ className }: { className?: string }) {
     setMaximizedSensor(null);
   }, [setMaximizedSensor]);
 
-  // 36. If maximized, show only that sensor.
   // If the maximized sensor no longer has a cell (destroyed / bridge reload),
   // clear the flag in an effect — not during render — to avoid React warnings.
   const maximizedCell =

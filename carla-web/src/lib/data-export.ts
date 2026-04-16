@@ -93,7 +93,6 @@ export function saveImuAsCsv(
   URL.revokeObjectURL(url);
 }
 
-// 45. Save JSON data
 export function saveJson(data: unknown, filename = "data.json"): void {
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: "application/json" });
@@ -105,7 +104,6 @@ export function saveJson(data: unknown, filename = "data.json"): void {
   URL.revokeObjectURL(url);
 }
 
-// 46. Save canvas as JPEG (smaller than PNG)
 export function saveCanvasAsJpeg(
   canvas: HTMLCanvasElement,
   filename = "frame.jpg",
@@ -126,7 +124,6 @@ export function saveCanvasAsJpeg(
   );
 }
 
-// 47. Copy canvas to clipboard
 export async function copyCanvasToClipboard(
   canvas: HTMLCanvasElement,
 ): Promise<boolean> {

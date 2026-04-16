@@ -3,7 +3,6 @@ import { UI_STATE_KEY } from "@/constants";
 
 export type CameraMode = "follow" | "birdseye" | "orbit" | "fpv" | "camera-match";
 
-// 34. Add "map" and "roads" tabs to BottomTab type
 type BottomTab = "sensors" | "map" | "roads" | "telemetry" | "events";
 
 interface UIState {
@@ -36,7 +35,6 @@ interface UIState {
   toggleCityEnvironment: () => void;
 }
 
-// 37. Persist UI state to localStorage
 function loadUiState(): Partial<UIState> {
   let hasCameraOverride = false;
   try {

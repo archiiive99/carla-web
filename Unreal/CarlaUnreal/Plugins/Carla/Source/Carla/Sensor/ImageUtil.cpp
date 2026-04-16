@@ -15,8 +15,7 @@
 #include <RHIGPUReadback.h>
 #include <util/ue-header-guard-end.h>
 
-#include <chrono>
-#include <thread>
+
 
 template <typename F>
 class ScopedCallback
@@ -256,7 +255,7 @@ namespace ImageUtil
       Self = std::move(Self)]() mutable
     {
       while (!Self.Readback->IsReady())
-        std::this_thread::sleep_for(std::chrono::microseconds(100));
+        std::this_thread::yield();
       ReadImageDataEnd(Self);
     });
   }

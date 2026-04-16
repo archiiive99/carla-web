@@ -1,4 +1,3 @@
-// 48. Reusable requestAnimationFrame hook
 import { useEffect, useRef } from "react";
 
 export function useAnimationFrame(callback: (deltaTime: number) => void, enabled = true) {

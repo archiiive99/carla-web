@@ -9,6 +9,7 @@
 #include "Carla/Game/Tagger.h"
 #include "Carla/Traffic/TrafficSignBase.h"
 #include "Carla/Vehicle/CarlaWheeledVehicle.h"
+#include "Carla/Game/Tagger.h"
 #include "Carla/Traffic/TrafficLightBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
@@ -50,21 +51,15 @@ FBoundingBox UBoundingBoxCalculator::GetActorBoundingBox(const AActor *Actor, ui
     auto Character = Cast<ACharacter>(Actor);
     if (Character != nullptr)
     {
-      UActorComponent *ActorComp = Character->GetComponentByClass(USkeletalMeshComponent::StaticClass());
-      USkeletalMeshComponent* ParentComp = Cast<USkeletalMeshComponent>(ActorComp);
-
-      if (ParentComp != nullptr)
+      auto Capsule = Character->GetCapsuleComponent();
+      if (Capsule != nullptr)
       {
-        FBoundingBox Box = GetSkeletalMeshBoundingBoxFromComponent(ParentComp);
-
-        if (Character->GetName().Contains("_AB001_G3")
-          || Character->GetName().Contains("_AG001_G3"))
-        {
-          // Hack to center the bbox of Gen3 kids
-          Box.Origin.Z -= Box.Extent.Z * (1.0f / 0.65f - 1.0f);
-        }
-
-        return Box;
+        const auto Radius = Capsule->GetScaledCapsuleRadius();
+        const auto HalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+        // Characters have the pivot point centered.
+        FVector Origin = {0.0f, 0.0f, 0.0f};
+        FVector Extent = {Radius, Radius, HalfHeight};
+        return {Origin, Extent};
       }
     }
     // Traffic sign.
@@ -201,15 +196,19 @@ FBoundingBox UBoundingBoxCalculator::GetCharacterBoundingBox(
   bool FilterByTag = TagQueried == crp::CityObjectLabel::Any ||
                      TagQueried == crp::CityObjectLabel::Pedestrians;
 
-  UActorComponent *ActorComp = Character->GetComponentByClass(USkeletalMeshComponent::StaticClass());
-  USkeletalMeshComponent* ParentComp = Cast<USkeletalMeshComponent>(ActorComp);
+  UCapsuleComponent* Capsule = Character->GetCapsuleComponent();
 
-  if (ParentComp && FilterByTag)
+
+  if (Capsule && FilterByTag)
   {
-    FBoundingBox BoundingBox = GetSkeletalMeshBoundingBoxFromComponent(ParentComp);
-
-    auto& CompToWorldTransform = ParentComp->GetComponentTransform();
-
+    const float Radius = Capsule->GetScaledCapsuleRadius();
+    const float HalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+    FBoundingBox BoundingBox;
+    // Characters have the pivot point centered.
+    BoundingBox.Origin = {0.0f, 0.0f, 0.0f};
+    BoundingBox.Extent = {Radius, Radius, HalfHeight};
+    // Component-to-world transform for this component
+    auto CompToWorldTransform = Capsule->GetComponentTransform();
     BoundingBox = ApplyTransformToBB(BoundingBox, CompToWorldTransform);
 
     return BoundingBox;
@@ -251,28 +250,6 @@ void UBoundingBoxCalculator::GetTrafficLightBoundingBox(
     OutBB.Emplace(BB);
     OutTag.Emplace(Tag);
   }
-}
-
-FBoundingBox UBoundingBoxCalculator::GetSkeletalMeshBoundingBoxFromComponent(
-  const USkeletalMeshComponent* SkeletalMeshComp
-)
-{
-  if(!SkeletalMeshComp || !SkeletalMeshComp->GetSkeletalMeshAsset())
-  {
-    UE_LOG(LogCarla, Error, TEXT("GetSkeletalMeshBoundingBoxFromComponent no SkeletalMeshComponent or SkeletalMesh"));
-    return {};
-  }
-
-  // Force update bounds to current pose
-  const_cast<USkeletalMeshComponent*>(SkeletalMeshComp)->UpdateBounds();
-
-  // Get bounds in component space (already includes current animation pose)
-  FBoxSphereBounds Bounds = SkeletalMeshComp->Bounds;
-
-  FVector Origin = FVector::ZeroVector;
-  FVector Extent = Bounds.BoxExtent;
-
-  return {Origin, Extent};
 }
 
 // TODO: update to calculate current animation pose

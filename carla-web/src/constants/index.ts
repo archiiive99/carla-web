@@ -1,5 +1,3 @@
-// 42. Centralize all magic numbers and defaults
-
 import { getDefaultBridgeUrl } from "@/lib/bridge-url";
 
 export const BRIDGE_URL_DEFAULT = getDefaultBridgeUrl();
