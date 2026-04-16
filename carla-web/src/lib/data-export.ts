@@ -17,11 +17,11 @@ export function saveCanvasAsPng(
   }, "image/png");
 }
 
-function savePointCloudAsPly(
+export function saveLidarAsPly(
   positions: Float32Array,
-  colors: Float32Array | null,
+  colors: Float32Array,
   pointCount: number,
-  filename = "pointcloud.ply",
+  filename = "lidar_cloud.ply",
 ): void {
   const header = [
     "ply",
@@ -30,7 +30,9 @@ function savePointCloudAsPly(
     "property float x",
     "property float y",
     "property float z",
-    ...(colors ? ["property uchar red", "property uchar green", "property uchar blue"] : []),
+    "property uchar red",
+    "property uchar green",
+    "property uchar blue",
     "end_header",
   ].join("\n");
 
@@ -43,14 +45,10 @@ function savePointCloudAsPly(
     const x = (positions[i * 3] ?? 0).toFixed(6);
     const y = (positions[i * 3 + 1] ?? 0).toFixed(6);
     const z = (positions[i * 3 + 2] ?? 0).toFixed(6);
-    if (colors) {
-      const r = Math.round((colors[i * 3] ?? 0) * 255);
-      const g = Math.round((colors[i * 3 + 1] ?? 0) * 255);
-      const b = Math.round((colors[i * 3 + 2] ?? 0) * 255);
-      lines.push(`${x} ${y} ${z} ${r} ${g} ${b}`);
-    } else {
-      lines.push(`${x} ${y} ${z}`);
-    }
+    const r = Math.round((colors[i * 3] ?? 0) * 255);
+    const g = Math.round((colors[i * 3 + 1] ?? 0) * 255);
+    const b = Math.round((colors[i * 3 + 2] ?? 0) * 255);
+    lines.push(`${x} ${y} ${z} ${r} ${g} ${b}`);
   }
 
   const blob = new Blob([lines.join("\n")], { type: "application/octet-stream" });
@@ -60,15 +58,6 @@ function savePointCloudAsPly(
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
-}
-
-export function saveLidarAsPly(
-  positions: Float32Array,
-  colors: Float32Array,
-  pointCount: number,
-  filename = "lidar_cloud.ply",
-): void {
-  savePointCloudAsPly(positions, colors, pointCount, filename);
 }
 
 export interface ImuCsvSample {
