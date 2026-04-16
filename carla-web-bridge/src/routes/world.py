@@ -29,30 +29,35 @@ def _require_connection() -> None:
 
 
 # --- Weather presets (CARLA built-in) ---
-WEATHER_PRESETS: dict[str, str] = {
-    "ClearNoon": "ClearNoon",
-    "CloudyNoon": "CloudyNoon",
-    "WetNoon": "WetNoon",
-    "WetCloudyNoon": "WetCloudyNoon",
-    "MidRainyNoon": "MidRainyNoon",
-    "HardRainNoon": "HardRainNoon",
-    "SoftRainNoon": "SoftRainNoon",
-    "ClearSunset": "ClearSunset",
-    "CloudySunset": "CloudySunset",
-    "WetSunset": "WetSunset",
-    "WetCloudySunset": "WetCloudySunset",
-    "MidRainSunset": "MidRainSunset",
-    "HardRainSunset": "HardRainSunset",
-    "SoftRainSunset": "SoftRainSunset",
-    "ClearNight": "ClearNight",
-    "CloudyNight": "CloudyNight",
-    "WetNight": "WetNight",
-    "WetCloudyNight": "WetCloudyNight",
-    "SoftRainNight": "SoftRainNight",
-    "MidRainyNight": "MidRainyNight",
-    "HardRainNight": "HardRainNight",
-    "DustStorm": "DustStorm",
-}
+# Ordered tuple so /api/world/weather/presets returns presets in a
+# UX-sensible Noon → Sunset → Night progression. Previously a
+# `dict[str, str]` whose values just duplicated the keys — every
+# consumer used it as an ordered set (membership test + .keys()), so
+# the redundant values were dead weight.
+WEATHER_PRESETS: tuple[str, ...] = (
+    "ClearNoon",
+    "CloudyNoon",
+    "WetNoon",
+    "WetCloudyNoon",
+    "MidRainyNoon",
+    "HardRainNoon",
+    "SoftRainNoon",
+    "ClearSunset",
+    "CloudySunset",
+    "WetSunset",
+    "WetCloudySunset",
+    "MidRainSunset",
+    "HardRainSunset",
+    "SoftRainSunset",
+    "ClearNight",
+    "CloudyNight",
+    "WetNight",
+    "WetCloudyNight",
+    "SoftRainNight",
+    "MidRainyNight",
+    "HardRainNight",
+    "DustStorm",
+)
 
 
 @router.get("/maps")
@@ -139,7 +144,7 @@ async def set_weather(req: SetWeatherRequest):
 
 @router.get("/weather/presets")
 async def list_weather_presets():
-    return {"presets": list(WEATHER_PRESETS.keys())}
+    return {"presets": list(WEATHER_PRESETS)}
 
 
 @router.get("/spectator")
