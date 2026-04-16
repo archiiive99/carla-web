@@ -75,6 +75,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-13-revisit-pose-coverage  Add chase/birdseye/intersection poses to compare.py POSES  (✅ — 3 new poses each produce numeric output + visually sensible framing; closed 2026-04-15T09:31+~35min)
 [x] iter-09-revisit-headlight-cone  Ego SpotLight cone shape tune  (✅ — angle 0.45→0.35, penumbra 0.45→0.35, distance 40→55, intensity 4→5; midday-pose byte-identical since EgoHeadlights returns null; closed 2026-04-16T09:14:00Z+~15min)
 [x] iter-11-revisit-fog-altitude-tint  Sun-altitude-driven fog hue/sat ramp  (✅ — HSL(210,4%) at noon → HSL(30,18%) at horizon; linear altFactor interp; byte-identical at midday pose by construction; closed 2026-04-16T09:29:00Z+~18min)
+[x] iter-03-revisit-paint-gloss  Vehicle paint PBR toward automotive-glossy  (✅ — roughness 0.45→0.3, metalness 0.5→0.35, envMapIntensity 0.5→0.7; ROI road-only so numbers within noise; closed 2026-04-16T09:40:00Z+~15min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 

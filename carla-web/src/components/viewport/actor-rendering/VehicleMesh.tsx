@@ -30,9 +30,9 @@ function GltfVehicleModel({ path, paintColor }: { path: string; paintColor: stri
           // Replace the UE5-leftover default with a real PBR paint.
           const paintMat = new THREE.MeshStandardMaterial({
             color: new THREE.Color(paintColor),
-            roughness: 0.45,
-            metalness: 0.5,
-            envMapIntensity: 0.5,
+            roughness: 0.3,
+            metalness: 0.35,
+            envMapIntensity: 0.7,
           });
           child.material = paintMat;
           child.userData.paintMatRef = paintMat;
