@@ -189,7 +189,14 @@ class WebSocketBroadcaster:
             # marks this as bridge-internal metadata; a buggy or hostile
             # client sending "_recv_ts" in the payload could otherwise freeze
             # the value and defeat adaptive_rate's stats dedup token).
-            msg["_recv_ts"] = time.time()
+            # time.monotonic() not time.time(): _recv_ts is the arrival-ID
+            # inside the stats-dedup token, so it only has to be unique
+            # per arrival. Wall-clock jumps (NTP correction, manual step)
+            # can make time.time() non-monotonic, and a backwards step
+            # could make a new arrival's _recv_ts collide with a previous
+            # arrival's token — the dedup check would then SKIP the new
+            # stats, muting adaptive-rate decisions until the next change.
+            msg["_recv_ts"] = time.monotonic()
             conn.last_stats = msg
         elif action == "set_rate" and sensor_id is not None:
             target = msg.get("target_fps")
@@ -251,7 +258,9 @@ class WebSocketBroadcaster:
                 parsed = json.loads(payload)
                 if isinstance(parsed, dict):
                     # Overwrite, not setdefault — see text CLIENT_STATS branch.
-                    parsed["_recv_ts"] = time.time()
+                    # time.monotonic() matches the text handler for the same
+                    # clock-jump reason (see that comment).
+                    parsed["_recv_ts"] = time.monotonic()
                     conn.last_stats = parsed
             except (json.JSONDecodeError, IndexError):
                 pass
