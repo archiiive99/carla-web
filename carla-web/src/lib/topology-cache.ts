@@ -28,19 +28,21 @@ export async function getTopologyCached(mapName: string): Promise<TopologyEdge[]
   const promise = carlaApi
     .getTopology()
     .then((edges) => {
-      // Cache only if invalidate hasn't run since we started. Otherwise the
-      // response arrives after the world has moved on (e.g. loadMap(Town02)
-      // fired while a Town01 fetch was in flight) and we'd pollute the
-      // cache with stale edges for a map the user is no longer on. Still
-      // return the edges to the caller — they requested this specific map.
-      if (inflight?.map === mapName) {
+      // Commit to cache only when WE are still the active inflight. The
+      // map-name check alone had a subtle race: invalidate + a new same-map
+      // request installs a DIFFERENT promise under the same map key, so
+      // comparing by `map === mapName` would let this stale response
+      // cache-write AND clear the new request's inflight tracker —
+      // stranding the new promise without a cache commit on resolve.
+      // Compare by promise identity instead.
+      if (inflight?.promise === promise) {
         cache = { map: mapName, edges };
         inflight = null;
       }
       return edges;
     })
     .catch((e) => {
-      if (inflight?.map === mapName) inflight = null;
+      if (inflight?.promise === promise) inflight = null;
       throw e;
     });
   inflight = { map: mapName, promise };
