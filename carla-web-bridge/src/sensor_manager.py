@@ -633,7 +633,15 @@ class SensorManager:
         if packet is None:
             return
 
-        self._loop.call_soon_threadsafe(self._enqueue_packet, sensor_id, packet)
+        # call_soon_threadsafe raises RuntimeError on a closed loop. During
+        # bridge shutdown the loop tears down before CARLA stops firing
+        # sensor callbacks, so without this guard the RuntimeError
+        # propagates into CARLA's internal thread and prints a traceback.
+        # A closed loop means frames can't be delivered anyway — skip.
+        try:
+            self._loop.call_soon_threadsafe(self._enqueue_packet, sensor_id, packet)
+        except RuntimeError:
+            pass
 
     def _enqueue_packet(self, sensor_id: int, packet: SensorPacket) -> None:
         queue = self._sensor_queues.get(sensor_id)
