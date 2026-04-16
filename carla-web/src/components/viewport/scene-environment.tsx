@@ -242,13 +242,23 @@ export function WeatherLighting({
   const nightFactor = Math.max(0, Math.min(1, -sunAlt / (Math.PI / 4)));
   const fillBoost = 0.12 + cloudFactor * 0.28 + nightFactor * 0.06;
   const ambientBase = 0.02 + cloudFactor * 0.05 + nightFactor * 0.03;
-  // Preetham→SkyAtmosphere parity (iter-05 Path A): bumped turbidity floor
-  // dilutes Preetham's saturated mid-altitude blue toward UE5
-  // SkyAtmosphereComponent's less-saturated output. Iter-01 ROI showed
-  // R/B inversion (UE5 warm 1.46, web cool 0.55); raising turbidity narrows
-  // the sky-blue dominance so IBL captures less cool fill.
-  const turbidity = 3 + weather.cloudiness / 8;
-  const rayleigh = Math.max(0.15, 0.4 - cloudFactor * 0.25);
+  // iter-05 Path A: bumped turbidity floor dilutes Preetham's
+  // saturated mid-altitude blue toward UE5 SkyAtmosphere output.
+  //
+  // iter-05-revisit-pathB (scoped Hosek-Wilkie approximation): the key
+  // Hosek improvement over Preetham is smoother horizon behavior at
+  // low sun — more atmospheric scattering near the horizon. Add an
+  // altitude-dependent boost to both turbidity and rayleigh that
+  // ramps from 0 (sun high) to significant (sun at horizon). At
+  // sun_alt=60 the formula matches Path A exactly (no regression);
+  // at sun_alt=0 turbidity gets +4 and rayleigh +0.3 which widens
+  // the warm-orange horizon glow Preetham misses. True Hosek needs
+  // precomputed coefficient tables (iter-05-revisit-pathB-full);
+  // this minimal approximation captures the perceptual improvement.
+  const altFactor = Math.max(0, Math.min(60, weather.sun_altitude_angle ?? 60)) / 60;
+  const horizonScatter = 1 - altFactor;
+  const turbidity = 3 + weather.cloudiness / 8 + horizonScatter * 4;
+  const rayleigh = Math.max(0.15, 0.4 - cloudFactor * 0.25 + horizonScatter * 0.3);
   // Sun color temperature shift with altitude. Horizon ≈ 5000K (warm
   // amber), zenith ≈ 5800K (slightly warm white). Matches UE5
   // SkyAtmosphere's sun-disc color shift; eliminates the iter-01 gap
