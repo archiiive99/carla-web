@@ -61,10 +61,12 @@ export function MapControls() {
   const [layerBusy, setLayerBusy] = useState<string | null>(null);
 
   const toggleLayer = useCallback(async (key: string) => {
-    // noUncheckedIndexedAccess types arbitrary-key lookups as T|undefined —
-    // a layer the user hasn't toggled yet is absent from the record.
-    // Treat missing as false (the starting "unloaded" default).
-    const current = enabledLayers[key] ?? false;
+    // Mirror the render fallback (see `?? true` below): CARLA ships every
+    // layer loaded by default, so a key not yet in the record should read
+    // as loaded. A `?? false` here would flip the very first click into
+    // a redundant "load" request on an already-loaded layer instead of
+    // the expected "unload" the user clicked to perform.
+    const current = enabledLayers[key] ?? true;
     const next = !current;
     setEnabledLayers((prev) => ({ ...prev, [key]: next }));
     setLayerBusy(key);
