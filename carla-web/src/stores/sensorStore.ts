@@ -100,10 +100,17 @@ export const useSensorStore = create<SensorState>((set, get) => ({
   },
 
   destroySensor: async (sensorId) => {
-    // Unsubscribe first
+    // Destroy FIRST, then unsubscribe from the worker. Previously the
+    // unsubscribe went out before the API call — if destroy failed, the
+    // worker's desiredSubscriptions had already dropped the id, so on
+    // the next WS reconnect we wouldn't re-subscribe to a sensor that
+    // was still alive on the bridge. Result: sensorStore still said
+    // "Subscribed", but no frames flowed (worker-side forget + server-
+    // side alive mismatch). Let the API call's error propagate to the
+    // caller without having touched the worker's subscription state.
+    await carlaApi.destroyActor(sensorId);
     const worker = getGlobalWsWorker();
     worker?.postMessage({ type: "unsubscribe", data: { sensorId } });
-    await carlaApi.destroyActor(sensorId);
     set((state) => {
       const sensors = new Map(state.sensors);
       sensors.delete(sensorId);
