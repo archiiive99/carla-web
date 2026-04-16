@@ -342,7 +342,19 @@ export function WeatherLighting({
           fillBoost,
         ]}
       />
-      <ambientLight intensity={ambientBase} color={isNight ? "#6a7080" : "#ffffff"} />
+      <ambientLight
+        intensity={ambientBase}
+        // iter-11-revisit-ambient-cloud-cool: day ambient cools with
+        // cloudiness from #ffffff (clear) to #c8d0da (overcast). Night
+        // branch unchanged at #6a7080.
+        color={
+          isNight
+            ? "#6a7080"
+            : `#${new THREE.Color()
+                .lerpColors(new THREE.Color(0xffffff), new THREE.Color(0xc8d0da), cloudFactor)
+                .getHexString()}`
+        }
+      />
       <Sky
         sunPosition={[sunX, sunY, sunZ]}
         turbidity={turbidity}
