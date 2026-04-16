@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 36 rows ✅, 7 rows ⚠️, 8 rows queued. §6.5 raise still active.
+**Summary:** 37 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -51,6 +51,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 07-revisit-wind | Foliage vertex-shader wind sway | **✅** | 16.70 | 0.3064 | 21.87 | ~40 min | 5b886e6b9 |
 | 11-revisit-auto-exposure | Spotlight-count heuristic (reverted) | ⚠️ §6.3 | 15.15 | 0.2987 | 23.19 | ~35 min | ded15af2c |
 | 06-revisit-csm | Adaptive ortho shadow frustum | **✅** | 16.71 | 0.3063 | 21.86 | ~20 min | 7a139627e |
+| 03-revisit-coverage | 16 CARLA-0.10 blueprint aliases | **✅** | 16.70 | 0.3063 | 21.87 | ~20 min | 213f83b50 |
 
 ## Notes
 
