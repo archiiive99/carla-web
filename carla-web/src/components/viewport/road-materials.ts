@@ -210,7 +210,7 @@ export function createRoadMaterial(baseHex: string, junction: boolean) {
           // asphalt so the wear pattern doesn't echo the road texture
           // repetition. High threshold means rare, visible chips.
           float grunge = texture2D(uMarkingGrunge, wXZ * ${GRUNGE_TILE}).r;
-          float wear = 1.0 - smoothstep(0.35, 0.85, grunge) * 0.65;
+          float wear = 1.0 - smoothstep(0.35, 0.85, grunge) * 0.50;
           stripeMask *= wear;
 
           vec3 paint = mix(paintColor, paintColor * 0.55, rFbm(wXZ * 4.0) * 0.30);
@@ -289,7 +289,7 @@ export function createRoadMaterial(baseHex: string, junction: boolean) {
           // reverts to asphalt roughness rather than keeping a glossy
           // roughness reading under a faded stripe.
           float grungeR = texture2D(uMarkingGrunge, vRoadWorldPos.xz * ${GRUNGE_TILE}).r;
-          float wearR = 1.0 - smoothstep(0.35, 0.85, grungeR) * 0.65;
+          float wearR = 1.0 - smoothstep(0.35, 0.85, grungeR) * 0.50;
           paintMask *= wearR;
           roughnessFactor = mix(roughnessFactor, 0.38, paintMask);
 
