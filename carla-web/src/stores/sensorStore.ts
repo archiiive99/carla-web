@@ -191,6 +191,28 @@ export const useSensorStore = create<SensorState>((set, get) => ({
       pendingSubscriptions = new Set(pendingSubscriptions);
       for (const id of pendingStale) pendingSubscriptions.delete(id);
     }
+    // Tell the ws-receiver worker about each stale id we dropped. The
+    // store and the worker's `desiredSubscriptions` must stay in sync —
+    // previously only the store side pruned, so the worker kept the dead
+    // ids and re-subscribed to them on every WS reconnect ("Subscribe
+    // ignored for unknown sensor N" warnings on the bridge). Sending the
+    // unsubscribe messages while still connected is also a no-op on the
+    // bridge since those sensors are already destroyed; the value is
+    // keeping the worker's internal set aligned with reality.
+    if (subsStale.length > 0) {
+      const worker = getGlobalWsWorker();
+      if (worker) {
+        for (const id of subsStale) {
+          try {
+            worker.postMessage({ type: "unsubscribe", data: { sensorId: id } });
+          } catch {
+            // Worker terminated between getGlobalWsWorker and postMessage
+            // (bridge URL race) — swallow; the new worker starts fresh
+            // with an empty desiredSubscriptions anyway.
+          }
+        }
+      }
+    }
     set({ sensors, subscriptions, pendingSubscriptions });
   },
 }));
