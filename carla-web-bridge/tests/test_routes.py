@@ -487,3 +487,72 @@ def test_apply_control_disables_autopilot_before_vehicle_control(monkeypatch):
             },
         ),
     ]
+
+
+def test_apply_control_rejects_non_vehicle_actor(monkeypatch):
+    """apply_vehicle_control returns 400 when the target isn't a vehicle
+    (pinned in test_control_helpers for the helper; this re-asserts the
+    wiring through the route so a refactor doesn't silently drop it)."""
+    import src.routes.actors as actors_routes
+
+    fake_manager = SimpleNamespace(
+        is_connected=True,
+        world=SimpleNamespace(
+            get_actor=lambda _aid: SimpleNamespace(type_id="walker.pedestrian.0043")
+        ),
+    )
+    monkeypatch.setattr(actors_routes, "carla_manager", fake_manager)
+    monkeypatch.setitem(
+        sys.modules, "carla", SimpleNamespace(VehicleControl=lambda **kw: kw)
+    )
+
+    resp = client.post("/api/actors/5/control", json={"throttle": 0.5})
+    assert resp.status_code == 400
+    assert resp.json()["detail"] == "Actor is not a vehicle"
+
+
+def test_set_autopilot_rejects_non_vehicle_actor(monkeypatch):
+    """set_autopilot inherits the same type guard added in commit
+    8ae22fb8f — 400 instead of 500 when called on a walker/sensor."""
+    import src.routes.actors as actors_routes
+
+    fake_manager = SimpleNamespace(
+        is_connected=True,
+        world=SimpleNamespace(
+            get_actor=lambda _aid: SimpleNamespace(
+                type_id="walker.pedestrian.0043",
+                set_autopilot=lambda *_a, **_kw: (_ for _ in ()).throw(
+                    AssertionError("set_autopilot should be blocked before CARLA call")
+                ),
+            )
+        ),
+    )
+    monkeypatch.setattr(actors_routes, "carla_manager", fake_manager)
+
+    resp = client.post("/api/actors/5/autopilot", json={"enabled": True})
+    assert resp.status_code == 400
+    assert resp.json()["detail"] == "Actor is not a vehicle"
+
+
+def test_set_lights_rejects_non_vehicle_actor(monkeypatch):
+    import src.routes.actors as actors_routes
+
+    fake_manager = SimpleNamespace(
+        is_connected=True,
+        world=SimpleNamespace(
+            get_actor=lambda _aid: SimpleNamespace(
+                type_id="sensor.camera.rgb",
+                set_light_state=lambda *_a, **_kw: (_ for _ in ()).throw(
+                    AssertionError("set_light_state should be blocked before CARLA call")
+                ),
+            )
+        ),
+    )
+    monkeypatch.setattr(actors_routes, "carla_manager", fake_manager)
+    monkeypatch.setitem(
+        sys.modules, "carla", SimpleNamespace(VehicleLightState=lambda x: x)
+    )
+
+    resp = client.post("/api/actors/5/lights", json={"light_state": 0})
+    assert resp.status_code == 400
+    assert resp.json()["detail"] == "Actor is not a vehicle"
