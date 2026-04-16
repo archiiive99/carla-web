@@ -169,7 +169,8 @@ export function RecordingControls() {
                 <Button
                   size="sm"
                   onClick={handleStartRecording}
-                  title="Start recording"
+                  disabled={!filename.trim()}
+                  title={filename.trim() ? "Start recording" : "Enter a filename first"}
                   aria-label="Start recording"
                 >
                   <Circle className="size-3 fill-current" aria-hidden="true" />
