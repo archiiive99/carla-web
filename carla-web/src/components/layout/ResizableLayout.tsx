@@ -16,22 +16,35 @@ const LAYOUT_VERSION = 5;
 const STORAGE_KEY_H = `carla-layout-h-v${LAYOUT_VERSION}`;
 const STORAGE_KEY_V = `carla-layout-v-v${LAYOUT_VERSION}`;
 
-function getSavedLayout(key: string): Layout | undefined {
+// Per-panel minSize floors for the sanity check below. Must track the
+// minSize= props on each ResizablePanel in this file — if a saved value
+// is non-zero but below the panel's minSize, the layout restores to a
+// sliver (collapsible panels accept 0 = collapsed, so only values in
+// the open range (0, minSize) are the bad-sliver case).
+const H_MIN_CONSTRAINTS: Record<string, number> = { left: 10, right: 18 };
+const V_MIN_CONSTRAINTS: Record<string, number> = { bottom: 15 };
+
+function getSavedLayout(
+  key: string,
+  minConstraints: Record<string, number>,
+): Layout | undefined {
   if (typeof window === "undefined") return undefined;
   try {
     const saved = localStorage.getItem(key);
     if (saved) {
       const layout = JSON.parse(saved) as Layout;
-      // Sanity check: the horizontal layout's "left" panel is collapsible
-      // with minSize=10. Layouts saved with left < 10 collapse the actor
-      // list to a sliver; drop the stored value and fall back to defaults.
-      // (Previously this read `Object.values(layout)[0]`, which works only
-      // while insertion order happens to put "left" first — fragile across
-      // browsers/serializers.)
-      const leftSize = layout["left"];
-      if (typeof leftSize === "number" && leftSize < 10) {
-        localStorage.removeItem(key);
-        return undefined;
+      // Sanity check: reject any panel whose saved size is in the
+      // sliver range (0, minSize). Previously this only checked the
+      // horizontal layout's "left" — vertical layouts could persist a
+      // tiny "bottom" that the check missed, and the legacy version
+      // before THAT read `Object.values(layout)[0]` which worked only
+      // because insertion order happened to put "left" first.
+      for (const [panel, minSize] of Object.entries(minConstraints)) {
+        const size = layout[panel];
+        if (typeof size === "number" && size > 0 && size < minSize) {
+          localStorage.removeItem(key);
+          return undefined;
+        }
       }
       return layout;
     }
@@ -95,7 +108,7 @@ export function ResizableLayout() {
   return (
     <ResizablePanelGroup
       orientation="horizontal"
-      defaultLayout={getSavedLayout(STORAGE_KEY_H)}
+      defaultLayout={getSavedLayout(STORAGE_KEY_H, H_MIN_CONSTRAINTS)}
       onLayoutChanged={onHorizontalLayoutChanged}
     >
       {/* Left Panel — Actor list, spawn controls */}
@@ -120,7 +133,7 @@ export function ResizableLayout() {
       <ResizablePanel id="center" defaultSize={61} minSize={40}>
         <ResizablePanelGroup
           orientation="vertical"
-          defaultLayout={getSavedLayout(STORAGE_KEY_V)}
+          defaultLayout={getSavedLayout(STORAGE_KEY_V, V_MIN_CONSTRAINTS)}
           onLayoutChanged={onVerticalLayoutChanged}
         >
           <ResizablePanel id="viewport" defaultSize={70} minSize={30}>
