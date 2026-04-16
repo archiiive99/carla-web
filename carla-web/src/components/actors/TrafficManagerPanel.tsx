@@ -1,5 +1,5 @@
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -28,6 +28,7 @@ import { useActorStore } from "@/stores/actorStore";
 import { useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
 import { reportError } from "@/lib/utils";
+import { WEATHER_SLIDER_DEBOUNCE_MS } from "@/constants";
 
 export function TrafficManagerPanel() {
   const isConnected = useIsConnected();
@@ -56,13 +57,26 @@ export function TrafficManagerPanel() {
     }
   }, [autoLaneChange]);
 
+  // Debounce the /api/traffic/global-speed write. A drag spans ~60 onValueChange
+  // events per second; without this, every frame of the drag fired a REST call
+  // the bridge couldn't keep up with. Match WeatherControls' 300ms window so
+  // slider behavior feels consistent across the two popovers.
+  const speedDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (speedDebounceRef.current) clearTimeout(speedDebounceRef.current);
+    };
+  }, []);
+
   const handleGlobalSpeed = useCallback((value: number | readonly number[]) => {
     const v = Array.isArray(value) ? value[0] : value;
     setGlobalSpeedPct(v);
-    // Slider drag produces many value changes per second; silent-swallow is
-    // intentional here (matches VehicleDetails slider behavior) so a
-    // transient bridge hiccup doesn't spam toasts while the user drags.
-    carlaApi.setGlobalSpeed(v).catch(() => {});
+    if (speedDebounceRef.current) clearTimeout(speedDebounceRef.current);
+    speedDebounceRef.current = setTimeout(() => {
+      // Silent-swallow on failure matches VehicleDetails slider behavior —
+      // a transient bridge hiccup shouldn't spam toasts while the user drags.
+      carlaApi.setGlobalSpeed(v).catch(() => {});
+    }, WEATHER_SLIDER_DEBOUNCE_MS);
   }, []);
 
   return (
