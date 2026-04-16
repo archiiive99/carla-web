@@ -36,6 +36,11 @@ export function OpenDriveViewer({ className }: OpenDriveViewerProps) {
   const viewRef = useRef({ cx: 0, cy: 0, zoom: 0.5 });
   const draggingRef = useRef(false);
   const lastMouseRef = useRef({ x: 0, y: 0 });
+  // Cache the last-seen CSS rect so the useAnimationFrame loop doesn't
+  // reassign canvas.width/height every frame — the assignment forces a
+  // layout sync and internally resets the backing store, both wasted
+  // when size is unchanged (which is the 60fps steady state).
+  const lastRectRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
 
   const currentMap = useSimulationStore((s) => s.currentMap);
   const isConnected = useIsConnected();
@@ -64,10 +69,19 @@ export function OpenDriveViewer({ className }: OpenDriveViewerProps) {
 
     const rect = canvas.getBoundingClientRect();
     const dpr = devicePixelRatio;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    if (
+      rect.width !== lastRectRef.current.w ||
+      rect.height !== lastRectRef.current.h
+    ) {
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      lastRectRef.current = { w: rect.width, h: rect.height };
+    }
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    // Reset the transform before applying DPR scale each frame, since we
+    // no longer force a backing-store reset by reassigning width/height.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
 
     const w = rect.width;
