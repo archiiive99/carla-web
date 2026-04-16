@@ -17,6 +17,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { Download } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useImuSensorData } from "@/hooks/useSensorData";
 import { saveImuAsCsv } from "@/lib/data-export";
@@ -123,7 +124,13 @@ export default function ImuChart({ sensorId, className }: ImuChartProps) {
       gyro: sample.gyro,
       compass: sample.compass,
     }));
-    if (samples.length === 0) return;
+    // Surface the no-data case instead of a silent no-op — matches the
+    // feedback LidarView.handleExport now gives. Clicking Export before
+    // the first IMU frame arrived looked like a broken button otherwise.
+    if (samples.length === 0) {
+      toast.error("No IMU data to export — waiting for first sample");
+      return;
+    }
     saveImuAsCsv(samples, `imu_${sensorId}.csv`);
   };
 

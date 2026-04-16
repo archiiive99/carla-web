@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/context-menu";
 import { Download } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { useLidarSensorData } from "@/hooks/useSensorData";
@@ -31,7 +32,12 @@ export default function LidarView({ sensorId, className }: LidarViewProps) {
     const positions = positionsRef.current;
     const colors = colorsRef.current;
     const count = liveCountRef.current;
-    if (!positions || !colors || count <= 0) return;
+    // Tell the user when Export is pressed before any frame has arrived
+    // — a silent no-op looked like a broken button.
+    if (!positions || !colors || count <= 0) {
+      toast.error("No LiDAR data to export — waiting for first frame");
+      return;
+    }
     saveLidarAsPly(positions, colors, count, `lidar_${sensorId}.ply`);
   };
 
