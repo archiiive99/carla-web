@@ -138,8 +138,6 @@ interface ImuSample {
 }
 
 export function useImuSensorData(sensorId: number) {
-  const accelRef = useRef({ x: 0, y: 0, z: 0 });
-  const gyroRef = useRef({ x: 0, y: 0, z: 0 });
   const compassRef = useRef(0);
   const bufferRef = useRef<ImuSample[]>([]);
 
@@ -160,8 +158,6 @@ export function useImuSensorData(sensorId: number) {
         z: v.getFloat32(36, true),
       };
       const compass = v.getFloat32(40, true);
-      accelRef.current = accel;
-      gyroRef.current = gyro;
       compassRef.current = compass;
       // Store compass per-sample so CSV export preserves the heading
       // at each reading time. Without this, ImuChart.handleExport wrote
@@ -171,14 +167,12 @@ export function useImuSensorData(sensorId: number) {
       if (bufferRef.current.length > IMU_BUFFER_MAX_SAMPLES) bufferRef.current.shift();
     },
     () => {
-      accelRef.current = { x: 0, y: 0, z: 0 };
-      gyroRef.current = { x: 0, y: 0, z: 0 };
       compassRef.current = 0;
       bufferRef.current = [];
     },
   );
 
-  return { accelRef, gyroRef, compassRef, bufferRef };
+  return { compassRef, bufferRef };
 }
 
 // --- GNSS ---
