@@ -103,6 +103,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-06-revisit-hemi-sky-fog  Hemisphere sky-color lerp with fog-density  (✅ — lerp #a5a8ae→#c0c2c7 on fogFactor; midday byte-identical (fog_density=0); closed 2026-04-16T13:36:00Z+~10min)
 [x] iter-04-revisit-yellow-stripe-brighten  Centerline yellow +5%  (✅ — (0.94,0.74,0.18)→(0.98,0.78,0.22) matches iter-04-revisit-stripe-brightness +6% bump; iter-01 road is white-centerline so metrics unchanged; closed 2026-04-16T13:42:00Z+~8min)
 [x] iter-06-revisit-hemi-ground-fog  Hemisphere ground-color fog lerp  (✅ — chained second lerp toward #6a6565 on fogFactor after altitude lerp; midday byte-identical; closed 2026-04-16T13:47:00Z+~8min)
+[x] iter-08-revisit-arm-stride-speed  Arm swing amp scales with walker speed  (✅ — armScale 0.7-1.2 by speed clamped 2.5 m/s; leg swing unchanged (phase already speed-coupled); midday byte-identical; closed 2026-04-16T13:52:00Z+~8min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 

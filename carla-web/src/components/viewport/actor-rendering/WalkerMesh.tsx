@@ -99,8 +99,12 @@ export const WalkerMesh = memo(function WalkerMesh({
     walkPhaseRef.current += delta * speed * 1.8;
     // Natural gait: arms swing narrower than legs. Split amplitudes
     // so arms read as counter-balance rather than matching leg stride.
+    // iter-08-revisit-arm-stride-speed: arm amp scales 0.7x-1.2x with
+    // walker speed (clamped at 2.5 m/s) so slow stroll vs fast-pace
+    // reads as different gait energy.
+    const armScale = 0.7 + Math.min(speed, 2.5) / 2.5 * 0.5;
     const phaseSin = Math.sin(walkPhaseRef.current);
-    const armSwing = phaseSin * 0.35;
+    const armSwing = phaseSin * 0.35 * armScale;
     const legSwing = phaseSin * 0.55;
     // iter-08-revisit-bob: body rises + falls twice per stride (plants
     // are upward-only → |sin(2φ)|). 3 cm peak amplitude.
