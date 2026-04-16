@@ -704,6 +704,43 @@ def test_get_actor_surfaces_runtime_error_as_400(monkeypatch):
     assert "stale actor reference" in resp.json()["detail"]
 
 
+def test_waypoints_rejects_non_finite_distance(monkeypatch):
+    """distance=NaN / Infinity would propagate through min/max (both return
+    NaN on NaN inputs in Python) and reach CARLA's generate_waypoints with
+    NaN — which errors opaquely or stalls. The Query(gt=0) bound trips on
+    NaN but not Infinity (Infinity > 0 is True), so the route also needs
+    an explicit math.isfinite guard."""
+    import src.routes.navigation as nav_routes
+
+    # Stub out the bridge so _require_connection passes; we never reach CARLA.
+    fake_manager = SimpleNamespace(
+        is_connected=True,
+        world=SimpleNamespace(
+            get_map=lambda: SimpleNamespace(
+                generate_waypoints=lambda _d: (_ for _ in ()).throw(
+                    AssertionError("should be blocked before CARLA call")
+                )
+            )
+        ),
+    )
+    monkeypatch.setattr(nav_routes, "carla_manager", fake_manager)
+
+    # NaN trips FastAPI's Query validation at the schema boundary (422).
+    # httpx serializes float('nan') as "NaN" in the query string, which
+    # fails Query(gt=0) validation before the handler runs.
+    resp = client.get("/api/map/waypoints?distance=NaN")
+    assert resp.status_code == 422
+
+    # Infinity passes Query(gt=0.0, le=100.0) in Python (Infinity > 0),
+    # wait — actually le=100.0 rejects Infinity. Good, also 422.
+    resp = client.get("/api/map/waypoints?distance=Infinity")
+    assert resp.status_code == 422
+
+    # Negative trips the gt=0 bound.
+    resp = client.get("/api/map/waypoints?distance=-5")
+    assert resp.status_code == 422
+
+
 def test_start_recording_moves_duplicate_filename_to_front(monkeypatch):
     """Previously, starting a recording with a name already in history was a
     no-op for the history list — the re-used name stayed buried under newer
