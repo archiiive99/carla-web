@@ -111,6 +111,13 @@ async def load_map(req: LoadMapRequest) -> Any:
     def _load() -> dict[str, Any]:
         try:
             carla_manager.client.load_world(req.map_name)
+            # Refresh the cached world reference. Without this, the main
+            # _world_tick_loop and any route handler that reads
+            # `carla_manager.world` keeps the pre-load reference — which
+            # errors on tick() until the next 5-second heartbeat catches
+            # up. Users saw the sim freeze for up to 5s after a map load
+            # despite the endpoint returning 200.
+            carla_manager.refresh_world()
             return {"status": "loaded", "map": req.map_name}
         except RuntimeError as e:
             # CARLA raises RuntimeError for invalid map name. Surface the

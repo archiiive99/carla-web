@@ -179,6 +179,12 @@ async def reload_map() -> Any:
     def _reload() -> dict[str, Any]:
         try:
             carla_manager.client.reload_world()
+            # Refresh the cached world reference — see world.load_map for
+            # the rationale. reload_world() replaces the world in CARLA
+            # but carla_manager._world still points at the pre-reload
+            # instance until the next heartbeat; ticks against the stale
+            # reference error out until then.
+            carla_manager.refresh_world()
             return {"status": "reloaded"}
         except RuntimeError as e:
             raise HTTPException(status_code=400, detail=str(e)) from e
