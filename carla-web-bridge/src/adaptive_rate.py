@@ -504,9 +504,15 @@ class RateController:
         if value is None:
             return None
         try:
-            return float(value)
+            result = float(value)
         except (TypeError, ValueError):
             return None
+        # Reject NaN / Infinity too — same reasoning as _finite_or_zero
+        # above. rtt_ms is currently only used in log formatting
+        # (f"{rtt_ms:.1f}" renders NaN as "nan"), but treating it as
+        # "unknown" is the honest shape matching None callers already
+        # handle.
+        return result if math.isfinite(result) else None
 
     @staticmethod
     def _stats_token(raw_stats: Mapping[str, Any]) -> str:
