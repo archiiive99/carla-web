@@ -201,6 +201,19 @@ async def compute_route(req: RouteQueryRequest) -> Any:
 
     def _compute() -> dict[str, Any]:
         try:
+            # Same NaN/Infinity guard as get_nearest_waypoint — Vector3's
+            # x/y/z are plain floats and accept non-finite values that
+            # then propagate into CARLA's Location / GRP planner with
+            # opaque failures. Trip 422 at the boundary.
+            if not all(
+                math.isfinite(v)
+                for v in (req.origin.x, req.origin.y, req.origin.z,
+                          req.destination.x, req.destination.y, req.destination.z)
+            ):
+                raise HTTPException(
+                    status_code=422,
+                    detail="origin and destination coordinates must be finite",
+                )
             import carla
 
             world = carla_manager.world
@@ -247,6 +260,15 @@ async def get_nearest_waypoint(x: float, y: float, z: float = 0.0) -> Any:
 
     def _get() -> dict[str, Any]:
         try:
+            # FastAPI's `float` query param happily accepts NaN / Infinity
+            # (neither fails numeric validation because there's no
+            # gt/le constraint). Without this guard, `carla.Location(x=NaN)`
+            # propagates the NaN through get_waypoint and typically errors
+            # with an opaque message on the CARLA side. Trip a clean 422
+            # at the boundary instead. Matches the same guard on
+            # get_dense_waypoints / get_road_geometry.
+            if not (math.isfinite(x) and math.isfinite(y) and math.isfinite(z)):
+                raise HTTPException(status_code=422, detail="x, y, z must be finite")
             import carla
 
             carla_map = carla_manager.world.get_map()
