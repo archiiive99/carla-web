@@ -150,7 +150,7 @@ def capture_carla_reference(
     import carla  # type: ignore
 
     client = carla.Client(host, port)
-    client.set_timeout(10.0)
+    client.set_timeout(30.0)
     world = client.get_world()
 
     # Force clear/midday by default; iter-12 wetness + iter-09 night

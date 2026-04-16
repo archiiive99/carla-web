@@ -93,6 +93,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-09-revisit-emissive-depth  Emissive intensity ramps by night-depth  (✅ — 1.2 + nightDepth*2.3; pairs with halo-opacity curve; midday byte-identical (sphere unmounted); closed 2026-04-16T12:12:00Z+~10min)
 [x] iter-07-revisit-trunk-vary  Per-instance trunk color variation  (✅ — ±15% value perturbation on TREE_TRUNK in procedural fallback; byte-identical at midday (GltfVegetation primary); closed 2026-04-16T12:19:00Z+~15min)
 [x] iter-06-revisit-sun-kelvin-cloud  Sun Kelvin drops with cloudiness  (✅ — -300K at cloudFactor=1; kelvinToColor handles the shift; midday byte-identical (cloudiness=0 reproduces prior base); closed 2026-04-16T12:28:00Z+~15min)
+[x] iter-08-revisit-bob  Vertical head/torso bob at 2× step rate  (✅ — |sin(2φ)|*0.03 upward-only bob on bodyGroupRef.position.y; compare.py client timeout 10→30s; post-restart reference drift (6.61/0.0627/49.24); edit unreachable at midday no-walker ROI; closed 2026-04-16T12:48:00Z+~70min including recovery)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 

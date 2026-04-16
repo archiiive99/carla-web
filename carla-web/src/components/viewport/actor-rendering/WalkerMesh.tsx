@@ -102,6 +102,12 @@ export const WalkerMesh = memo(function WalkerMesh({
     const phaseSin = Math.sin(walkPhaseRef.current);
     const armSwing = phaseSin * 0.35;
     const legSwing = phaseSin * 0.55;
+    // iter-08-revisit-bob: body rises + falls twice per stride (plants
+    // are upward-only → |sin(2φ)|). 3 cm peak amplitude.
+    if (bodyGroupRef.current) {
+      const bob = Math.abs(Math.sin(walkPhaseRef.current * 2)) * 0.03;
+      bodyGroupRef.current.position.set(pos.x, pos.y + bob, pos.z);
+    }
     if (leftArmRef.current) leftArmRef.current.rotation.x = -armSwing;
     if (rightArmRef.current) rightArmRef.current.rotation.x = armSwing;
     if (leftLegRef.current) leftLegRef.current.rotation.x = legSwing;
