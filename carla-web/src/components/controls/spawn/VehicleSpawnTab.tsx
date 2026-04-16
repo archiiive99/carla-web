@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Car, Shuffle, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useActorStore } from "@/stores/actorStore";
+import { useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
 import { reportError } from "@/lib/utils";
 import type { Blueprint, CarlaTransform } from "@/types/carla";
@@ -29,10 +30,17 @@ function VehicleSpawnTab() {
   const [autopilot, setAutopilot] = useState(false);
   const [spawning, setSpawning] = useState(false);
   const spawnVehicle = useActorStore((s) => s.spawnVehicle);
+  const isConnected = useIsConnected();
 
+  // Gate the blueprint fetch on connection state. The tab lives in the left
+  // panel and mounts before useConnectionHealth completes its first poll, so
+  // an unconditional mount fetch races the connect and fails silently — the
+  // user would then be stuck with the 3-item hardcoded fallback list even
+  // after the bridge comes up. Re-run on connect so the real list loads.
   useEffect(() => {
+    if (!isConnected) return;
     carlaApi.getVehicleBlueprints().then(setBlueprints).catch(() => {});
-  }, []);
+  }, [isConnected]);
 
   const handleRandomSpawnPoint = useCallback(async () => {
     try {

@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { PersonStanding, Shuffle, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useActorStore } from "@/stores/actorStore";
+import { useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
 import { reportError } from "@/lib/utils";
 import type { Blueprint, CarlaTransform } from "@/types/carla";
@@ -27,10 +28,14 @@ function WalkerSpawnTab() {
   const [transform, setTransform] = useState<CarlaTransform>(DEFAULT_TRANSFORM);
   const [spawning, setSpawning] = useState(false);
   const spawnWalker = useActorStore((s) => s.spawnWalker);
+  const isConnected = useIsConnected();
 
+  // Same connection-gate as VehicleSpawnTab: mount-time fetch races the
+  // bridge connect and silently fails with the 2-item hardcoded fallback.
   useEffect(() => {
+    if (!isConnected) return;
     carlaApi.getWalkerBlueprints().then(setBlueprints).catch(() => {});
-  }, []);
+  }, [isConnected]);
 
   const handleRandomSpawnPoint = useCallback(async () => {
     try {
