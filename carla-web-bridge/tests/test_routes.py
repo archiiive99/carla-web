@@ -275,6 +275,46 @@ def test_traffic_status_requires_connection():
     assert resp.status_code == 503
 
 
+def _install_traffic_non_vehicle_stubs(monkeypatch) -> None:
+    """Share the non-vehicle-actor fake across the four TM vehicle routes."""
+    import src.routes.traffic as traffic_routes
+
+    fake_manager = SimpleNamespace(
+        is_connected=True,
+        world=SimpleNamespace(
+            get_actor=lambda _aid: SimpleNamespace(type_id="walker.pedestrian.0043")
+        ),
+        get_traffic_manager=lambda *_a, **_kw: (_ for _ in ()).throw(
+            AssertionError("get_traffic_manager should be blocked before TM call")
+        ),
+    )
+    monkeypatch.setattr(traffic_routes, "carla_manager", fake_manager)
+
+
+def test_tm_set_speed_rejects_non_vehicle(monkeypatch):
+    _install_traffic_non_vehicle_stubs(monkeypatch)
+    resp = client.post("/api/traffic/vehicle/5/speed", json={"speed_diff": 10.0})
+    assert resp.status_code == 400
+    assert resp.json()["detail"] == "Actor is not a vehicle"
+
+
+def test_tm_set_lane_rejects_non_vehicle(monkeypatch):
+    _install_traffic_non_vehicle_stubs(monkeypatch)
+    resp = client.post(
+        "/api/traffic/vehicle/5/lane",
+        json={"auto_lane_change": True, "force_lane_change": False, "lane_offset": 0.0},
+    )
+    assert resp.status_code == 400
+    assert resp.json()["detail"] == "Actor is not a vehicle"
+
+
+def test_tm_set_ignore_rejects_non_vehicle(monkeypatch):
+    _install_traffic_non_vehicle_stubs(monkeypatch)
+    resp = client.post("/api/traffic/vehicle/5/ignore", json={"lights": 0.0})
+    assert resp.status_code == 400
+    assert resp.json()["detail"] == "Actor is not a vehicle"
+
+
 def test_blueprints_vehicles_requires_connection():
     resp = client.get("/api/blueprints/vehicles")
     assert resp.status_code == 503
