@@ -131,9 +131,14 @@ async def step() -> Any:
     _require_connection()
 
     def _step() -> dict[str, Any]:
-        world = carla_manager.world
-        frame = world.tick()
-        return {"frame": frame}
+        try:
+            world = carla_manager.world
+            frame = world.tick()
+            return {"frame": frame}
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_step)
 
@@ -143,7 +148,12 @@ async def get_tick() -> Any:
     _require_connection()
 
     def _get() -> dict[str, Any]:
-        return {"tick": carla_manager.world.get_snapshot().frame}
+        try:
+            return {"tick": carla_manager.world.get_snapshot().frame}
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_get)
 
@@ -153,22 +163,27 @@ async def update_settings(req: SimulationSettings) -> Any:
     _require_connection()
 
     def _update() -> dict[str, Any]:
-        world = carla_manager.world
-        settings = world.get_settings()
-        if req.sync_mode is not None:
-            settings.synchronous_mode = req.sync_mode
-        if req.fixed_delta is not None:
-            settings.fixed_delta_seconds = req.fixed_delta
-        if req.no_rendering is not None:
-            settings.no_rendering_mode = req.no_rendering
-        if req.substepping is not None:
-            settings.substepping = req.substepping
-        if req.max_substep_delta is not None:
-            settings.max_substep_delta_time = req.max_substep_delta
-        if req.max_substeps is not None:
-            settings.max_substeps = req.max_substeps
-        world.apply_settings(settings)
-        return {"status": "updated"}
+        try:
+            world = carla_manager.world
+            settings = world.get_settings()
+            if req.sync_mode is not None:
+                settings.synchronous_mode = req.sync_mode
+            if req.fixed_delta is not None:
+                settings.fixed_delta_seconds = req.fixed_delta
+            if req.no_rendering is not None:
+                settings.no_rendering_mode = req.no_rendering
+            if req.substepping is not None:
+                settings.substepping = req.substepping
+            if req.max_substep_delta is not None:
+                settings.max_substep_delta_time = req.max_substep_delta
+            if req.max_substeps is not None:
+                settings.max_substeps = req.max_substeps
+            world.apply_settings(settings)
+            return {"status": "updated"}
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_update)
 

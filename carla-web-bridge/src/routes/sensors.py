@@ -83,17 +83,24 @@ async def get_sensor_config(sensor_id: int) -> Any:
     _require_connection()
 
     def _get() -> dict[str, Any]:
-        actor = carla_manager.world.get_actor(sensor_id)
-        if actor is None:
-            raise HTTPException(status_code=404, detail=f"Sensor {sensor_id} not found")
-        attrs = {}
-        for attr in actor.attributes:
-            attrs[attr] = actor.attributes[attr]
-        return {
-            "id": sensor_id,
-            "type_id": actor.type_id,
-            "attributes": attrs,
-        }
+        try:
+            actor = carla_manager.world.get_actor(sensor_id)
+            if actor is None:
+                raise HTTPException(status_code=404, detail=f"Sensor {sensor_id} not found")
+            attrs = {}
+            for attr in actor.attributes:
+                attrs[attr] = actor.attributes[attr]
+            return {
+                "id": sensor_id,
+                "type_id": actor.type_id,
+                "attributes": attrs,
+            }
+        except HTTPException:
+            raise
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_get)
 
