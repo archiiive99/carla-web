@@ -179,7 +179,7 @@ export function createRoadMaterial(baseHex: string, junction: boolean) {
           // directional-light / tree-shadow parity problem for a later
           // iteration, not this one's scope.
           asphalt *= vec3(1.20, 1.02, 0.82);
-          asphalt *= 0.72;
+          asphalt *= 0.78;
 
           // === Lane markings (procedural shape, textured wear overlay) ===
           // Shape calculation stays procedural so marking positions follow
