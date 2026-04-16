@@ -704,6 +704,68 @@ def test_get_actor_surfaces_runtime_error_as_400(monkeypatch):
     assert "stale actor reference" in resp.json()["detail"]
 
 
+def test_set_transform_rejects_non_finite_coordinates(monkeypatch):
+    """dict_to_carla_transform now trips 422 at the helper level for any
+    NaN/Infinity in location/rotation — covers every spawn/set-transform/
+    set-spectator call path without per-route guards. Pin the reject on
+    POST /api/actors/:id/transform."""
+    import src.routes.actors as actors_routes
+
+    fake_manager = SimpleNamespace(
+        is_connected=True,
+        world=SimpleNamespace(
+            get_actor=lambda _aid: SimpleNamespace(
+                type_id="vehicle.tesla.model3",
+                set_transform=lambda *_a, **_kw: (_ for _ in ()).throw(
+                    AssertionError("should be blocked before CARLA call")
+                ),
+            )
+        ),
+    )
+    monkeypatch.setattr(actors_routes, "carla_manager", fake_manager)
+    # carla module must be importable before the route's `import carla`
+    # runs; stub a minimal Transform/Location/Rotation.
+    monkeypatch.setitem(
+        sys.modules,
+        "carla",
+        SimpleNamespace(
+            Transform=lambda loc, rot: SimpleNamespace(location=loc, rotation=rot),
+            Location=lambda **kw: SimpleNamespace(**kw),
+            Rotation=lambda **kw: SimpleNamespace(**kw),
+        ),
+    )
+
+    # stdlib json rejects NaN in strict mode, so hand-craft the body:
+    # Pydantic's JSON parser accepts "NaN" / "Infinity" as float literals.
+    nan_body = '{"location":{"x":NaN,"y":0.0,"z":0.0},"rotation":{"pitch":0.0,"yaw":0.0,"roll":0.0}}'
+    resp = client.post(
+        "/api/actors/5/transform",
+        content=nan_body,
+        headers={"Content-Type": "application/json"},
+    )
+    assert resp.status_code == 422
+    assert "finite" in resp.json()["detail"].lower()
+
+    inf_body = '{"location":{"x":0.0,"y":0.0,"z":0.0},"rotation":{"pitch":Infinity,"yaw":0.0,"roll":0.0}}'
+    resp = client.post(
+        "/api/actors/5/transform",
+        content=inf_body,
+        headers={"Content-Type": "application/json"},
+    )
+    assert resp.status_code == 422
+
+    # Canonical finite values pass the helper (stubbed CARLA assertion
+    # fires → 500 via the Exception wrapper). What matters: not 422.
+    resp = client.post(
+        "/api/actors/5/transform",
+        json={
+            "location": {"x": 1.0, "y": 2.0, "z": 0.5},
+            "rotation": {"pitch": 0.0, "yaw": 90.0, "roll": 0.0},
+        },
+    )
+    assert resp.status_code != 422
+
+
 def test_waypoints_rejects_non_finite_distance(monkeypatch):
     """distance=NaN / Infinity would propagate through min/max (both return
     NaN on NaN inputs in Python) and reach CARLA's generate_waypoints with

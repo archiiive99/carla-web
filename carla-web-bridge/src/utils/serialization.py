@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import math
 import struct
 from typing import Any
+
+from fastapi import HTTPException
 
 from src.models.schemas import (
     ActorInfo,
@@ -30,9 +33,26 @@ def carla_vector_to_dict(v: Any) -> Vector3:
 
 
 def dict_to_carla_transform(data: Transform) -> Any:
-    """Convert Transform schema to carla.Transform. Must be called from thread."""
+    """Convert Transform schema to carla.Transform. Must be called from thread.
+
+    Raises HTTPException(422) if any coordinate is non-finite. Pydantic's
+    plain `float` fields accept NaN / Infinity, which then propagated
+    through carla.Location / carla.Rotation and produced opaque errors
+    (or silent physics corruption) deep inside CARLA. Catching it at
+    this single chokepoint protects every spawn/ set_transform /
+    set_spectator path without adding per-route guards.
+    """
     import carla
 
+    coords = (
+        data.location.x, data.location.y, data.location.z,
+        data.rotation.pitch, data.rotation.yaw, data.rotation.roll,
+    )
+    if not all(math.isfinite(v) for v in coords):
+        raise HTTPException(
+            status_code=422,
+            detail="transform location and rotation values must be finite",
+        )
     return carla.Transform(
         carla.Location(
             x=data.location.x, y=data.location.y, z=data.location.z
