@@ -24,6 +24,7 @@ import {
   Trash2,
   Download,
 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const EVENT_ICONS: Record<EventType, React.ReactNode> = {
@@ -87,6 +88,13 @@ export function EventLog({ events, onClear, className }: EventLogProps) {
   }, [filteredEvents.length, autoScroll]);
 
   const exportEvents = useCallback(() => {
+    // Guard the empty case — otherwise the user got a header-only CSV
+    // with no feedback that anything happened (the browser just silently
+    // saves events.csv). Matches the LidarView/ImuChart export feedback.
+    if (events.length === 0) {
+      toast.error("No events to export");
+      return;
+    }
     const csv = [
       "timestamp,type,message",
       ...events.map(
@@ -100,6 +108,7 @@ export function EventLog({ events, onClear, className }: EventLogProps) {
     a.download = "events.csv";
     a.click();
     URL.revokeObjectURL(url);
+    toast.success(`Exported ${events.length} events`);
   }, [events]);
 
   return (
