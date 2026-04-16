@@ -102,6 +102,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-04-revisit-asphalt-brightness  Asphalt final mult 0.72→0.78  (✅ — +8% asphalt brightness; 3 consecutive road-shader edits now producing identical metrics (stable cluster, 14dB gap is upstream lighting); under §4.3 1dB threshold; closed 2026-04-16T13:30:00Z+~10min)
 [x] iter-06-revisit-hemi-sky-fog  Hemisphere sky-color lerp with fog-density  (✅ — lerp #a5a8ae→#c0c2c7 on fogFactor; midday byte-identical (fog_density=0); closed 2026-04-16T13:36:00Z+~10min)
 [x] iter-04-revisit-yellow-stripe-brighten  Centerline yellow +5%  (✅ — (0.94,0.74,0.18)→(0.98,0.78,0.22) matches iter-04-revisit-stripe-brightness +6% bump; iter-01 road is white-centerline so metrics unchanged; closed 2026-04-16T13:42:00Z+~8min)
+[x] iter-06-revisit-hemi-ground-fog  Hemisphere ground-color fog lerp  (✅ — chained second lerp toward #6a6565 on fogFactor after altitude lerp; midday byte-identical; closed 2026-04-16T13:47:00Z+~8min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 

@@ -359,10 +359,15 @@ export function WeatherLighting({
           // interpolates between #7a4c30 (warm dusk, altFactor=0) and
           // #5a4f44 (neutral warm, altFactor=1). No-op at midday (altFactor=1
           // reproduces prior literal).
+          //
+          // iter-06-revisit-hemi-ground-fog: then lerp that altitude-driven
+          // color toward #6a6565 on fogFactor so foggy scenes get a
+          // desaturated ground bounce. No-op at fog_density=0.
           isNight
             ? "#1c1f26"
             : `#${new THREE.Color()
                 .lerpColors(new THREE.Color(0x7a4c30), new THREE.Color(0x5a4f44), altFactor)
+                .lerp(new THREE.Color(0x6a6565), fogFactor)
                 .getHexString()}`,
           fillBoost,
         ]}
