@@ -100,7 +100,7 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     logger.info("Shutting down…")
-    adaptive_controller.stop()
+    await adaptive_controller.stop()
     if _tick_task:
         _tick_task.cancel()
         try:

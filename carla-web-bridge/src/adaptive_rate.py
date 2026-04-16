@@ -541,10 +541,20 @@ class AdaptiveRateController:
         self._task = asyncio.get_running_loop().create_task(self._run())
         logger.info("Adaptive rate control loop started (sample_hz=%.2f)", self.sample_hz)
 
-    def stop(self) -> None:
-        if self._task is not None:
-            self._task.cancel()
-            self._task = None
+    async def stop(self) -> None:
+        task = self._task
+        self._task = None
+        if task is not None:
+            # Await the cancelled task so Python's asyncio runtime doesn't
+            # log "Task was destroyed but it is pending!" on shutdown and
+            # any unobserved exception is collected here.
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+            except Exception as exc:
+                logger.debug("AdaptiveRateController stop: task exited with %s", exc)
 
     async def _run(self) -> None:
         period = 1.0 / max(self.sample_hz, 0.1)
