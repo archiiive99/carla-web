@@ -57,10 +57,18 @@ export default function CameraView({
     label || (sensorType ? getSensorDisplayName(sensorType) : "Camera");
 
   // Reset "received" flag when switching sensors so the loading state shows
-  // until the new camera delivers a frame (prevents stale FPS/last-frame bleed).
+  // until the new camera delivers a frame (prevents stale FPS/last-frame
+  // bleed). Pure state reset uses the React-19 "adjust state during render"
+  // idiom (matches SegmentationView) so we don't trigger a cascading render
+  // via setState-in-effect. Ref mutation + DOM side-effects legitimately
+  // still need an effect because refs/DOM only exist after commit.
+  const [lastSensorId, setLastSensorId] = useState(sensorId);
+  if (lastSensorId !== sensorId) {
+    setLastSensorId(sensorId);
+    setHasReceivedFrame(false);
+  }
   useEffect(() => {
     hasReceivedFrameRef.current = false;
-    setHasReceivedFrame(false);
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext("2d");
