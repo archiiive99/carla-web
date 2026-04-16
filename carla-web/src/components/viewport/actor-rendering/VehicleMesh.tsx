@@ -36,6 +36,20 @@ function GltfVehicleModel({ path, paintColor }: { path: string; paintColor: stri
           });
           child.material = paintMat;
           child.userData.paintMatRef = paintMat;
+        } else if (/glass|window|windscreen|windshield/i.test(mat.name ?? "")) {
+          // iter-03-revisit-windshield-tint: replace the GLB's authored
+          // glass material (often an unrealistic flat gray) with a
+          // tinted transparent surface. Sharp roughness + high metalness
+          // + elevated envMap read as reflective glass against the sky.
+          const glassMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0x262c38),
+            roughness: 0.08,
+            metalness: 0.6,
+            envMapIntensity: 0.8,
+            transparent: true,
+            opacity: 0.55,
+          });
+          child.material = glassMat;
         } else {
           // Preserve the GLB's authored material; just tone down env map.
           const cloned_mat = (mat as THREE.MeshStandardMaterial).clone();
