@@ -117,6 +117,34 @@ def test_weather_presets_no_connection_needed():
     assert "ClearNoon" in data["presets"]
 
 
+def test_set_weather_rejects_unknown_preset(monkeypatch):
+    """Unknown weather presets must 400 with the allow-list in the detail,
+    not silently fall through to the generic "Provide preset or params"."""
+    import src.routes.world as world_routes
+
+    monkeypatch.setattr(world_routes, "_require_connection", lambda: None)
+    # The _set inner function does `import carla` before the preset check,
+    # so a minimal stub is required even though our unknown-preset path
+    # doesn't read any carla members.
+    monkeypatch.setitem(sys.modules, "carla", SimpleNamespace(WeatherParameters=SimpleNamespace()))
+    monkeypatch.setattr(
+        world_routes,
+        "carla_manager",
+        SimpleNamespace(
+            is_connected=True,
+            world=SimpleNamespace(set_weather=lambda _w: None),
+        ),
+    )
+
+    resp = client.post("/api/world/weather", json={"preset": "NotAPreset"})
+    assert resp.status_code == 400
+    detail = resp.json()["detail"]
+    assert "Unknown weather preset" in detail
+    # Error message should list the valid presets so the user can see
+    # what they meant to type.
+    assert "ClearNoon" in detail
+
+
 def test_sensor_types_no_connection_needed():
     resp = client.get("/api/sensors/types")
     assert resp.status_code == 200
