@@ -362,4 +362,10 @@ function getBridgeUrl(): string {
   return getDefaultBridgeUrl();
 }
 
-export const carlaApi = new CarlaApi(getBridgeUrl());
+// Pass the function reference, NOT its return value — `CarlaApi.url()`
+// re-invokes the provider on every request when it's callable. Previously
+// we captured `getBridgeUrl()`'s result at module-load time, so after the
+// user changed the bridge URL via Settings ("Save & Connect"), localStorage
+// and the store updated, but the module-level carlaApi kept sending REST
+// calls to the old origin until the page was reloaded.
+export const carlaApi = new CarlaApi(getBridgeUrl);
