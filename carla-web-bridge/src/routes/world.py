@@ -66,35 +66,40 @@ async def list_maps() -> Any:
     _require_connection()
 
     def _get() -> dict[str, Any]:
-        maps = carla_manager.client.get_available_maps()
-        # Filter CARLA-internal templates + Town15 sublevel fragments.
-        # `get_available_maps()` returns every .umap under /Game/Carla/Maps
-        # including generator templates (BaseMap, DigitalTwinsTemplate,
-        # MapGeneratorBaseMap, …) and Town15's streaming sublevels
-        # (Town15_Vegetation, Town15_Buildings, …). Loading any of those
-        # 500s the bridge — they aren't playable worlds — and offering
-        # them in the frontend dropdown is a trap.
-        _TEMPLATE_NAMES = {
-            "BaseMap",
-            "BaseTileEmpty",
-            "DigitalTwinsTemplate",
-            "DigitalTwinMap",
-            "MapGeneratorBaseMap",
-            "MapGeneratorBaseLargeMap",
-            "RiverPreset01",
-        }
-        filtered: list[str] = []
-        for m in maps:
-            basename = m.split("/")[-1]
-            if basename in _TEMPLATE_NAMES:
-                continue
-            # Town15 itself is playable; its _Vegetation/_Buildings/
-            # _Roads/_Props/_Decals/_RepSplinesCaps/_YieldBoxes sublevels
-            # are not. Pattern is stable across CARLA 0.9.x/0.10.x.
-            if basename.startswith("Town15_"):
-                continue
-            filtered.append(basename)
-        return {"maps": filtered}
+        try:
+            maps = carla_manager.client.get_available_maps()
+            # Filter CARLA-internal templates + Town15 sublevel fragments.
+            # `get_available_maps()` returns every .umap under /Game/Carla/Maps
+            # including generator templates (BaseMap, DigitalTwinsTemplate,
+            # MapGeneratorBaseMap, …) and Town15's streaming sublevels
+            # (Town15_Vegetation, Town15_Buildings, …). Loading any of those
+            # 500s the bridge — they aren't playable worlds — and offering
+            # them in the frontend dropdown is a trap.
+            _TEMPLATE_NAMES = {
+                "BaseMap",
+                "BaseTileEmpty",
+                "DigitalTwinsTemplate",
+                "DigitalTwinMap",
+                "MapGeneratorBaseMap",
+                "MapGeneratorBaseLargeMap",
+                "RiverPreset01",
+            }
+            filtered: list[str] = []
+            for m in maps:
+                basename = m.split("/")[-1]
+                if basename in _TEMPLATE_NAMES:
+                    continue
+                # Town15 itself is playable; its _Vegetation/_Buildings/
+                # _Roads/_Props/_Decals/_RepSplinesCaps/_YieldBoxes sublevels
+                # are not. Pattern is stable across CARLA 0.9.x/0.10.x.
+                if basename.startswith("Town15_"):
+                    continue
+                filtered.append(basename)
+            return {"maps": filtered}
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_get)
 
@@ -135,8 +140,13 @@ async def get_weather() -> Any:
     _require_connection()
 
     def _get() -> Any:
-        w = carla_manager.world.get_weather()
-        return serialize_weather(w)
+        try:
+            w = carla_manager.world.get_weather()
+            return serialize_weather(w)
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_get)
 
@@ -260,10 +270,15 @@ async def get_spawn_points() -> Any:
     _require_connection()
 
     def _get() -> dict[str, Any]:
-        points = carla_manager.world.get_map().get_spawn_points()
-        return {
-            "spawn_points": [carla_transform_to_dict(sp).model_dump() for sp in points]
-        }
+        try:
+            points = carla_manager.world.get_map().get_spawn_points()
+            return {
+                "spawn_points": [carla_transform_to_dict(sp).model_dump() for sp in points]
+            }
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_get)
 
