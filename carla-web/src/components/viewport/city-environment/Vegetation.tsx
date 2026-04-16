@@ -2,6 +2,7 @@ import { Suspense, useMemo, useRef } from "react"
 import * as THREE from "three"
 import { useGLTF } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
+import { useSimulationStore } from "@/stores/simulationStore"
 import { VEGETATION_MODELS } from "../CarlaAssetLoader"
 import { computeVegetationPlacement } from "../vegetation-placement"
 import { EnvObj, c2t } from "./shared"
@@ -67,6 +68,14 @@ function GltfVegetation({ objects }: { objects: EnvObj[] }) {
     transforms: ReturnType<typeof computeVegetationPlacement>[]
   }>>([])
   const lastCullPos = useRef(new THREE.Vector3(Infinity, Infinity, Infinity))
+  // iter-07-revisit-wind: shared shader uniforms for foliage wind sway.
+  // uTime increments each frame; uWindIntensity is read from the bridge
+  // weather broadcast. Kept as ref objects so onBeforeCompile's
+  // shader.uniforms.X = uniformRef assignment shares the live value
+  // across all vegetation materials (all tree buckets sway together).
+  const uTime = useRef({ value: 0 })
+  const uWindIntensity = useRef({ value: 0 })
+  const weatherWind = useSimulationStore((s) => s.weather?.wind_intensity ?? 0)
 
   const group = useMemo(() => {
     const g = new THREE.Group()
@@ -112,6 +121,29 @@ function GltfVegetation({ objects }: { objects: EnvObj[] }) {
         if (mat instanceof THREE.MeshStandardMaterial) {
           mat.roughness = 0.85
         }
+        // iter-07-revisit-wind: patch the vertex shader to sway the
+        // foliage geometry. Higher local-y vertices (treetops) sway
+        // more; ground-level (trunk base) stays anchored. Sway
+        // amplitude scales with wind intensity from weather broadcast.
+        mat.onBeforeCompile = (shader) => {
+          shader.uniforms.uTime = uTime.current
+          shader.uniforms.uWindIntensity = uWindIntensity.current
+          shader.vertexShader =
+            `uniform float uTime;\nuniform float uWindIntensity;\n` +
+            shader.vertexShader.replace(
+              "#include <begin_vertex>",
+              `
+              #include <begin_vertex>
+              // Height-weighted wind sway: only upper foliage sways,
+              // trunk base stays fixed. World-XZ-offset in sin() so
+              // neighboring trees don't all sway in lockstep.
+              float windAmp = uWindIntensity * max(transformed.y * 0.06, 0.0);
+              transformed.x += sin(uTime * 1.3 + position.x * 0.08 + position.z * 0.08) * windAmp;
+              transformed.z += cos(uTime * 0.9 + position.x * 0.08) * windAmp * 0.55;
+              `,
+            )
+        }
+        mat.customProgramCacheKey = () => "vegetation-wind-v1"
 
         const mesh = new THREE.InstancedMesh(part.geometry, mat, bucket.length)
 
@@ -144,7 +176,13 @@ function GltfVegetation({ objects }: { objects: EnvObj[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [objects, loaded])
 
-  useFrame(({ camera }) => {
+  useFrame(({ camera }, delta) => {
+    // iter-07-revisit-wind: advance shader time + push latest wind
+    // intensity (normalized 0-1) into the shared uniforms. Happens
+    // every frame regardless of camera-move throttle since wind
+    // animation is time-driven, not camera-driven.
+    uTime.current.value += delta
+    uWindIntensity.current.value = weatherWind / 100
     if (camera.position.distanceTo(lastCullPos.current) < RUNTIME_CULL_SENSITIVITY) return
     lastCullPos.current.copy(camera.position)
     const r2 = RUNTIME_CULL_RADIUS * RUNTIME_CULL_RADIUS

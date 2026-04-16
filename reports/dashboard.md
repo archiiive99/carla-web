@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 34 rows ✅, 6 rows ⚠️, 8 rows queued. §6.5 raise still active.
+**Summary:** 35 rows ✅, 6 rows ⚠️, 8 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -47,7 +47,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 06-revisit-bias-by-altitude | Sun-altitude shadow bias ramp | **✅** | 16.73 | 0.3061 | 21.85 | ~15 min | 7f486ad53 |
 | 14-revisit-runtime-incremental | Incremental cull batching | **✅** | 16.71 | 0.3062 | 21.86 | ~25 min | 8c5254a64 |
 | 08-walk-yaw-from-velocity | Walker faces direction of travel | **✅** | 11.02 | 0.2123 | 35.95 | ~25 min | a0c24abfc |
-| 08-knee-bend | Thigh + shin with knee pivot | **✅** | 16.71 | 0.3062 | 21.86 | ~35 min | (this commit) |
+| 08-knee-bend | Thigh + shin with knee pivot | **✅** | 16.71 | 0.3062 | 21.86 | ~35 min | 20bba8595 |
+| 07-revisit-wind | Foliage vertex-shader wind sway | **✅** | 16.70 | 0.3064 | 21.87 | ~40 min | (this commit) |
 
 ## Notes
 
