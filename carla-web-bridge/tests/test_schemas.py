@@ -9,11 +9,14 @@ import pytest
 from pydantic import ValidationError
 
 from src.models.schemas import (
+    AutopilotRequest,
     IgnoreRequest,
     LaneChangeRequest,
+    LightStateRequest,
     LoadMapRequest,
     MapLayerRequest,
     SimulationSettings,
+    SpawnSensorRequest,
     StartRecordingRequest,
     StartReplayRequest,
     VehicleControl,
@@ -177,3 +180,53 @@ def test_vehicle_control_accepts_canonical_values() -> None:
     assert VehicleControl(steer=1.0).steer == 1.0
     assert VehicleControl(steer=-1.0).steer == -1.0
     assert VehicleControl(brake=1.0).brake == 1.0
+
+
+# --- AutopilotRequest.tm_port bounds -------------------------------------
+
+
+@pytest.mark.parametrize("bad_port", [0, -1, 65536, 100000, -100])
+def test_autopilot_rejects_invalid_tm_port(bad_port: int) -> None:
+    # tm_port is a TCP port — out-of-range trips 422 at the schema instead
+    # of reaching CARLA and failing with an opaque RPC error.
+    with pytest.raises(ValidationError):
+        AutopilotRequest(tm_port=bad_port)
+
+
+@pytest.mark.parametrize("good_port", [1, 8000, 65535])
+def test_autopilot_accepts_valid_tm_port(good_port: int) -> None:
+    assert AutopilotRequest(tm_port=good_port).tm_port == good_port
+
+
+# --- LightStateRequest bounds --------------------------------------------
+
+
+@pytest.mark.parametrize("bad_state", [-1, -100, 0xFFFFFFFF + 1])
+def test_light_state_rejects_out_of_range(bad_state: int) -> None:
+    with pytest.raises(ValidationError):
+        LightStateRequest(light_state=bad_state)
+
+
+def test_light_state_accepts_known_bitmask_values() -> None:
+    # 0 = all off, 0xFF = Position+LowBeam+HighBeam+Brake+L/R Blinker+Reverse+Fog,
+    # 0xFFFFFFFF = the "All" sentinel.
+    assert LightStateRequest(light_state=0).light_state == 0
+    assert LightStateRequest(light_state=0xFF).light_state == 0xFF
+    assert LightStateRequest(light_state=0xFFFFFFFF).light_state == 0xFFFFFFFF
+
+
+# --- SpawnSensorRequest.parent_id bounds ---------------------------------
+
+
+@pytest.mark.parametrize("bad_parent", [-1, -100])
+def test_spawn_sensor_rejects_negative_parent_id(bad_parent: int) -> None:
+    # parent_id=0 means "attach to world" in CARLA. Negative ids would
+    # otherwise reach sensor_manager and raise a deep "Parent actor -1
+    # not found" — bound at schema for a clean 422.
+    with pytest.raises(ValidationError):
+        SpawnSensorRequest(type="sensor.camera.rgb", parent_id=bad_parent)
+
+
+def test_spawn_sensor_accepts_zero_and_positive_parent_id() -> None:
+    assert SpawnSensorRequest(type="sensor.camera.rgb", parent_id=0).parent_id == 0
+    assert SpawnSensorRequest(type="sensor.camera.rgb", parent_id=42).parent_id == 42

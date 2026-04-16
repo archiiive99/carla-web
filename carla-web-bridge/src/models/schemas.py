@@ -119,7 +119,11 @@ class SpawnWalkerRequest(BaseModel):
 class SpawnSensorRequest(BaseModel):
     type: str
     transform: Transform = Field(default_factory=Transform)
-    parent_id: int = 0
+    # parent_id=0 means "attach to world" in CARLA. Negative ids are
+    # never valid — bound at the schema so a typoed -1 returns 422
+    # instead of reaching sensor_manager and raising a "Parent actor -1
+    # not found" RuntimeError several layers deeper.
+    parent_id: int = Field(0, ge=0)
     attributes: dict[str, str | int | float] = Field(default_factory=dict)
 
 
@@ -139,11 +143,24 @@ class VehicleControl(BaseModel):
 
 class AutopilotRequest(BaseModel):
     enabled: bool = True
-    tm_port: int = 8000
+    # tm_port is a TCP port — valid range [1, 65535]. CARLA's
+    # Actor.set_autopilot(enabled, port) passes it through to the
+    # Traffic Manager RPC; an out-of-range value (0, negative, or
+    # > 65535) would fail deep in the CARLA client with an unhelpful
+    # error. Bound at the schema so a typoed 80000 trips 422 at the
+    # boundary.
+    tm_port: int = Field(8000, ge=1, le=65535)
 
 
 class LightStateRequest(BaseModel):
-    light_state: int = 0
+    # CARLA's VehicleLightState is a uint32 bitmask. Individual bits
+    # enumerated in carla.VehicleLightState: Position, LowBeam, HighBeam,
+    # Brake, LeftBlinker, RightBlinker, Reverse, Fog, Interior, Special1,
+    # Special2, All (0xFFFFFFFF). Negative values are never valid; bounding
+    # at the low end catches typos that would otherwise reach
+    # carla.VehicleLightState(-1) and raise opaquely. Upper bound is the
+    # full uint32 range since `All` sets every bit.
+    light_state: int = Field(0, ge=0, le=0xFFFFFFFF)
 
 
 # --- Traffic Manager ---
