@@ -57,67 +57,80 @@ export function NightStreetLights() {
     });
   }, [lampSpecs]);
 
-  if (!isNight) return null;
-
   return (
     <>
-      {lampSpecs.map((spec, i) => (
-        <group key={i}>
-          {/* Anchor the target object in the scene so the spotLight has
-             something to point at. */}
-          <primitive object={targetRefs.current[i]} />
-          <spotLight
-            position={spec.position}
-            target={targetRefs.current[i]}
-            color={HEADLIGHT_BEAM}
-            intensity={SPOTLIGHT_INTENSITY}
-            distance={SPOTLIGHT_DISTANCE}
-            angle={SPOTLIGHT_ANGLE}
-            penumbra={SPOTLIGHT_PENUMBRA}
-            decay={SPOTLIGHT_DECAY}
-            castShadow={false}
-          />
-          {/* iter-09-revisit-emissive: small emissive sphere at the lamp
-             head position so the source of the light is visible in the
-             scene — without it the SpotLights just appear as bright
-             cones with nothing emitting them. The CARLA static-prop
-             streetlamp GLBs are dormant in the scene (exported but
-             unused), so this plays the role of the lamp head visual.
-             iter-09-revisit-bloom-v2: layer 1 marks this for
-             SelectiveBloom while leaving the rest of the scene render
-             on layer 0 (default) so the multi-camera composition isn't
-             intercepted. */}
-          <mesh
-            position={spec.position}
-            ref={(m) => {
-              if (m) m.layers.enable(BLOOM_LAYER);
-            }}
-          >
-            <sphereGeometry args={[0.18, 12, 12]} />
-            <meshStandardMaterial
-              color={HEADLIGHT_BEAM}
-              emissive={HEADLIGHT_BEAM}
-              emissiveIntensity={2.5}
-              roughness={0.5}
-              metalness={0}
-            />
-          </mesh>
-          {/* iter-09-revisit-lamp-halo: larger transparent additive sphere
-             so the lamp head reads as glowing against the dim night sky
-             without needing EffectComposer bloom (which broke the
-             multi-camera WorldCanvas composition in v1/v2 attempts). */}
-          <mesh position={spec.position}>
-            <sphereGeometry args={[0.4, 16, 16]} />
-            <meshBasicMaterial
-              color={HEADLIGHT_BEAM}
-              transparent
-              opacity={0.35}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-            />
-          </mesh>
-        </group>
-      ))}
+      {lampSpecs.map((spec, i) => {
+        const [lx, ly, lz] = spec.position;
+        return (
+          <group key={i}>
+            {/* iter-09-revisit-lamp-pole: always-visible pole cylinder.
+               Lamp-heads used to float at y=6 with nothing under them;
+               the pole grounds them visually. Cylinder goes from y=0 to
+               y=5.8 (just below the 6m head sphere). */}
+            <mesh position={[lx, ly / 2, lz]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.06, 0.08, ly, 10]} />
+              <meshStandardMaterial color="#2a2a30" roughness={0.7} metalness={0.4} />
+            </mesh>
+            {isNight && (
+              <>
+                {/* Anchor the target object in the scene so the spotLight has
+                   something to point at. */}
+                <primitive object={targetRefs.current[i]} />
+                <spotLight
+                  position={spec.position}
+                  target={targetRefs.current[i]}
+                  color={HEADLIGHT_BEAM}
+                  intensity={SPOTLIGHT_INTENSITY}
+                  distance={SPOTLIGHT_DISTANCE}
+                  angle={SPOTLIGHT_ANGLE}
+                  penumbra={SPOTLIGHT_PENUMBRA}
+                  decay={SPOTLIGHT_DECAY}
+                  castShadow={false}
+                />
+                {/* iter-09-revisit-emissive: small emissive sphere at the lamp
+                   head position so the source of the light is visible in the
+                   scene — without it the SpotLights just appear as bright
+                   cones with nothing emitting them. The CARLA static-prop
+                   streetlamp GLBs are dormant in the scene (exported but
+                   unused), so this plays the role of the lamp head visual.
+                   iter-09-revisit-bloom-v2: layer 1 marks this for
+                   SelectiveBloom while leaving the rest of the scene render
+                   on layer 0 (default) so the multi-camera composition isn't
+                   intercepted. */}
+                <mesh
+                  position={spec.position}
+                  ref={(m) => {
+                    if (m) m.layers.enable(BLOOM_LAYER);
+                  }}
+                >
+                  <sphereGeometry args={[0.18, 12, 12]} />
+                  <meshStandardMaterial
+                    color={HEADLIGHT_BEAM}
+                    emissive={HEADLIGHT_BEAM}
+                    emissiveIntensity={2.5}
+                    roughness={0.5}
+                    metalness={0}
+                  />
+                </mesh>
+                {/* iter-09-revisit-lamp-halo: larger transparent additive sphere
+                   so the lamp head reads as glowing against the dim night sky
+                   without needing EffectComposer bloom (which broke the
+                   multi-camera WorldCanvas composition in v1/v2 attempts). */}
+                <mesh position={spec.position}>
+                  <sphereGeometry args={[0.4, 16, 16]} />
+                  <meshBasicMaterial
+                    color={HEADLIGHT_BEAM}
+                    transparent
+                    opacity={0.35}
+                    blending={THREE.AdditiveBlending}
+                    depthWrite={false}
+                  />
+                </mesh>
+              </>
+            )}
+          </group>
+        );
+      })}
     </>
   );
 }
