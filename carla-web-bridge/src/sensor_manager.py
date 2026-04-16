@@ -396,7 +396,23 @@ class SensorManager:
 
     def _prune_dead_sensors(self) -> None:
         for sensor_id, sensor in list(self._sensors.items()):
-            if not getattr(sensor, "is_alive", True):
+            # getattr with a default doesn't catch exceptions from the
+            # property access itself — CARLA's Actor.is_alive can raise
+            # RuntimeError on a stale reference (connection dropped,
+            # actor destroyed externally). Letting that propagate out
+            # of /health was loud and surprising (500 error on a GET
+            # that's supposed to be status-only). Treat "can't tell"
+            # as "drop it so we stop trying" — the sensor's actual
+            # liveness can be re-established on the next adopt.
+            try:
+                alive = bool(getattr(sensor, "is_alive", True))
+            except Exception as exc:
+                logger.debug(
+                    "Sensor %d is_alive probe raised; treating as dead: %s",
+                    sensor_id, exc,
+                )
+                alive = False
+            if not alive:
                 self._drop_dead_sensor_ref(sensor_id)
 
     def get_sensor_ids(self) -> list[int]:
