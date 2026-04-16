@@ -71,20 +71,42 @@ export function ResizableLayout() {
   const rightPanelRef = useRef<PanelImperativeHandle | null>(null);
   const bottomPanelRef = useRef<PanelImperativeHandle | null>(null);
 
+  // Debounce the localStorage writes. onLayoutChanged fires on every
+  // pixel during a divider drag (~60Hz). localStorage.setItem is
+  // main-thread blocking, so writing at 60Hz while the user is actively
+  // dragging produced a ~1-frame stutter per write and measurably slowed
+  // the drag. 250ms is past typical drag-settle time while still feeling
+  // "saved immediately" to the user. Final state always lands because
+  // the last change before settling gets its own flush.
+  const hSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const vSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (hSaveTimerRef.current) clearTimeout(hSaveTimerRef.current);
+      if (vSaveTimerRef.current) clearTimeout(vSaveTimerRef.current);
+    };
+  }, []);
+
   const onHorizontalLayoutChanged = useCallback((layout: Layout) => {
-    try {
-      localStorage.setItem(STORAGE_KEY_H, JSON.stringify(layout));
-    } catch {
-      // Ignore storage write failures (private mode / quota).
-    }
+    if (hSaveTimerRef.current) clearTimeout(hSaveTimerRef.current);
+    hSaveTimerRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY_H, JSON.stringify(layout));
+      } catch {
+        // Ignore storage write failures (private mode / quota).
+      }
+    }, 250);
   }, []);
 
   const onVerticalLayoutChanged = useCallback((layout: Layout) => {
-    try {
-      localStorage.setItem(STORAGE_KEY_V, JSON.stringify(layout));
-    } catch {
-      // Ignore storage write failures (private mode / quota).
-    }
+    if (vSaveTimerRef.current) clearTimeout(vSaveTimerRef.current);
+    vSaveTimerRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY_V, JSON.stringify(layout));
+      } catch {
+        // Ignore storage write failures (private mode / quota).
+      }
+    }, 250);
   }, []);
 
   useEffect(() => {
