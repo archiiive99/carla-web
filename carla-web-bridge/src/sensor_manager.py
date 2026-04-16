@@ -355,7 +355,7 @@ class SensorManager:
                     native_fps=self.get_native_fps(new_id),
                 )
 
-        snapshot = {
+        result: dict[str, Any] = {
             "old_sensor_id": sensor_id,
             "new_sensor_id": new_id,
             "subscribers": list(old_subs),
@@ -365,7 +365,7 @@ class SensorManager:
             "Recreated sensor %d → %d with overrides=%s (subs=%d)",
             sensor_id, new_id, attribute_overrides, len(old_subs),
         )
-        return new_id, snapshot
+        return new_id, result
 
     LIVE_ADJUSTABLE_ATTRIBUTES: tuple[str, ...] = ()
     """Attributes CARLA supports adjusting on a live sensor.
@@ -630,7 +630,10 @@ class SensorManager:
                     queue.maxsize,
                     new_maxsize,
                 )
-                queue._maxsize = new_maxsize  # noqa: SLF001 - resize in-place to preserve waiter state
+                # asyncio.Queue has no public resize; mutate the private
+                # field to preserve blocked waiters. mypy can't see the
+                # attribute (it's not in the stub), so cast through Any.
+                queue._maxsize = new_maxsize  # type: ignore[attr-defined]  # noqa: SLF001
             queue.put_nowait(packet)
             depth = queue.qsize()
             if depth > SENSOR_EVENT_QUEUE_WARN:
