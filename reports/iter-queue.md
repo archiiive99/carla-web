@@ -100,6 +100,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-04-revisit-stripe-brightness  Brighter white stripe paint  (✅ — (0.88,0.86,0.80)→(0.94,0.92,0.86) same warm ratio +6-7%; PSNR -0.30 within cluster, SSIM -0.05; under §4.3 1dB swap threshold; closed 2026-04-16T13:14:00Z+~10min)
 [x] iter-04-revisit-wear-softer  Grunge wear depth 0.65→0.50  (✅ — paired change in diffuse + roughness branches; metrics identical to prior (stripes small in ROI); closed 2026-04-16T13:22:00Z+~12min)
 [x] iter-04-revisit-asphalt-brightness  Asphalt final mult 0.72→0.78  (✅ — +8% asphalt brightness; 3 consecutive road-shader edits now producing identical metrics (stable cluster, 14dB gap is upstream lighting); under §4.3 1dB threshold; closed 2026-04-16T13:30:00Z+~10min)
+[x] iter-06-revisit-hemi-sky-fog  Hemisphere sky-color lerp with fog-density  (✅ — lerp #a5a8ae→#c0c2c7 on fogFactor; midday byte-identical (fog_density=0); closed 2026-04-16T13:36:00Z+~10min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 

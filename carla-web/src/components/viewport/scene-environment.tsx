@@ -342,7 +342,14 @@ export function WeatherLighting({
       )}
       <hemisphereLight
         args={[
-          isNight ? "#5a6575" : "#a5a8ae",
+          // iter-06-revisit-hemi-sky-fog: day sky-color lerps toward
+          // #c0c2c7 (neutral fog gray) on fogFactor. Night branch
+          // unchanged.
+          isNight
+            ? "#5a6575"
+            : `#${new THREE.Color()
+                .lerpColors(new THREE.Color(0xa5a8ae), new THREE.Color(0xc0c2c7), fogFactor)
+                .getHexString()}`,
           // Warm ground-bounce hex (was cool #3b3d42) so asphalt + horizontal
           // car panels receive the warm fill UE5 produces from its
           // SkyAtmosphere ground-color reflectance term. Closes part of the
