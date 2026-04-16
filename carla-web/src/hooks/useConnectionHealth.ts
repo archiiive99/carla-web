@@ -39,14 +39,26 @@ export function useConnectionHealth() {
           }
           try {
             const status = await carlaApi.getStatus();
-            useSimulationStore.setState({
-              isRunning: status.running,
-              isPaused: status.paused,
-              syncMode: status.sync_mode,
-              currentTick: status.tick,
-              elapsedTime: status.elapsed_time,
-              currentMap: status.map,
-              serverVersion: status.server_version,
+            useSimulationStore.setState((s) => {
+              // tick/elapsed_time are authoritatively delivered by the 20 Hz
+              // WS world_tick stream via updateFromTick. The 2s HTTP poll's
+              // snapshot is ~50-100ms older by the time it lands, so
+              // unconditionally setting them here overwrote fresher WS ticks
+              // and flickered the StatusBar frame counter backwards. Accept
+              // the poll value only if it strictly advances the store —
+              // covers the initial-load case (store at 0, WS not yet connected)
+              // while letting WS dominate steady-state.
+              const advances = status.tick > s.currentTick;
+              return {
+                isRunning: status.running,
+                isPaused: status.paused,
+                syncMode: status.sync_mode,
+                currentMap: status.map,
+                serverVersion: status.server_version,
+                ...(advances
+                  ? { currentTick: status.tick, elapsedTime: status.elapsed_time }
+                  : {}),
+              };
             });
             // Weather changes only happen via explicit user actions
             // (setWeather / setWeatherPreset already update the store)
