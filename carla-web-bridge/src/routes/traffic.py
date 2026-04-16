@@ -43,9 +43,9 @@ async def set_global_speed(req: GlobalSpeedRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_set)
 
@@ -65,9 +65,9 @@ async def set_vehicle_speed(vehicle_id: int, req: VehicleSpeedRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_set)
 
@@ -89,9 +89,9 @@ async def set_lane_behavior(vehicle_id: int, req: LaneChangeRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_set)
 
@@ -114,9 +114,9 @@ async def set_ignore(vehicle_id: int, req: IgnoreRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_set)
 
@@ -139,8 +139,8 @@ async def set_route(vehicle_id: int, req: RouteRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_set)

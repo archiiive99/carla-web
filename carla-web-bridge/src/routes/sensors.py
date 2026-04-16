@@ -127,7 +127,7 @@ async def patch_sensor_attributes(sensor_id: int, attributes: dict[str, str]) ->
     try:
         known_attributes = sm.get_sensor_attributes(sensor_id)
     except KeyError:
-        raise HTTPException(status_code=404, detail=f"Sensor {sensor_id} not managed by bridge")
+        raise HTTPException(status_code=404, detail=f"Sensor {sensor_id} not managed by bridge") from None
 
     unknown_attributes = sorted(set(attributes) - set(known_attributes))
     if unknown_attributes:
@@ -158,10 +158,10 @@ async def patch_sensor_attributes(sensor_id: int, attributes: dict[str, str]) ->
         raise HTTPException(
             status_code=404,
             detail=f"Sensor {sensor_id} not managed by bridge (cannot recreate without spawn params)",
-        )
+        ) from None
     except Exception as exc:
         logger.error("PATCH sensor attributes failed for %d: %s", sensor_id, exc)
-        raise HTTPException(status_code=500, detail=str(exc))
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     return {
         "status": "recreated",

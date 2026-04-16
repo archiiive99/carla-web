@@ -172,8 +172,8 @@ async def reload_map() -> Any:
             carla_manager.client.reload_world()
             return {"status": "reloaded"}
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_reload)

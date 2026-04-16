@@ -31,9 +31,9 @@ async def start_recording(req: StartRecordingRequest) -> Any:
                 _recording_history.insert(0, req.filename)
             return {"status": "recording", "filename": req.filename}
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_start)
 
@@ -47,9 +47,9 @@ async def stop_recording() -> Any:
             carla_manager.client.stop_recorder()
             return {"status": "stopped"}
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_stop)
 
@@ -88,9 +88,9 @@ async def start_replay(req: StartReplayRequest) -> Any:
             )
             return {"status": "replaying", "filename": req.filename}
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_start)
 
@@ -104,8 +104,8 @@ async def stop_replay() -> Any:
             carla_manager.client.stop_replayer(True)
             return {"status": "stopped"}
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_stop)

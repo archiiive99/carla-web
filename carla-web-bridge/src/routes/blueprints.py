@@ -26,9 +26,9 @@ def _filter_blueprints(prefix: str) -> list[dict]:
             results.append(serialize_blueprint(bp).model_dump())
         return results
     except RuntimeError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/vehicles")

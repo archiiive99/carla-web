@@ -189,9 +189,9 @@ async def compute_route(req: RouteQueryRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_compute)
 
@@ -222,8 +222,8 @@ async def get_nearest_waypoint(x: float, y: float, z: float = 0.0) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_get)

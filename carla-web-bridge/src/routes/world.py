@@ -89,9 +89,9 @@ async def load_map(req: LoadMapRequest) -> Any:
             # CARLA raises RuntimeError for invalid map name. Surface the
             # detail so the frontend's "Map load failed: ..." toast is
             # informative instead of a generic 500.
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_load)
 
@@ -144,9 +144,9 @@ async def set_weather(req: SetWeatherRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_set)
 

@@ -97,7 +97,7 @@ async def destroy_all_actors() -> Any:
             carla_manager.clear_tracked_actors()
             return {"status": "destroyed", "count": destroyed}
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_destroy_all)
 
@@ -137,7 +137,7 @@ async def spawn_vehicle(req: SpawnVehicleRequest) -> Any:
             try:
                 bp = bp_lib.find(req.blueprint)
             except Exception:
-                raise HTTPException(status_code=400, detail=f"Blueprint not found: {req.blueprint}")
+                raise HTTPException(status_code=400, detail=f"Blueprint not found: {req.blueprint}") from None
             if bp is None:
                 raise HTTPException(status_code=400, detail=f"Blueprint not found: {req.blueprint}")
             transform = dict_to_carla_transform(req.transform)
@@ -160,9 +160,9 @@ async def spawn_vehicle(req: SpawnVehicleRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_spawn)
 
@@ -178,7 +178,7 @@ async def spawn_walker(req: SpawnWalkerRequest) -> Any:
             try:
                 bp = bp_lib.find(req.blueprint)
             except Exception:
-                raise HTTPException(status_code=400, detail=f"Blueprint not found: {req.blueprint}")
+                raise HTTPException(status_code=400, detail=f"Blueprint not found: {req.blueprint}") from None
             if bp is None:
                 raise HTTPException(status_code=400, detail=f"Blueprint not found: {req.blueprint}")
             transform = dict_to_carla_transform(req.transform)
@@ -190,9 +190,9 @@ async def spawn_walker(req: SpawnWalkerRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_spawn)
 
@@ -211,9 +211,9 @@ async def spawn_sensor(req: SpawnSensorRequest) -> dict[str, Any]:
         )
         return {"id": sensor_id, "type": req.type, "parent_id": req.parent_id}
     except RuntimeError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.delete("/{actor_id}")
@@ -241,9 +241,9 @@ async def destroy_actor(actor_id: int) -> dict[str, Any]:
             except HTTPException:
                 raise
             except RuntimeError as e:
-                raise HTTPException(status_code=400, detail=str(e))
+                raise HTTPException(status_code=400, detail=str(e)) from e
             except Exception as e:
-                raise HTTPException(status_code=500, detail=str(e))
+                raise HTTPException(status_code=500, detail=str(e)) from e
 
         await asyncio.to_thread(_destroy)
 
@@ -271,9 +271,9 @@ async def apply_control(actor_id: int, req: VehicleControl) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_ctrl)
 
@@ -292,9 +292,9 @@ async def set_autopilot(actor_id: int, req: AutopilotRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_set)
 
@@ -314,9 +314,9 @@ async def set_transform(actor_id: int, req: Transform) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_set)
 
@@ -337,9 +337,9 @@ async def set_lights(actor_id: int, req: LightStateRequest) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_set)
 

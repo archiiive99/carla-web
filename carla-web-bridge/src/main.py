@@ -252,9 +252,9 @@ async def apply_realtime_control(req: VehicleControl) -> Any:
         except HTTPException:
             raise
         except RuntimeError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_ctrl)
 
