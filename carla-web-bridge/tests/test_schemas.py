@@ -10,6 +10,7 @@ from pydantic import ValidationError
 
 from src.models.schemas import (
     AutopilotRequest,
+    GlobalSpeedRequest,
     IgnoreRequest,
     LaneChangeRequest,
     LightStateRequest,
@@ -20,6 +21,7 @@ from src.models.schemas import (
     StartRecordingRequest,
     StartReplayRequest,
     VehicleControl,
+    VehicleSpeedRequest,
 )
 
 
@@ -230,3 +232,33 @@ def test_spawn_sensor_rejects_negative_parent_id(bad_parent: int) -> None:
 def test_spawn_sensor_accepts_zero_and_positive_parent_id() -> None:
     assert SpawnSensorRequest(type="sensor.camera.rgb", parent_id=0).parent_id == 0
     assert SpawnSensorRequest(type="sensor.camera.rgb", parent_id=42).parent_id == 42
+
+
+# --- Traffic-manager speed-diff bounds -----------------------------------
+
+
+@pytest.mark.parametrize("bad", [-101.0, -9999.0, 101.0, 9999.0])
+def test_global_speed_rejects_out_of_range(bad: float) -> None:
+    # tm.global_percentage_speed_difference accepts any percentage; CARLA
+    # doesn't clip. Bound [-100, 100] is the operationally useful range —
+    # beyond that values flip to negative speed targets that no caller
+    # legitimately wants.
+    with pytest.raises(ValidationError):
+        GlobalSpeedRequest(speed_diff=bad)
+
+
+@pytest.mark.parametrize("good", [-100.0, -50.0, 0.0, 50.0, 100.0])
+def test_global_speed_accepts_percentage_range(good: float) -> None:
+    assert GlobalSpeedRequest(speed_diff=good).speed_diff == good
+
+
+@pytest.mark.parametrize("bad", [-101.0, 101.0, 500.0])
+def test_vehicle_speed_rejects_out_of_range(bad: float) -> None:
+    with pytest.raises(ValidationError):
+        VehicleSpeedRequest(speed_diff=bad)
+
+
+def test_vehicle_speed_accepts_percentage_range() -> None:
+    assert VehicleSpeedRequest(speed_diff=-100.0).speed_diff == -100.0
+    assert VehicleSpeedRequest(speed_diff=0.0).speed_diff == 0.0
+    assert VehicleSpeedRequest(speed_diff=100.0).speed_diff == 100.0

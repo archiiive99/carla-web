@@ -177,11 +177,22 @@ class TrafficStatus(BaseModel):
 
 
 class GlobalSpeedRequest(BaseModel):
-    speed_diff: float
+    # tm.global_percentage_speed_difference interprets the value as a
+    # percentage relative to the posted speed limit: 0 = at limit,
+    # positive = slower, negative = faster. CARLA doesn't clip, so a typoed
+    # 9999 silently drives the fleet at ridiculous speeds. Bound at the
+    # operationally-useful range: [-100, 100] covers "2x the limit" through
+    # "zero speed"; anything beyond produces reverse/backwards targets that
+    # no legitimate caller should want. The TrafficManagerPanel slider
+    # already self-limits to ±50, so this is purely a direct-API guard.
+    speed_diff: float = Field(..., ge=-100.0, le=100.0)
 
 
 class VehicleSpeedRequest(BaseModel):
-    speed_diff: float
+    # Mirrors GlobalSpeedRequest — same CARLA API (tm.vehicle_percentage_
+    # speed_difference) with the same "percentage relative to limit" shape,
+    # so the same bounds apply.
+    speed_diff: float = Field(..., ge=-100.0, le=100.0)
 
 
 class LaneChangeRequest(BaseModel):
