@@ -20,6 +20,11 @@ export function MiniMap({ className }: MiniMapProps) {
   const viewRef = useRef({ cx: 0, cy: 0, zoom: MINIMAP_DEFAULT_ZOOM });
   const draggingRef = useRef(false);
   const lastMouseRef = useRef({ x: 0, y: 0 });
+  // Cache the last-seen CSS rect so the 60Hz rAF draw doesn't reassign
+  // canvas.width/height every frame — see RadarView / OpenDriveViewer
+  // for the same pattern. Avoids a layout sync + backing-store reset
+  // when nothing about the element's size has changed.
+  const lastRectRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
 
   const actors = useActorStore((s) => s.actors);
   const selectedActorId = useActorStore((s) => s.selectedActorId);
@@ -93,10 +98,19 @@ export function MiniMap({ className }: MiniMapProps) {
 
     const rect = canvas.getBoundingClientRect();
     const dpr = devicePixelRatio;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    if (
+      rect.width !== lastRectRef.current.w ||
+      rect.height !== lastRectRef.current.h
+    ) {
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      lastRectRef.current = { w: rect.width, h: rect.height };
+    }
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    // Reset transform each frame — with the resize gated, the implicit
+    // identity-on-width-assign no longer runs every tick.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
 
     const w = rect.width;
