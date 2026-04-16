@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import math
 import time
 from collections import deque
 from collections.abc import Mapping
@@ -460,10 +461,23 @@ class RateController:
 
     @staticmethod
     def _clamp_fps(target_fps: float, native_fps: float | None) -> float:
+        # A NaN/Infinity target_fps propagates through min/max (both
+        # return NaN on NaN inputs in Python) and lands in
+        # state.effective_fps — after which every comparison with NaN is
+        # False, so the ratio-gate in should_send silently drops every
+        # frame for that subscriber. The WS handler only catches
+        # TypeError/ValueError from its float() cast, and float("nan")
+        # succeeds without raising. Replace non-finite inputs with the
+        # MIN_CLIENT_FPS floor so a hostile or buggy set_rate payload
+        # just falls back to the minimum cadence instead of muting the
+        # stream.
+        target = float(target_fps)
+        if not math.isfinite(target):
+            target = MIN_CLIENT_FPS
         ceiling = ADAPTIVE_MAX_FPS
-        if native_fps is not None and native_fps > 0:
+        if native_fps is not None and math.isfinite(native_fps) and native_fps > 0:
             ceiling = min(ceiling, native_fps)
-        return max(MIN_CLIENT_FPS, min(float(target_fps), ceiling))
+        return max(MIN_CLIENT_FPS, min(target, ceiling))
 
     @staticmethod
     def _coerce_optional_float(value: Any) -> float | None:

@@ -105,6 +105,35 @@ class TestRateController(unittest.TestCase):
         self.assertEqual(state.target_fps, 20.0)
         self.assertEqual(state.effective_fps, 20.0)
 
+    def test_set_rate_rejects_nan_infinity_target_fps(self):
+        """A WS client sending `target_fps: NaN` (float("nan") doesn't raise
+        in the ws-handler cast) would otherwise propagate NaN through
+        min/max into state.effective_fps. Every subsequent ratio-gate
+        comparison with NaN is False, so should_send silently drops every
+        frame for that subscriber. Clamp to MIN_CLIENT_FPS on non-finite."""
+        import math
+        controller = RateController()
+        applied_nan = controller.set_target_fps("c1", 7, float("nan"), native_fps=20.0)
+        self.assertTrue(math.isfinite(applied_nan))
+        state_nan = controller.get_state("c1", 7)
+        self.assertIsNotNone(state_nan)
+        # Pin to MIN_CLIENT_FPS floor — bound-recovery doesn't need to
+        # hit a specific value, just needs to be finite + positive so the
+        # ratio division in should_send stays well-defined.
+        self.assertGreater(state_nan.effective_fps, 0)
+        self.assertTrue(math.isfinite(state_nan.effective_fps))
+
+        applied_inf = controller.set_target_fps("c2", 8, float("inf"), native_fps=20.0)
+        self.assertTrue(math.isfinite(applied_inf))
+        state_inf = controller.get_state("c2", 8)
+        self.assertIsNotNone(state_inf)
+        self.assertTrue(math.isfinite(state_inf.effective_fps))
+
+        # should_send must not throw — this is the downstream failure the
+        # guard protects against. One call per client proves it.
+        controller.should_send("c1", 7, 30.0)
+        controller.should_send("c2", 8, 30.0)
+
     def test_should_send_uses_ratio_counter(self):
         controller = RateController()
         controller.set_target_fps("slow", 3, 10.0, native_fps=30.0)
