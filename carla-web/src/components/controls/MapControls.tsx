@@ -58,7 +58,14 @@ export function MapControls() {
   const [enabledLayers, setEnabledLayers] = useState<Record<string, boolean>>(
     () => Object.fromEntries(MAP_LAYERS.map((l) => [l.key, true])),
   );
-  const [layerBusy, setLayerBusy] = useState<string | null>(null);
+  // Per-layer in-flight tracker. Same race as TrafficManagerPanel's
+  // lane-toggle before its fix: a single `string | null` scalar only
+  // pinned the most-recently-clicked layer, so toggling A then B before
+  // A's RPC returned overwrote the scalar to B, reopened A's checkbox
+  // mid-flight, and when A finished its `finally` cleared the flag to
+  // null — reopening B's checkbox too while B was still in flight.
+  // Set lets every in-flight layer keep its own Checkbox disabled.
+  const [layerBusySet, setLayerBusySet] = useState<Set<string>>(() => new Set());
 
   const toggleLayer = useCallback(async (key: string) => {
     // Mirror the render fallback (see `?? true` below): CARLA ships every
@@ -69,7 +76,11 @@ export function MapControls() {
     const current = enabledLayers[key] ?? true;
     const next = !current;
     setEnabledLayers((prev) => ({ ...prev, [key]: next }));
-    setLayerBusy(key);
+    setLayerBusySet((prev) => {
+      const nextSet = new Set(prev);
+      nextSet.add(key);
+      return nextSet;
+    });
     try {
       await carlaApi.setMapLayer(key, next ? "load" : "unload");
     } catch (e) {
@@ -77,7 +88,12 @@ export function MapControls() {
       setEnabledLayers((prev) => ({ ...prev, [key]: current }));
       reportError("Map layer", e);
     } finally {
-      setLayerBusy(null);
+      setLayerBusySet((prev) => {
+        if (!prev.has(key)) return prev;
+        const nextSet = new Set(prev);
+        nextSet.delete(key);
+        return nextSet;
+      });
     }
   }, [enabledLayers]);
 
@@ -189,7 +205,7 @@ export function MapControls() {
             <div className="grid grid-cols-2 gap-2">
               {MAP_LAYERS.map((layer) => {
                 const checked = enabledLayers[layer.key] ?? true;
-                const busy = layerBusy === layer.key;
+                const busy = layerBusySet.has(layer.key);
                 return (
                   <div key={layer.key} className="flex items-center gap-2">
                     <Checkbox
