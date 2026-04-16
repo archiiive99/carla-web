@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import math
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -149,6 +150,17 @@ async def set_route(vehicle_id: int, req: RouteRequest) -> Any:
             if not getattr(actor, "type_id", "").startswith("vehicle."):
                 raise HTTPException(status_code=400, detail="Actor is not a vehicle")
             tm = carla_manager.get_traffic_manager()
+            # Same NaN/Infinity guard as dict_to_carla_transform /
+            # get_nearest_waypoint: Vector3's x/y/z accept non-finite values
+            # and tm.set_path would either stall or panic with NaN targets.
+            # Single all-finite scan up-front before allocating Location
+            # objects, then 422 if any slip through.
+            for w in req.waypoints:
+                if not (math.isfinite(w.x) and math.isfinite(w.y) and math.isfinite(w.z)):
+                    raise HTTPException(
+                        status_code=422,
+                        detail="waypoint coordinates must be finite",
+                    )
             locs = [carla.Location(x=w.x, y=w.y, z=w.z) for w in req.waypoints]
             tm.set_path(actor, locs)
             return {"status": "route_set", "id": vehicle_id, "waypoints": len(locs)}
