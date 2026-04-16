@@ -488,6 +488,16 @@ class SensorManager:
                     exc,
                 )
                 parent = None
+            # Fail loud when the user explicitly asked to attach to an
+            # actor that no longer exists (destroyed between the UI
+            # pick and this spawn). Silent fallback to "world attached"
+            # had two problems: the sensor doesn't follow the vehicle
+            # the user picked, and the bridge's spawn response echoes
+            # the now-wrong parent_id so the frontend never notices.
+            if parent is None:
+                raise RuntimeError(
+                    f"Parent actor {parent_id} not found — it may have been destroyed"
+                )
         if parent:
             return world.spawn_actor(bp, t, attach_to=parent)
         return world.spawn_actor(bp, t)
