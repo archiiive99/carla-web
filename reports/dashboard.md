@@ -77,7 +77,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 08-revisit-bob | Vertical torso bob at 2× step rate | **✅** | 6.61 | 0.0627 | 49.24 | ~70 min (incl CARLA recovery) | f0be4ef26 |
 | 06-revisit-ambient-fog | Ambient fill lifts with fog-density | **✅** | 15.45 | 0.3433 | 22.85 | ~12 min | f898a86c1 |
 | 06-revisit-sun-precip | Direct sun attenuated by precipitation | **✅** | 15.50 | 0.3388 | 22.79 | ~10 min | 44ed5fb80 |
-| 11-revisit-exposure-precip | Exposure target lifts with precipitation | **✅** | 15.37 | 0.3040 | 22.94 | ~8 min | (this commit) |
+| 11-revisit-exposure-precip | Exposure target lifts with precipitation | **✅** | 15.37 | 0.3040 | 22.94 | ~8 min | 2fee3274f |
 
 ## Notes
 
