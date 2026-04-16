@@ -83,7 +83,11 @@ class ActorInfo(BaseModel):
     type: str = ""  # "vehicle", "walker", "sensor", "traffic_light", "other"
     transform: Transform = Field(default_factory=Transform)
     velocity: Vector3 = Field(default_factory=Vector3)
-    is_alive: bool = True
+    # is_alive field dropped — serialize_actor never passed it, so every
+    # response hardcoded True. The frontend also removed its mirror of
+    # the field from CarlaActor. If actor-liveness ever needs to be
+    # surfaced, derive it from `getattr(actor, "is_alive", False)` in
+    # serialize_actor and re-add here.
     parent_id: int | None = None
     role_name: str | None = None
     traffic_light_state: str | None = None  # "Red"|"Yellow"|"Green"|"Off"|"Unknown" for TL actors
