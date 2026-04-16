@@ -130,7 +130,13 @@ export interface SensorConfig {
   type: string;
   parent_id: number;
   transform: CarlaTransform;
-  attributes: Record<string, string | number>;
+  // Always strings at the store level — sensorStore.spawnSensor coerces
+  // the user's `string | number` request values to strings before storing
+  // (matching what GET /api/sensors/:id/config returns and what CARLA
+  // itself exposes on actor.attributes). `string | number` was copied in
+  // from SpawnSensorRequest.attributes (the request shape) and leaked
+  // into the stored shape, promising a union that never actually appears.
+  attributes: Record<string, string>;
 }
 
 // --- Blueprints ---
