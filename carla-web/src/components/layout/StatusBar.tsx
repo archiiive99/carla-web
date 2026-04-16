@@ -128,7 +128,13 @@ export function StatusBar() {
       } else if (tickRateRef.current) {
         const tickDelta = state.currentTick - lastTickRef.current.tick;
         const timeDelta = (now - lastTickRef.current.at) / 1000;
-        if (tickDelta >= 0 && timeDelta > 0.25) {
+        if (tickDelta < 0) {
+          // currentTick decreased — CARLA reset (map reload, reconnect).
+          // Rebase the baseline so the Hz readout doesn't freeze at its
+          // pre-reset value for the thousands of ticks it takes to climb
+          // back above the old high-water mark.
+          lastTickRef.current = { tick: state.currentTick, at: now };
+        } else if (timeDelta > 0.25) {
           const hz = tickDelta / timeDelta;
           tickRateRef.current.textContent = `${hz.toFixed(hz >= 10 ? 0 : 1)} Hz`;
           lastTickRef.current = { tick: state.currentTick, at: now };

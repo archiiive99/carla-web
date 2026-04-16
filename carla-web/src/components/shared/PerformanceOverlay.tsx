@@ -43,7 +43,12 @@ export function PerformanceOverlay() {
       const now = performance.now();
       const dt = (now - lastTickRef.current.at) / 1000;
       const dTick = state.currentTick - lastTickRef.current.tick;
-      if (dt >= 0.5 && dTick > 0) {
+      if (dTick < 0) {
+        // currentTick went backwards — map reload / reconnect reset the
+        // simulation. Rebase so Server FPS doesn't stay frozen until the
+        // tick counter climbs back past the stale baseline.
+        lastTickRef.current = { tick: state.currentTick, at: now };
+      } else if (dt >= 0.5 && dTick > 0) {
         setServerFps(Math.round(dTick / dt));
         lastTickRef.current = { tick: state.currentTick, at: now };
       }
