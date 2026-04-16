@@ -191,7 +191,7 @@ export function createRoadMaterial(baseHex: string, junction: boolean) {
           float s = dot(wXZ, vForwardXZ);
           float distEdge = min(u, 1.0 - u);
           float stripeMask = 0.0;
-          vec3 paintColor = vec3(0.88, 0.86, 0.80);
+          vec3 paintColor = vec3(0.94, 0.92, 0.86);
           float STRIPE_INNER = 0.022;
           float STRIPE_OUTER = 0.038;
           if (style == 1) {

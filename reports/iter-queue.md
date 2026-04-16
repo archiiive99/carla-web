@@ -97,6 +97,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-06-revisit-ambient-fog  Ambient fill lifts with fog-density  (✅ — + fogFactor*0.04 term; midday byte-identical (fog_density=0); closed 2026-04-16T12:56:00Z+~12min)
 [x] iter-06-revisit-sun-precip  Direct sun attenuated by precipitation  (✅ — +precipFactor*0.25 attenuation, floored; midday byte-identical (precip=0); closed 2026-04-16T13:02:00Z+~10min)
 [x] iter-11-revisit-exposure-precip  Exposure target lifts with precipitation  (✅ — +precipitation*0.0010 (smaller coef than cloudiness since directIntensity already rain-attenuated); midday byte-identical (precip=0); closed 2026-04-16T13:08:00Z+~8min)
+[x] iter-04-revisit-stripe-brightness  Brighter white stripe paint  (✅ — (0.88,0.86,0.80)→(0.94,0.92,0.86) same warm ratio +6-7%; PSNR -0.30 within cluster, SSIM -0.05; under §4.3 1dB swap threshold; closed 2026-04-16T13:14:00Z+~10min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 
