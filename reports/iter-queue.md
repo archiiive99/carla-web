@@ -85,6 +85,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-11-revisit-ambient-cloud-cool  Ambient color cools under cloudiness  (✅ — lerp #ffffff→#c8d0da on cloudFactor; midday byte-identical (cloudiness=0); closed 2026-04-16T10:55:00Z+~12min)
 [x] iter-09-revisit-lamp-pole  Visible pole cylinder ground→lamp head  (✅ — tapered 0.06→0.08 radius cylinder per lamp; always-visible; night rig gated under isNight inside group; midday byte-identical (poles above road ROI); closed 2026-04-16T11:03:00Z+~20min)
 [x] iter-09-revisit-lamp-arm  Horizontal arm offset + head moves to arm end  (✅ — armDir ±0.5 by CARLA x=120 split; head + halo + spot all at arm end; thin (0.04r) 0.5m horizontal cylinder; byte-identical at midday; closed 2026-04-16T11:16:00Z+~25min)
+[x] iter-06-revisit-shadow-softness-cloudiness  Shadow radius ramps with cloudiness  (✅ — 2.5 + cloudFactor*3.5; 2.5 clear → 6.0 overcast; midday byte-identical (cloudiness=0); closed 2026-04-16T11:26:00Z+~12min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 
