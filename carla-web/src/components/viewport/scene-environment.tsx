@@ -264,6 +264,9 @@ export function WeatherLighting({
   const horizonScatter = 1 - altFactor;
   const turbidity = 3 + weather.cloudiness / 8 + horizonScatter * 4;
   const rayleigh = Math.max(0.15, 0.4 - cloudFactor * 0.25 + horizonScatter * 0.3);
+  // iter-05-revisit-mie-altitude: aerosol scattering widens the warm sun
+  // halo near horizon. Noon = 0.005 (drei default), horizon = 0.02.
+  const mieCoefficient = 0.005 + horizonScatter * 0.015;
   // Sun color temperature shift with altitude. Horizon ≈ 5000K (warm
   // amber), zenith ≈ 5800K (slightly warm white). Matches UE5
   // SkyAtmosphere's sun-disc color shift; eliminates the iter-01 gap
@@ -344,6 +347,7 @@ export function WeatherLighting({
         sunPosition={[sunX, sunY, sunZ]}
         turbidity={turbidity}
         rayleigh={rayleigh}
+        mieCoefficient={mieCoefficient}
       />
       {!skipEnvironment && (
         <Environment
@@ -358,6 +362,7 @@ export function WeatherLighting({
             sunPosition={[sunX, sunY, sunZ]}
             turbidity={turbidity}
             rayleigh={rayleigh}
+            mieCoefficient={mieCoefficient}
           />
         </Environment>
       )}
