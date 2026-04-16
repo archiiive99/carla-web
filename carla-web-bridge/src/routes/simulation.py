@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -12,6 +13,8 @@ from src.models.schemas import (
     SimulationSettings,
     SimulationStatus,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/simulation", tags=["simulation"])
 
@@ -53,7 +56,13 @@ async def get_status() -> Any:
     try:
         return await asyncio.to_thread(_get)
     except Exception as exc:
-        return SimulationStatus(connected=False, server_version=str(exc))
+        # `server_version` is a user-visible label ("0.9.14"). Previously this
+        # stuffed the exception string into it, so the Settings "Server" row
+        # and StatusBar ended up showing "TimeoutError: ..." as if it were
+        # the CARLA build ID. Log the real error and return an empty version
+        # instead so the UI falls back to "Disconnected" cleanly.
+        logger.warning("simulation.status failed: %s", exc)
+        return SimulationStatus(connected=False)
 
 
 @router.post("/play")
