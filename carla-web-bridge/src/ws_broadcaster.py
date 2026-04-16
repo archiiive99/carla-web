@@ -161,8 +161,11 @@ class WebSocketBroadcaster:
             if on_unsubscribe:
                 on_unsubscribe(sensor_id, conn.client_id)
         elif action == "stats":
-            # Stamp arrival time so the adaptive loop can detect stale clients.
-            msg.setdefault("_recv_ts", time.time())
+            # Server-stamped arrival time (not `setdefault` — the `_` prefix
+            # marks this as bridge-internal metadata; a buggy or hostile
+            # client sending "_recv_ts" in the payload could otherwise freeze
+            # the value and defeat adaptive_rate's stats dedup token).
+            msg["_recv_ts"] = time.time()
             conn.last_stats = msg
         elif action == "set_rate" and sensor_id is not None:
             target = msg.get("target_fps")
@@ -223,7 +226,8 @@ class WebSocketBroadcaster:
             try:
                 parsed = json.loads(payload)
                 if isinstance(parsed, dict):
-                    parsed.setdefault("_recv_ts", time.time())
+                    # Overwrite, not setdefault — see text CLIENT_STATS branch.
+                    parsed["_recv_ts"] = time.time()
                     conn.last_stats = parsed
             except (json.JSONDecodeError, IndexError):
                 pass
