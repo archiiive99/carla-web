@@ -101,7 +101,18 @@ export function VehicleControls({ actorId, enabled }: VehicleControlsProps) {
 
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Shift") { shiftHeldRef.current = true; return; }
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      // Mirror useKeyboardShortcuts' focus-guard so driving keys don't fire
+      // while the user is typing in a Select's search box, a contentEditable
+      // div, or any other text-entry surface beyond the two HTML primitives.
+      const target = e.target;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable)
+      ) {
+        return;
+      }
       const action = KEY_MAP[e.key];
       if (action) {
         e.preventDefault();
