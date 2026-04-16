@@ -47,7 +47,12 @@ export function SensorDetails({ actorId, typeId }: SensorDetailsProps) {
         detail: { sensorId: actorId, typeId },
       }),
     );
-    toast.success(`${getSensorDisplayName(typeId)} #${actorId} added to sensor grid`);
+    // Previous copy said "added to sensor grid" — misleading when the
+    // sensor was already in a cell (SensorPanel's handler early-returns
+    // on duplicate), since nothing actually gets added. "Opened" is
+    // accurate either way: the panel opens to the sensors tab and the
+    // sensor is visible regardless of whether a new cell was allocated.
+    toast.success(`Opened ${getSensorDisplayName(typeId)} #${actorId} in sensor panel`);
   }, [actorId, typeId]);
 
   const loc = sensor?.transform.location;
