@@ -10,6 +10,14 @@ const POLL_INTERVAL_MS = 2_000;
 
 export function useConnectionHealth() {
   const lastStatusRef = useRef<string>("disconnected");
+  // Track whether we've ever reached "connected" successfully in this
+  // session. The previous `lastStatusRef === "disconnected"` check for
+  // "Connected" vs "Reconnected" flipped to "Reconnected" as soon as any
+  // non-"disconnected" state had been observed — including the "error"
+  // path hit when the bridge is down at page load. Result: a user who
+  // opened the page before the bridge was up saw the first-ever
+  // connection announced as "Reconnected", which is wrong.
+  const hasEverConnectedRef = useRef(false);
 
   useEffect(() => {
     const check = async () => {
@@ -22,17 +30,12 @@ export function useConnectionHealth() {
         if (health.carla_connected) {
           useSimulationStore.setState({ connectionStatus: "connected" });
           if (lastStatusRef.current !== "connected") {
-            // Toast + event log used to diverge: the event log correctly
-            // distinguished first-time "Connected" from post-error
-            // "Reconnected", but the toast always said "Reconnected" —
-            // so a user opening the page for the first time was told
-            // the bridge had "Reconnected" as if it had dropped earlier.
-            const message =
-              lastStatusRef.current === "disconnected"
-                ? "Connected to CARLA bridge"
-                : "Reconnected to CARLA bridge";
+            const message = hasEverConnectedRef.current
+              ? "Reconnected to CARLA bridge"
+              : "Connected to CARLA bridge";
             toast.success(message);
             useEventStore.getState().addEvent("connection", message);
+            hasEverConnectedRef.current = true;
           }
           try {
             const status = await carlaApi.getStatus();
