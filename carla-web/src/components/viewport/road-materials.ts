@@ -204,7 +204,7 @@ export function createRoadMaterial(baseHex: string, junction: boolean) {
             float lineA = 1.0 - smoothstep(0.010, 0.016, abs(distEdge - 0.014));
             float lineB = 1.0 - smoothstep(0.010, 0.016, abs(distEdge - 0.034));
             stripeMask = max(lineA, lineB);
-            paintColor = vec3(0.94, 0.74, 0.18);
+            paintColor = vec3(0.98, 0.78, 0.22);
           }
           // Grunge: sampled grayscale opacity at a smaller tile than
           // asphalt so the wear pattern doesn't echo the road texture
