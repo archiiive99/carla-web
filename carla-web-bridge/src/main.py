@@ -67,6 +67,13 @@ async def _world_tick_loop() -> None:
     from src.routes import simulation as simulation_routes
     from src.utils.serialization import encode_world_tick
 
+    # Track consecutive tick failures so a silent debug-only log doesn't hide
+    # a persistent problem (CARLA daemon crashed, sync-mode timeout, etc.)
+    # while also not spamming 20 warnings/sec during a transient blip. The
+    # first failure after a healthy streak logs at warning; subsequent ones
+    # stay at debug; a recovered tick logs once at info with the count.
+    consecutive_failures = 0
+
     while True:
         await asyncio.sleep(WORLD_TICK_INTERVAL)
         if not carla_manager.is_connected:
@@ -100,10 +107,23 @@ async def _world_tick_loop() -> None:
                     actors,
                 )
             tick_data = await asyncio.to_thread(_tick_and_get_data)
+            if consecutive_failures > 0:
+                logger.info(
+                    "World tick recovered after %d consecutive failure(s)",
+                    consecutive_failures,
+                )
+                consecutive_failures = 0
             if tick_data is not None:
                 await ws_broadcaster.broadcast_world_tick(tick_data)
         except Exception as exc:
-            logger.debug("World tick error: %s", exc)
+            consecutive_failures += 1
+            if consecutive_failures == 1:
+                logger.warning("World tick error: %s", exc)
+            else:
+                logger.debug(
+                    "World tick error (#%d consecutive): %s",
+                    consecutive_failures, exc,
+                )
 
 
 @asynccontextmanager
