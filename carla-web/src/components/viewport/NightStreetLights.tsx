@@ -37,8 +37,12 @@ export function NightStreetLights() {
   // iter-09-revisit-halo-opacity-altitude: halo opacity ramps with
   // how deep into night we are. Twilight (sun_alt ≈ 0) = 0.2;
   // deep night (sun_alt ≤ -15) = 0.5.
+  // iter-09-revisit-emissive-depth: emissive sphere intensity ramps
+  // on the same curve so the sphere's perceived brightness stays
+  // in proportion to its halo.
   const nightDepth = Math.max(0, Math.min(1, -sunAltitude / 15));
   const haloOpacity = 0.2 + nightDepth * 0.3;
+  const emissiveIntensity = 1.2 + nightDepth * 2.3;
 
   const lampSpecs = useMemo(
     () =>
@@ -135,7 +139,7 @@ export function NightStreetLights() {
                   <meshStandardMaterial
                     color={STREETLAMP_BEAM}
                     emissive={STREETLAMP_BEAM}
-                    emissiveIntensity={2.5}
+                    emissiveIntensity={emissiveIntensity}
                     roughness={0.5}
                     metalness={0}
                   />
