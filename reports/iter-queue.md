@@ -78,6 +78,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-03-revisit-paint-gloss  Vehicle paint PBR toward automotive-glossy  (✅ — roughness 0.45→0.3, metalness 0.5→0.35, envMapIntensity 0.5→0.7; ROI road-only so numbers within noise; closed 2026-04-16T09:40:00Z+~15min)
 [x] iter-10-revisit-bulb-sun-drive  TL bulb emissive driven by sun altitude  (✅ — 1.0 at noon → 2.6 at/below horizon; store subscription per TL; byte-identical at midday since TLs outside road ROI; closed 2026-04-16T09:53:00Z+~20min)
 [x] iter-06-revisit-ground-bounce-altitude  Hemisphere ground-bounce color ramp  (✅ — lerp #7a4c30→#5a4f44 on altFactor; reuses existing altFactor; midday byte-identical; closed 2026-04-16T10:04:00Z+~15min)
+[x] iter-08-revisit-swing-amp-split  Split arm vs leg swing amplitudes  (✅ — arms 0.35, legs 0.55 (was 0.45 shared); byte-identical midday; closed 2026-04-16T10:14:00Z+~12min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 

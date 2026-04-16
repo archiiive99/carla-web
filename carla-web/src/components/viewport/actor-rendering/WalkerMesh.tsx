@@ -97,11 +97,15 @@ export const WalkerMesh = memo(function WalkerMesh({
     // Phase increment scaled by speed (faster speed = quicker stride).
     // 1.8 rad/s/(m/s) ≈ natural human cadence at walking pace.
     walkPhaseRef.current += delta * speed * 1.8;
-    const swing = Math.sin(walkPhaseRef.current) * 0.45;
-    if (leftArmRef.current) leftArmRef.current.rotation.x = -swing;
-    if (rightArmRef.current) rightArmRef.current.rotation.x = swing;
-    if (leftLegRef.current) leftLegRef.current.rotation.x = swing;
-    if (rightLegRef.current) rightLegRef.current.rotation.x = -swing;
+    // Natural gait: arms swing narrower than legs. Split amplitudes
+    // so arms read as counter-balance rather than matching leg stride.
+    const phaseSin = Math.sin(walkPhaseRef.current);
+    const armSwing = phaseSin * 0.35;
+    const legSwing = phaseSin * 0.55;
+    if (leftArmRef.current) leftArmRef.current.rotation.x = -armSwing;
+    if (rightArmRef.current) rightArmRef.current.rotation.x = armSwing;
+    if (leftLegRef.current) leftLegRef.current.rotation.x = legSwing;
+    if (rightLegRef.current) rightLegRef.current.rotation.x = -legSwing;
     // iter-08-knee-bend: knee bends during forward half of swing
     // (leg moving forward through air). Left leg phase = walkPhase;
     // right leg = walkPhase + π. Knee angle clamps to zero during
