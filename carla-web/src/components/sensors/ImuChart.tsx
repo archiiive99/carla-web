@@ -112,6 +112,7 @@ export default function ImuChart({ sensorId, className }: ImuChartProps) {
   const [accelData, setAccelData] = useState<Sample[]>([]);
   const [gyroData, setGyroData] = useState<Sample[]>([]);
   const compassDisplayRef = useRef<HTMLSpanElement>(null);
+  const lastSignatureRef = useRef("");
   const { bufferRef, compassRef } = useImuSensorData(sensorId);
   const chartColors = chartThemeColors();
 
@@ -131,6 +132,21 @@ export default function ImuChart({ sensorId, className }: ImuChartProps) {
     const interval = setInterval(() => {
       const buf = bufferRef.current;
       if (buf.length === 0) return;
+
+      // Skip the setState (and all downstream recharts work) when the
+      // source buffer hasn't advanced since the previous flush — e.g.
+      // while the sim is paused or the IMU sensor went quiet. Same
+      // pattern as CollisionLog / LaneInvasionLog: length + newest
+      // timestamp uniquely identifies the buffer tip.
+      const newest = buf[buf.length - 1];
+      const signature = newest ? `${buf.length}:${newest.t}` : "0";
+      if (signature === lastSignatureRef.current) {
+        if (compassDisplayRef.current) {
+          compassDisplayRef.current.textContent = `${compassRef.current.toFixed(1)}°`;
+        }
+        return;
+      }
+      lastSignatureRef.current = signature;
 
       const accelSamples = buf.map((s, i) => ({
         t: i,
