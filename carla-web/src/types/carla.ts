@@ -37,7 +37,6 @@ export interface CarlaActor {
   type: ActorType;
   transform: CarlaTransform;
   velocity: Vector3;
-  is_alive: boolean;
   parent_id?: number | null;
   role_name?: string | null;
   /** "Red" | "Yellow" | "Green" | "Off" | "Unknown" — only set for traffic_light actors */
