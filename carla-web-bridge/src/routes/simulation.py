@@ -59,15 +59,18 @@ async def play():
 
     def _play():
         world = carla_manager.world
-        settings = world.get_settings()
         if _paused:
+            settings = world.get_settings()
             settings.synchronous_mode = (
                 _pre_pause_sync_mode if _pre_pause_sync_mode is not None else False
             )
             settings.fixed_delta_seconds = _pre_pause_fixed_delta
             world.apply_settings(settings)
-        elif settings.synchronous_mode:
-            world.tick()
+        # Previously also called `world.tick()` when not paused but in sync
+        # mode. With _world_tick_loop as the single tick source (see main.py
+        # and the explicit warning in routes/actors.py apply_control), that
+        # extra call just raced the loop and caused the actor control bug
+        # the other comment describes.
         return {"status": "playing"}
 
     result = await asyncio.to_thread(_play)
