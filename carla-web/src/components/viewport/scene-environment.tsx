@@ -78,9 +78,15 @@ export function GroundPlane() {
  *  config with weather-adaptive exposure. */
 const EXPOSURE_MIDDAY = 0.82;
 const EXPOSURE_DUSK_NIGHT = 1.6;
+// iter-11-revisit-smoothing: damping rate for exposure transitions.
+// Units per second of exposure-change. With EXPOSURE_DUSK_NIGHT−EXPOSURE_MIDDAY
+// ≈ 0.78, a rate of 0.4/s takes ~2s to ease from full day to full night;
+// matches real-camera iris-adaption time-constants (~1-3s typical).
+const EXPOSURE_DAMP_RATE = 0.4;
 export function ExposureDriver() {
   const weather = useSimulationStore((s) => s.weather);
-  useFrame(({ gl }) => {
+  const currentExposure = useRef<number | null>(null);
+  useFrame(({ gl }, delta) => {
     const sunAlt = weather.sun_altitude_angle ?? 60;
     const cloudiness = weather.cloudiness ?? 0;
     const base =
@@ -89,7 +95,22 @@ export function ExposureDriver() {
         : EXPOSURE_MIDDAY +
           (EXPOSURE_DUSK_NIGHT - EXPOSURE_MIDDAY) *
             (1 - Math.min(Math.max(sunAlt, 0), 60) / 60);
-    gl.toneMappingExposure = base + cloudiness * 0.0015;
+    const target = base + cloudiness * 0.0015;
+    // First-frame seed: start AT target (no transient on mount).
+    if (currentExposure.current === null) {
+      currentExposure.current = target;
+    } else {
+      // Linear lerp toward target, capped by per-frame max step so
+      // a sudden weather change eases over ~(|Δ|/EXPOSURE_DAMP_RATE) s.
+      const diff = target - currentExposure.current;
+      const step = EXPOSURE_DAMP_RATE * delta;
+      if (Math.abs(diff) <= step) {
+        currentExposure.current = target;
+      } else {
+        currentExposure.current += Math.sign(diff) * step;
+      }
+    }
+    gl.toneMappingExposure = currentExposure.current;
   });
   return null;
 }
