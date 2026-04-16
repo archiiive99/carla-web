@@ -189,7 +189,7 @@ export function WeatherLighting({
   // map and reads as flat-lit. Bounds widened to ±350m so a wider ring of
   // mapped area around ego casts/receives shadows for every active
   // viewport's camera, not just the primary follow-cam.
-  useFrame(() => {
+  useFrame(({ camera }) => {
     const light = sunRef.current;
     if (!light) return;
     const actors = useActorStore.getState().actors;
@@ -212,6 +212,24 @@ export function WeatherLighting({
     // so its shadow-view direction stays aligned with the sun angle even
     // as the ego moves.
     light.position.set(tx + sunX, sunY, tz + sunZ);
+    // iter-06-revisit-csm: adaptive shadow frustum. True CSM (per-
+    // cascade multi-bucket) is out of Three.js-directionalLight scope;
+    // as a pseudo-cascade we narrow the orthographic frustum when the
+    // camera is at street-level (height < 10m → ±100m tight) and
+    // widen it when higher (birdseye 80m → ±350m baseline). Texel
+    // density scales with camera height so visible shadows get more
+    // pixels at close range. Shadow camera matrices are recomputed
+    // whenever the ortho extents change.
+    const camY = Math.abs(camera.position.y);
+    const frustumExtent = Math.min(350, Math.max(100, 100 + camY * 3));
+    const shadowCam = light.shadow.camera as THREE.OrthographicCamera;
+    if (shadowCam.left !== -frustumExtent) {
+      shadowCam.left = -frustumExtent;
+      shadowCam.right = frustumExtent;
+      shadowCam.top = frustumExtent;
+      shadowCam.bottom = -frustumExtent;
+      shadowCam.updateProjectionMatrix();
+    }
   });
   const cloudFactor = weather.cloudiness / 100;
   // Sun altitude in [-π/2, π/2]. Daytime drives the direct light via
