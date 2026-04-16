@@ -53,10 +53,20 @@ async def list_actors() -> Any:
         seen_ids = set()
         result = []
         for a in actors:
-            if a.type_id.startswith("traffic.") and "light" not in a.type_id:
-                continue
-            seen_ids.add(a.id)
-            result.append(serialize_actor(a).model_dump())
+            # Per-actor guard so one stale reference doesn't abort the whole
+            # list. serialize_actor calls actor.get_transform() / get_velocity()
+            # without an inner guard; a raising property on a single actor
+            # used to bubble up as a 500, emptying the frontend's actor
+            # panel even when most actors were fine. Matches the managed-
+            # actors loop below.
+            try:
+                if a.type_id.startswith("traffic.") and "light" not in a.type_id:
+                    continue
+                seen_ids.add(a.id)
+                result.append(serialize_actor(a).model_dump())
+            except Exception:
+                # Expected on stale references — skip this actor, keep the rest.
+                pass
         # Fix CARLA inconsistency: get_actors() may not include managed/spawned actors
         missing_ids = set()
         if realtime_session.default_vehicle_id is not None:
