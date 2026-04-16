@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field, field_validator
 
 # --- Common ---
@@ -266,8 +268,13 @@ class LoadMapRequest(BaseModel):
 
 
 class MapLayerRequest(BaseModel):
+    # `action` was typed as bare `str` with a free-form comment. Pydantic
+    # accepted "wrong" / "toggle" / "" and the route only noticed inside the
+    # thread, returning a custom 400 instead of the standard 422 every peer
+    # schema produces on validation miss. Literal forces the reject up-front
+    # and gives the frontend a consistent error shape.
     layer: str
-    action: str = "load"  # "load" or "unload"
+    action: Literal["load", "unload"] = "load"
 
 
 class RouteQueryRequest(BaseModel):

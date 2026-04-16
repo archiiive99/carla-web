@@ -12,6 +12,7 @@ from src.models.schemas import (
     IgnoreRequest,
     LaneChangeRequest,
     LoadMapRequest,
+    MapLayerRequest,
     SimulationSettings,
     StartRecordingRequest,
     StartReplayRequest,
@@ -114,3 +115,28 @@ def test_lane_change_accepts_valid_offset() -> None:
 def test_ignore_request_bounds_percentages(field: str, bad_value: float) -> None:
     with pytest.raises(ValidationError):
         IgnoreRequest(**{field: bad_value})
+
+
+# --- MapLayerRequest action Literal --------------------------------------
+
+
+@pytest.mark.parametrize(
+    "bad_action",
+    ["", "toggle", "LOAD", "Unload", "remove", "on", "off"],
+)
+def test_map_layer_rejects_unknown_action(bad_action: str) -> None:
+    # Literal["load", "unload"] — schema trips 422 before the route ever
+    # runs. Previously `action: str` accepted any value and the route
+    # itself returned a custom 400; this pins the schema-level reject
+    # so frontends get a consistent error shape.
+    with pytest.raises(ValidationError):
+        MapLayerRequest(layer="buildings", action=bad_action)
+
+
+@pytest.mark.parametrize("good_action", ["load", "unload"])
+def test_map_layer_accepts_load_and_unload(good_action: str) -> None:
+    assert MapLayerRequest(layer="buildings", action=good_action).action == good_action
+
+
+def test_map_layer_defaults_to_load_when_action_omitted() -> None:
+    assert MapLayerRequest(layer="foliage").action == "load"

@@ -273,32 +273,43 @@ async def manage_map_layer(req: MapLayerRequest) -> Any:
     _require_connection()
 
     def _manage() -> dict[str, Any]:
-        import carla
+        try:
+            import carla
 
-        layer_map = {
-            "buildings": carla.MapLayer.Buildings,
-            "decals": carla.MapLayer.Decals,
-            "foliage": carla.MapLayer.Foliage,
-            "ground": carla.MapLayer.Ground,
-            "parked_vehicles": carla.MapLayer.ParkedVehicles,
-            "particles": carla.MapLayer.Particles,
-            "props": carla.MapLayer.Props,
-            "street_lights": carla.MapLayer.StreetLights,
-            "walls": carla.MapLayer.Walls,
-            "all": carla.MapLayer.All,
-        }
-        layer = layer_map.get(req.layer.lower())
-        if layer is None:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Unknown layer: {req.layer}. Valid: {list(layer_map.keys())}",
-            )
-        if req.action == "load":
-            carla_manager.world.load_map_layer(layer)
-        elif req.action == "unload":
-            carla_manager.world.unload_map_layer(layer)
-        else:
-            raise HTTPException(status_code=400, detail="action must be 'load' or 'unload'")
-        return {"status": f"layer {req.layer} {req.action}ed"}
+            layer_map = {
+                "buildings": carla.MapLayer.Buildings,
+                "decals": carla.MapLayer.Decals,
+                "foliage": carla.MapLayer.Foliage,
+                "ground": carla.MapLayer.Ground,
+                "parked_vehicles": carla.MapLayer.ParkedVehicles,
+                "particles": carla.MapLayer.Particles,
+                "props": carla.MapLayer.Props,
+                "street_lights": carla.MapLayer.StreetLights,
+                "walls": carla.MapLayer.Walls,
+                "all": carla.MapLayer.All,
+            }
+            layer = layer_map.get(req.layer.lower())
+            if layer is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Unknown layer: {req.layer}. Valid: {list(layer_map.keys())}",
+                )
+            # req.action is Literal["load", "unload"] — schema rejects anything
+            # else upstream, so no else-branch needed here.
+            if req.action == "load":
+                carla_manager.world.load_map_layer(layer)
+            else:
+                carla_manager.world.unload_map_layer(layer)
+            return {"status": f"layer {req.layer} {req.action}ed"}
+        except HTTPException:
+            raise
+        except RuntimeError as e:
+            # CARLA's load/unload can raise when called at the wrong moment
+            # (map change mid-request, world locked). Surface the detail so
+            # the frontend toast gets "Layer load failed: <why>" instead of
+            # a bare 500 with no body — matches load_map / set_weather.
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_manage)
