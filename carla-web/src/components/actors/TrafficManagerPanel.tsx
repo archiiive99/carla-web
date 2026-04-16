@@ -40,20 +40,36 @@ export function TrafficManagerPanel() {
   // (tm.auto_lane_change has no getter), so start each vehicle optimistic-true
   // — matches CARLA's default for autopilot-managed vehicles.
   const [autoLaneChange, setAutoLaneChange] = useState<Record<number, boolean>>({});
-  const [laneBusy, setLaneBusy] = useState<number | null>(null);
+  // Per-vehicle in-flight tracker. Previously a single `number | null`
+  // scalar which only pinned the most-recently-clicked vehicle: clicking
+  // toggle A then B before A's RPC returned overwrote the scalar to B,
+  // so A's Switch re-enabled mid-flight, and when A finished its finally
+  // cleared the flag to null — reopening B's Switch too while B was
+  // still in flight. Using a Set lets every in-flight vehicle keep its
+  // Switch disabled independently.
+  const [laneBusySet, setLaneBusySet] = useState<Set<number>>(() => new Set());
 
   const toggleAutoLane = useCallback(async (vehicleId: number) => {
     const current = autoLaneChange[vehicleId] ?? true;
     const next = !current;
     setAutoLaneChange((prev) => ({ ...prev, [vehicleId]: next }));
-    setLaneBusy(vehicleId);
+    setLaneBusySet((prev) => {
+      const nextSet = new Set(prev);
+      nextSet.add(vehicleId);
+      return nextSet;
+    });
     try {
       await carlaApi.setVehicleAutoLaneChange(vehicleId, next);
     } catch (e) {
       setAutoLaneChange((prev) => ({ ...prev, [vehicleId]: current }));
       reportError(`Auto lane change #${vehicleId}`, e);
     } finally {
-      setLaneBusy(null);
+      setLaneBusySet((prev) => {
+        if (!prev.has(vehicleId)) return prev;
+        const nextSet = new Set(prev);
+        nextSet.delete(vehicleId);
+        return nextSet;
+      });
     }
   }, [autoLaneChange]);
 
@@ -175,7 +191,7 @@ export function TrafficManagerPanel() {
                             <Switch
                               checked={laneOn}
                               onCheckedChange={() => toggleAutoLane(id)}
-                              disabled={!isConnected || laneBusy === id}
+                              disabled={!isConnected || laneBusySet.has(id)}
                               aria-label={`Auto lane change for actor #${id}`}
                             />
                           </TableCell>
