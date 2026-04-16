@@ -62,6 +62,38 @@ export function GroundPlane() {
  *  that previously made the approximation look nothing like real
  *  atmospheric scattering). Returns null when density is 0 so the fog
  *  fixture doesn't persist across weather changes. */
+/** iter-11: weather-driven exposure driver. Writes
+ *  gl.toneMappingExposure each frame per a tuned formula that:
+ *    - At midday-clear (sunAlt=60, cloud=10): 0.82 (matches the
+ *      prior static constant that visually worked for sensor captures).
+ *    - At dusk (sunAlt=0): 1.6 (brightens to keep the frame readable
+ *      as natural lighting dims).
+ *    - At night (sunAlt<0): 1.6 + cloud×0.0015 (floor so night
+ *      doesn't crush to pure black; cloud adds tiny lift).
+ *
+ *  Linear interp between midday and dusk:
+ *    base = 0.82 + (1.6 - 0.82) × (1 − clamp(sunAlt, 0, 60) / 60)
+ *
+ *  Replaces the prior static 0.82 constant in WorldCanvas's gl
+ *  config with weather-adaptive exposure. */
+const EXPOSURE_MIDDAY = 0.82;
+const EXPOSURE_DUSK_NIGHT = 1.6;
+export function ExposureDriver() {
+  const weather = useSimulationStore((s) => s.weather);
+  useFrame(({ gl }) => {
+    const sunAlt = weather.sun_altitude_angle ?? 60;
+    const cloudiness = weather.cloudiness ?? 0;
+    const base =
+      sunAlt <= 0
+        ? EXPOSURE_DUSK_NIGHT
+        : EXPOSURE_MIDDAY +
+          (EXPOSURE_DUSK_NIGHT - EXPOSURE_MIDDAY) *
+            (1 - Math.min(Math.max(sunAlt, 0), 60) / 60);
+    gl.toneMappingExposure = base + cloudiness * 0.0015;
+  });
+  return null;
+}
+
 export function WeatherFog() {
   const weather = useSimulationStore((s) => s.weather);
   const density = weather.fog_density ?? 0;

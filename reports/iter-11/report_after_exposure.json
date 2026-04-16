@@ -1,0 +1,46 @@
+{
+  "label": "after_exposure",
+  "pose": {
+    "name": "street_clear_midday",
+    "x": 118.9,
+    "y": 55.8,
+    "z": 1.8,
+    "yaw": 180.0,
+    "pitch": -8.0,
+    "roll": 0.0
+  },
+  "metrics": {
+    "psnr_db": 10.256330547693082,
+    "ssim": 0.1758099652169948,
+    "delta_e_mean": 38.068588841447415,
+    "roi_pixel_count": 182736,
+    "roi_mode": "road"
+  },
+  "images": {
+    "reference": "ue5_reference_after_exposure.png",
+    "measured": "web_render_after_exposure.png",
+    "roi_overlay": "roi_overlay_after_exposure.png"
+  },
+  "capture": {
+    "width": 1920,
+    "height": 1080
+  },
+  "roi_polygon_frac": [
+    [
+      0.2800000011920929,
+      0.75
+    ],
+    [
+      0.7200000286102295,
+      0.75
+    ],
+    [
+      0.7200000286102295,
+      0.949999988079071
+    ],
+    [
+      0.2800000011920929,
+      0.949999988079071
+    ]
+  ]
+}

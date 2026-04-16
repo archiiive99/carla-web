@@ -14,6 +14,7 @@ import { NightStreetLights } from "./NightStreetLights";
 // import { BLOOM_LAYER } from "./bloom-layer";
 import {
   GroundPlane,
+  ExposureDriver,
   WeatherFog,
   WeatherLighting,
 } from "./scene-environment";
@@ -187,6 +188,7 @@ export function WorldCanvas({ showCityEnvironment }: WorldCanvasProps) {
         }}
       >
         <WeatherLighting />
+        <ExposureDriver />
         <WeatherFog />
         <NightStreetLights />
         <GroundPlane />
