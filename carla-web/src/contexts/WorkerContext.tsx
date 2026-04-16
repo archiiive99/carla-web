@@ -4,7 +4,6 @@ import { useActorStore } from "@/stores/actorStore";
 import { usePerformanceStore } from "@/stores/performanceStore";
 import { setGlobalWsWorker } from "@/lib/worker-ref";
 import { bridgeUrlToWebSocketUrl, normalizeBridgeUrl } from "@/lib/bridge-url";
-import { toast } from "sonner";
 import type { WorkerStatus } from "@/types/ws";
 import { EMPTY_WORKERS, WorkerContext, type WorkerRefs } from "@/contexts/workers";
 
@@ -81,21 +80,23 @@ export function WorkerProvider({ children }: { children: ReactNode }) {
       [imageChannel.port1, lidarChannel.port1, telemetryChannel.port1],
     );
 
-    let toastShown = false;
     wsReceiver.onmessage = (event: MessageEvent) => {
       const msg = event.data;
       if (msg.type === "status") {
         const status = msg.status as WorkerStatus;
         useSimulationStore.getState().setConnectionStatus(status);
+        // Uptime tracking still tracks WS readiness (bandwidth telemetry
+        // stops when the WS drops even if /health stays responsive).
+        // User-facing "Connected"/"Reconnected"/"unreachable" toasts are
+        // owned exclusively by useConnectionHealth, which has the full
+        // picture (carla_connected, not just WS readiness) and was the
+        // second firer on every connect — toasting here as well showed
+        // the user two identical toasts and, if the WS was up but CARLA
+        // wasn't, a misleading "Connected" before the real state arrived.
         if (status === "connected") {
           usePerformanceStore.getState().markConnected();
-          if (!toastShown) {
-            toast.success("Connected to CARLA bridge");
-            toastShown = true;
-          }
         } else if (status === "disconnected" || status === "error") {
           usePerformanceStore.getState().markDisconnected();
-          toastShown = false;
         }
       } else if (msg.type === "stats") {
         usePerformanceStore.getState().update({
