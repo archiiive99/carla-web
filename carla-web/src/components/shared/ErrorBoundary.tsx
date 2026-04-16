@@ -1,4 +1,4 @@
-import { Component, type ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
@@ -9,6 +9,20 @@ interface State { hasError: boolean; error: Error | null }
 export class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false, error: null };
   static getDerivedStateFromError(error: Error) { return { hasError: true, error }; }
+  // Log the thrown error + React's component stack so devs actually see
+  // the failure in devtools. Previously only getDerivedStateFromError ran,
+  // so the UI flipped to "Something went wrong" but the console stayed
+  // empty — no way to tell which sensor panel threw or what the stack
+  // was. React 19 swallows the default rethrow in development when an
+  // error boundary is present, so this is the only path.
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    // eslint-disable-next-line no-console
+    console.error(
+      "[ErrorBoundary] Component render threw:",
+      error,
+      info.componentStack,
+    );
+  }
   render() {
     if (this.state.hasError) {
       return this.props.fallback || (
