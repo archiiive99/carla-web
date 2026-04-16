@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { Badge } from "@/components/ui/badge";
 import { useActorStore } from "@/stores/actorStore";
+import { useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
 
 const LIGHT_BUTTONS = [
@@ -30,6 +31,7 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
   const setAutopilot = useActorStore((s) => s.setAutopilot);
   const egoVehicleId = useActorStore((s) => s.egoVehicleId);
   const egoAutopilot = useActorStore((s) => s.egoAutopilot);
+  const isConnected = useIsConnected();
   const isEgo = egoVehicleId === actorId;
   const [control, setControl] = useState({ throttle: 0, steer: 0, brake: 0 });
   const [lightState, setLightState] = useState(0);
@@ -58,6 +60,7 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
   );
 
   useEffect(() => {
+    if (!isConnected) return;
     let cancelled = false;
     const poll = async () => {
       // The user isn't seeing the VehicleDetails sheet when the tab is
@@ -85,7 +88,7 @@ export function VehicleDetails({ actorId }: VehicleDetailsProps) {
     poll();
     const interval = setInterval(poll, 500);
     return () => { cancelled = true; clearInterval(interval); };
-  }, [actorId]);
+  }, [actorId, isConnected]);
 
   const handleAutopilotToggle = useCallback(
     (checked: boolean) => {
