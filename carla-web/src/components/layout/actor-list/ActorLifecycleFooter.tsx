@@ -14,7 +14,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Car, PersonStanding, Users, Trash2 } from "lucide-react";
 import { SpawnPanel } from "@/components/controls/SpawnPanel";
-import { resolveVehicleBlueprint, useActorStore } from "@/stores/actorStore";
+import {
+  resolveVehicleBlueprint,
+  resolveWalkerBlueprint,
+  useActorStore,
+} from "@/stores/actorStore";
 import { useIsConnected } from "@/stores/simulationStore";
 import { carlaApi } from "@/lib/carla-api";
 import { reportError } from "@/lib/utils";
@@ -61,6 +65,14 @@ export function ActorLifecycleFooter() {
 
   const quickSpawnWalker = useCallback(async () => {
     try {
+      // Same cross-version fallback pattern as quickSpawnVehicle —
+      // "walker.pedestrian.0001" exists in 0.9.x but is absent from
+      // 0.10's walker set (which starts at 0014).
+      const blueprint = await resolveWalkerBlueprint();
+      if (!blueprint) {
+        toast.error("No walker blueprint available in this CARLA build");
+        return;
+      }
       const points = await carlaApi.getSpawnPoints();
       const pt = points[Math.floor(Math.random() * points.length)];
       if (!pt) {
@@ -68,7 +80,7 @@ export function ActorLifecycleFooter() {
         return;
       }
       await useActorStore.getState().spawnWalker({
-        blueprint: "walker.pedestrian.0001",
+        blueprint,
         transform: pt,
       });
     } catch (e) {

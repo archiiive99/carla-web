@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSimulationStore, useIsConnected } from "@/stores/simulationStore";
-import { useActorStore } from "@/stores/actorStore";
+import { resolveWalkerBlueprint, useActorStore } from "@/stores/actorStore";
 import { useSensorStore } from "@/stores/sensorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { carlaApi } from "@/lib/carla-api";
@@ -199,6 +199,11 @@ export function CommandPalette() {
             <CommandItem
               onSelect={() =>
                 run(async () => {
+                  // Resolve against the live blueprint list so this works
+                  // across CARLA versions — walker.pedestrian.0001 existed
+                  // in 0.9.x but 0.10's walker set starts at 0014.
+                  const blueprint = await resolveWalkerBlueprint();
+                  if (!blueprint) return;
                   const points = await carlaApi.getSpawnPoints();
                   const store = useActorStore.getState();
                   for (let i = 0; i < Math.min(10, points.length); i++) {
@@ -206,7 +211,7 @@ export function CommandPalette() {
                     if (!transform) continue;
                     try {
                       await store.spawnWalker({
-                        blueprint: "walker.pedestrian.0001",
+                        blueprint,
                         transform,
                       });
                     } catch { break; }

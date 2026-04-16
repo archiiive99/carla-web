@@ -40,6 +40,33 @@ export async function resolveVehicleBlueprint(
   }
 }
 
+// Same class of bug as PREFERRED_VEHICLE_BLUEPRINTS — "walker.pedestrian.0001"
+// exists in 0.9.x but CARLA 0.10 ships a different set starting at 0043.
+// Resolve against the live list so the walker quick-spawn buttons don't 400
+// with "Blueprint not found" on newer builds.
+const PREFERRED_WALKER_BLUEPRINTS = [
+  "walker.pedestrian.0001",
+  "walker.pedestrian.0014",
+  "walker.pedestrian.0020",
+  "walker.pedestrian.0043",
+];
+
+export async function resolveWalkerBlueprint(
+  hint?: string,
+): Promise<string | null> {
+  try {
+    const blueprints = await carlaApi.getWalkerBlueprints();
+    const ids = new Set(blueprints.map((bp) => bp.id));
+    if (hint && ids.has(hint)) return hint;
+    for (const preferred of PREFERRED_WALKER_BLUEPRINTS) {
+      if (ids.has(preferred)) return preferred;
+    }
+    return blueprints[0]?.id ?? null;
+  } catch {
+    return hint ?? null;
+  }
+}
+
 interface ActorsByType {
   vehicles: number[];
   walkers: number[];
