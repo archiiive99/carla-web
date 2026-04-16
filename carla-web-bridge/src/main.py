@@ -175,6 +175,19 @@ from src.ws.handler import router as ws_router
 app.include_router(ws_router)
 
 
+# Endpoints the frontend polls every ~2s from useConnectionHealth /
+# SimulationPage. Without filtering, each poll cycle wrote four INFO
+# lines into the bridge log, drowning out meaningful events (spawns,
+# map loads, control errors) and making tail-to-debug useless.
+# Non-2xx responses still log — errors aren't silenced.
+_QUIET_POLL_PATHS = frozenset({
+    "/health",
+    "/api/simulation/status",
+    "/api/realtime/session",
+    "/api/actors",
+})
+
+
 @app.middleware("http")
 async def log_requests(request, call_next):
     # time.monotonic() instead of time.time() so the ms duration stays
@@ -184,7 +197,8 @@ async def log_requests(request, call_next):
     start = time.monotonic()
     response = await call_next(request)
     duration = (time.monotonic() - start) * 1000
-    if request.url.path != "/health":
+    quiet = request.url.path in _QUIET_POLL_PATHS and 200 <= response.status_code < 300
+    if not quiet:
         logger.info(f"{request.method} {request.url.path} → {response.status_code} ({duration:.0f}ms)")
     return response
 
