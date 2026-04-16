@@ -445,7 +445,18 @@ class SensorManager:
 
         world = self._carla.refresh_world()
         bp_lib = world.get_blueprint_library()
-        bp = bp_lib.find(sensor_type)
+        try:
+            bp = bp_lib.find(sensor_type)
+        except Exception as exc:
+            # bp_lib.find() raises IndexError on an unknown blueprint id,
+            # which bubbled up through the route's generic Exception catch
+            # as a 500 with "IndexError: ..." in the detail. Re-raise as
+            # RuntimeError so the spawn_sensor handler returns 400
+            # "Blueprint not found: sensor.camera.rgb2" — matches how
+            # spawn/vehicle and spawn/walker surface the same error.
+            raise RuntimeError(f"Sensor blueprint not found: {sensor_type}") from exc
+        if bp is None:
+            raise RuntimeError(f"Sensor blueprint not found: {sensor_type}")
         for key, value in attributes.items():
             if bp.has_attribute(key):
                 bp.set_attribute(key, str(value))
