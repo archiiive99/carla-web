@@ -33,6 +33,7 @@ const SPOTLIGHT_DECAY = 1.5;
  *  reference shows but pre-iter-09 web rendered without. */
 export function NightStreetLights() {
   const sunAltitude = useSimulationStore((s) => s.weather.sun_altitude_angle ?? 75);
+  const fogDensity = useSimulationStore((s) => s.weather.fog_density ?? 0);
   const isNight = sunAltitude < 0;
   // iter-09-revisit-halo-opacity-altitude: halo opacity ramps with
   // how deep into night we are. Twilight (sun_alt ≈ 0) = 0.2;
@@ -43,6 +44,11 @@ export function NightStreetLights() {
   const nightDepth = Math.max(0, Math.min(1, -sunAltitude / 15));
   const haloOpacity = 0.2 + nightDepth * 0.3;
   const emissiveIntensity = 1.2 + nightDepth * 2.3;
+  // iter-09-revisit-cone-fog: beam-volume cone is most visible
+  // through fog. Amplify its base 0.4× halo multiplier with
+  // (1 + fogFactor * 1.5) so clear = 0.4×, heavy fog = 1.0×.
+  const fogFactor = Math.max(0, Math.min(1, fogDensity / 100));
+  const coneOpacity = haloOpacity * 0.4 * (1 + fogFactor * 1.5);
 
   const lampSpecs = useMemo(
     () =>
@@ -171,7 +177,7 @@ export function NightStreetLights() {
                   <meshBasicMaterial
                     color={STREETLAMP_BEAM}
                     transparent
-                    opacity={haloOpacity * 0.4}
+                    opacity={coneOpacity}
                     blending={THREE.AdditiveBlending}
                     depthWrite={false}
                     side={THREE.DoubleSide}
