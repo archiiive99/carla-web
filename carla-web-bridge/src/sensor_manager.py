@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
+import math
 import struct
 import time
 from collections.abc import Awaitable, Callable
@@ -463,17 +464,24 @@ class SensorManager:
 
         loc = transform.get("location", {})
         rot = transform.get("rotation", {})
+        # dict_to_carla_transform guards against NaN/Infinity at the
+        # Transform-schema boundary, but this path takes a raw dict (the
+        # route calls `req.transform.model_dump()` and hands it down) so
+        # that guard is bypassed. Repeat the finite-check here so a spawn
+        # sensor with NaN coords can't reach CARLA.
+        loc_x = float(loc.get("x", 0))
+        loc_y = float(loc.get("y", 0))
+        loc_z = float(loc.get("z", 0))
+        rot_p = float(rot.get("pitch", 0))
+        rot_y = float(rot.get("yaw", 0))
+        rot_r = float(rot.get("roll", 0))
+        if not all(math.isfinite(v) for v in (loc_x, loc_y, loc_z, rot_p, rot_y, rot_r)):
+            raise RuntimeError(
+                "sensor transform location and rotation values must be finite"
+            )
         t = carla_mod.Transform(
-            carla_mod.Location(
-                x=float(loc.get("x", 0)),
-                y=float(loc.get("y", 0)),
-                z=float(loc.get("z", 0)),
-            ),
-            carla_mod.Rotation(
-                pitch=float(rot.get("pitch", 0)),
-                yaw=float(rot.get("yaw", 0)),
-                roll=float(rot.get("roll", 0)),
-            ),
+            carla_mod.Location(x=loc_x, y=loc_y, z=loc_z),
+            carla_mod.Rotation(pitch=rot_p, yaw=rot_y, roll=rot_r),
         )
 
         parent = None
