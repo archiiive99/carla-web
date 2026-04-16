@@ -704,7 +704,10 @@ class SensorManager:
 
         frame = int(getattr(data, "frame", 0))
         timestamp = float(getattr(data, "timestamp", time.time()))
-        subscribers = set(subs)
+        # `subs` is already a fresh set() copy taken by _on_sensor_data at
+        # call time, so we don't need a second defensive copy here; the
+        # packet owns it and no other thread retains the reference.
+        subscribers = subs
 
         if kind == KIND_CAMERA:
             return SensorPacket(
