@@ -10,22 +10,13 @@ function wsProtocolFor(pageProtocol: string): "ws:" | "wss:" {
  * In dev mode, Vite proxies /api and /ws to the bridge,
  * so the browser only ever needs to talk to the frontend port.
  */
-function buildSameOriginUrl(protocol: "http:" | "ws:"): string {
-  if (typeof window === "undefined") {
-    return `${protocol}//127.0.0.1:${DEFAULT_BRIDGE_PORT}`;
-  }
-
-  const page = new URL(window.location.href);
-  const resolvedProtocol = protocol === "ws:"
-    ? wsProtocolFor(page.protocol)
-    : page.protocol;
-
-  // Use the SAME host:port as the page — Vite proxy handles the rest
-  return `${resolvedProtocol}//${page.host}`;
-}
-
 export function getDefaultBridgeUrl(): string {
-  return buildSameOriginUrl("http:");
+  if (typeof window === "undefined") {
+    return `http://127.0.0.1:${DEFAULT_BRIDGE_PORT}`;
+  }
+  // Use the SAME host:port as the page — Vite proxy handles the rest
+  const page = new URL(window.location.href);
+  return `${page.protocol}//${page.host}`;
 }
 
 export function normalizeBridgeUrl(value: string): string {
