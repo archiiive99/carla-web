@@ -153,23 +153,32 @@ class WebSocketBroadcaster:
         if channel == Channel.SUBSCRIBE:
             try:
                 msg = json.loads(payload)
-                sensor_id = msg.get("sensor_id")
-                if sensor_id is not None:
-                    conn.subscriptions.add(sensor_id)
-                    if on_subscribe:
-                        on_subscribe(sensor_id, conn.client_id)
-            except (json.JSONDecodeError, IndexError):
-                pass
+            except json.JSONDecodeError:
+                return
+            # A malformed payload that's valid JSON but not a dict
+            # (e.g. bare `42`) would crash msg.get(...) with
+            # AttributeError and propagate out of the handler. Peer
+            # branches (CLIENT_STATS, CONTROL) already guard on this
+            # with isinstance — do the same here.
+            if not isinstance(msg, dict):
+                return
+            sensor_id = msg.get("sensor_id")
+            if sensor_id is not None:
+                conn.subscriptions.add(sensor_id)
+                if on_subscribe:
+                    on_subscribe(sensor_id, conn.client_id)
         elif channel == Channel.UNSUBSCRIBE:
             try:
                 msg = json.loads(payload)
-                sensor_id = msg.get("sensor_id")
-                if sensor_id is not None:
-                    conn.subscriptions.discard(sensor_id)
-                    if on_unsubscribe:
-                        on_unsubscribe(sensor_id, conn.client_id)
-            except (json.JSONDecodeError, IndexError):
-                pass
+            except json.JSONDecodeError:
+                return
+            if not isinstance(msg, dict):
+                return
+            sensor_id = msg.get("sensor_id")
+            if sensor_id is not None:
+                conn.subscriptions.discard(sensor_id)
+                if on_unsubscribe:
+                    on_unsubscribe(sensor_id, conn.client_id)
         elif channel == Channel.CLIENT_STATS:
             try:
                 parsed = json.loads(payload)
