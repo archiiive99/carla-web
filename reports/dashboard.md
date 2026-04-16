@@ -71,7 +71,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09-revisit-halo-opacity-altitude | Halo opacity ramps by night-depth | **✅** | 16.71 | 0.3063 | 21.87 | ~10 min | 6e8d3165f |
 | 09-revisit-beam-halogen | STREETLAMP_BEAM distinct from HEADLIGHT_BEAM | **✅** | 12.29 | 0.2803 | 27.85 | ~45 min | 1470ea525 |
 | 09-revisit-shield | Disc reflector shield above lamp head | **✅** | 10.97 | 0.2109 | 36.10 | ~15 min | bf22b0a62 |
-| 09-revisit-emissive-depth | Emissive intensity ramps by night-depth | **✅** | 10.97 | 0.2109 | 36.10 | ~10 min | (this commit) |
+| 09-revisit-emissive-depth | Emissive intensity ramps by night-depth | **✅** | 10.97 | 0.2109 | 36.10 | ~10 min | dbf86f64c |
 
 ## Notes
 
