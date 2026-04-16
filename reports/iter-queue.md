@@ -60,7 +60,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-14-revisit-runtime-bldg-only  Buildings runtime cull (per-building useFrame visibility toggle)  (✅ — two-layer LOD: entry filter caps React-mounted set, per-GltfBuilding useFrame handles dynamic visibility; closed 2026-04-15T10:56+~30min)
 [x] iter-14-revisit-runtime-no-entry-filter  Lift Buildings entry-filter; rely on per-building runtime cull  (✅ — byte-identical baseline; interactive movement now past 300m horizon; closed 2026-04-15T11:00+~10min)
 [x] iter-14-revisit-runtime-procedural-bldg  Procedural buildings runtime cull  (✅ — userData(cullSourceBuildings + originalMatrices) on each InstancedMesh + Buildings.tsx useFrame; +1.24 dB unexplained but reproducible delta with clean visual; closed 2026-04-15T11:03+~45min)
-[ ] iter-14-revisit-runtime-incremental  Amortize runtime cull across N frames (~1h)
+[x] iter-14-revisit-runtime-incremental  Amortize runtime cull across N frames  (✅ — incrementalBatchSize prop + cullCursor ref in GltfInstanced; default 0 = full pass; closed 2026-04-16T07:02:28Z)
 [x] iter-14-revisit-other-categories  Opt-in maxDistance for Poles/Fences/Rocks/GuardRails/TrafficLights/TrafficSigns  (✅ — 6 sites opted in; PSNR/SSIM/ΔE byte-identical to baseline; closed 2026-04-15T10:08+~25min)
 [x] iter-14-revisit-vegetation-buildings  Audit + opt-in Vegetation/Buildings  (✅ — Vegetation opted in via bespoke InstancedMesh path; Buildings deferred (one-mesh-per-building, needs different pattern); PSNR/SSIM/ΔE within noise; closed 2026-04-15T10:11+~20min)
 [x] iter-14-revisit-buildings  LOD per-building React conditional render  (✅ — single-filter at Buildings entry useMemo; byte-identical PSNR/SSIM/ΔE; closed 2026-04-15T10:19+~15min)

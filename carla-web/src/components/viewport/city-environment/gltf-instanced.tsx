@@ -57,6 +57,7 @@ export function GltfInstanced({
   referencePoint = [0, 0, 0],
   runtimeCull = false,
   runtimeCullSensitivity = 5,
+  incrementalBatchSize = 0,
 }: {
   path: string
   objects: EnvObj[]
@@ -74,10 +75,18 @@ export function GltfInstanced({
   /** Re-evaluate the runtime cull only when the camera has moved this
    *  many meters since the last evaluation. Default 5m. */
   runtimeCullSensitivity?: number
+  /** iter-14-revisit-runtime-incremental: max instances to process
+   *  per frame during a cull pass. When the camera moves past
+   *  sensitivity, the cull starts at index 0 and processes up to
+   *  this many per frame, amortizing the rebuild cost across frames.
+   *  Default 0 = full pass in one frame (no batching). Set to e.g.
+   *  200 for large scenes to avoid frame spikes. */
+  incrementalBatchSize?: number
 }) {
   const { scene } = useGLTF(path)
   const meshRef = useRef<THREE.InstancedMesh | null>(null)
   const lastCullPos = useRef(new THREE.Vector3(Infinity, Infinity, Infinity))
+  const cullCursor = useRef<number>(-1) // -1 = no pass in progress
 
   const group = useMemo(() => {
     const g = new THREE.Group()
@@ -126,17 +135,27 @@ export function GltfInstanced({
 
   useFrame(({ camera }) => {
     if (!runtimeCull || !meshRef.current) return
-    if (camera.position.distanceTo(lastCullPos.current) < runtimeCullSensitivity) return
-    lastCullPos.current.copy(camera.position)
+    // Start a new cull pass when the camera has moved past
+    // sensitivity AND no pass is currently in flight. Incremental
+    // mode leaves partial-pass state on cullCursor between frames;
+    // full mode advances cursor to length in one pass.
+    if (cullCursor.current < 0) {
+      if (camera.position.distanceTo(lastCullPos.current) < runtimeCullSensitivity) return
+      lastCullPos.current.copy(camera.position)
+      cullCursor.current = 0
+    }
 
     const r2 = maxDistance * maxDistance
     const dummy = new THREE.Object3D()
-    for (let i = 0; i < objects.length; i++) {
+    const batchEnd =
+      incrementalBatchSize > 0
+        ? Math.min(objects.length, cullCursor.current + incrementalBatchSize)
+        : objects.length
+    for (let i = cullCursor.current; i < batchEnd; i++) {
       const obj = objects[i]
       // c2t converts CARLA-coord obj.b.{x,y,z} → Three.js position so
       // distance is computed in the SAME coordinate system as
-      // camera.position. (Earlier bug: was comparing CARLA-coord obj
-      // directly to Three-coord camera, mixing X/Y/Z axes.)
+      // camera.position.
       const pos = c2t(obj.b.x, obj.b.y, obj.b.z)
       const dx = pos.x - camera.position.x
       const dy = pos.y - camera.position.y
@@ -155,7 +174,13 @@ export function GltfInstanced({
       dummy.updateMatrix()
       meshRef.current.setMatrixAt(i, dummy.matrix)
     }
+    cullCursor.current = batchEnd
     meshRef.current.instanceMatrix.needsUpdate = true
+    // Pass complete: reset cursor so the next camera-move triggers a
+    // fresh pass.
+    if (cullCursor.current >= objects.length) {
+      cullCursor.current = -1
+    }
   })
 
   return <primitive object={group} />

@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 31 rows ✅, 6 rows ⚠️, 11 rows queued. §6.5 raise still active.
+**Summary:** 32 rows ✅, 6 rows ⚠️, 10 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -44,7 +44,8 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 11 | Post-process (ExposureDriver, weather-driven) | **✅** | 11.02/30.67 | 0.2122/0.4586 | 35.95/1.71 | ~40 min | a4175cc67 |
 | 11-revisit-smoothing | Exposure lerp 0.4/s | **✅** | 11.01/30.67 | 0.2122/0.4585 | 35.95/1.71 | ~20 min | 0a96e172c |
 | 08-clothes-pattern | Pants color separate from shirt | **✅** | 11.02 | 0.2125 | 35.93 | ~15 min | 70e700480 |
-| 06-revisit-bias-by-altitude | Sun-altitude shadow bias ramp | **✅** | 16.73 | 0.3061 | 21.85 | ~15 min | (this commit) |
+| 06-revisit-bias-by-altitude | Sun-altitude shadow bias ramp | **✅** | 16.73 | 0.3061 | 21.85 | ~15 min | 7f486ad53 |
+| 14-revisit-runtime-incremental | Incremental cull batching | **✅** | 16.71 | 0.3062 | 21.86 | ~25 min | (this commit) |
 
 ## Notes
 
