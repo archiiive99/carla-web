@@ -23,8 +23,11 @@ Color-pipeline notes (audited 2026-04-14 under the Agent C fidelity task):
 from __future__ import annotations
 
 import logging
+from io import BytesIO
 
 import numpy as np
+from PIL import Image
+
 from src.config import (
     JPEG_AUTO_EXPOSE,
     JPEG_BACKEND,
@@ -281,9 +284,8 @@ class ImageCompressor:
         quality: int,
         fmt: str,
     ) -> bytes:
-        from io import BytesIO
-        from PIL import Image
-
+        # BytesIO + Image imports moved to module scope — re-importing
+        # them every frame was a 20fps × N-sensor dict-lookup cost.
         arr = np.frombuffer(raw_data, dtype=np.uint8).reshape(height, width, 4)
         arr = self._auto_expose_bgra(arr)
         # BGRA -> RGB (alpha is dropped here; see test_pattern harness in
