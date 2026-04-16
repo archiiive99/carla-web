@@ -132,7 +132,12 @@ export function WeatherFog() {
   const near = Math.max(10, weather.fog_distance || 50);
   const far = Math.max(near + 50, near + (1 - density / 100) * 2500);
   const tintL = Math.max(0.45, 1 - density / 220);
-  const hex = `hsl(210, 4%, ${Math.round(tintL * 100)}%)`;
+  // Altitude ramp: neutral cool gray HSL(210,4%,L) at sun_alt≥60,
+  // warm dusk HSL(30,18%,L) at sun_alt≤0. No-op at midday pose.
+  const altFactor = Math.max(0, Math.min(1, weather.sun_altitude_angle / 60));
+  const hue = Math.round(30 + (210 - 30) * altFactor);
+  const sat = Math.round(18 + (4 - 18) * altFactor);
+  const hex = `hsl(${hue}, ${sat}%, ${Math.round(tintL * 100)}%)`;
   return <fog attach="fog" args={[hex, near, far]} />;
 }
 

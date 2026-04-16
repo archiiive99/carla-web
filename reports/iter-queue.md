@@ -74,6 +74,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-14-revisit-perf-measurement  Playwright FPS probe in compare.py  (✅ — --measure-fps-ms flag added; FPS=0.5 under SwiftShader software-WebGL (not user-perceived); infra deliverable; closed 2026-04-15T10:15+~25min)
 [x] iter-13-revisit-pose-coverage  Add chase/birdseye/intersection poses to compare.py POSES  (✅ — 3 new poses each produce numeric output + visually sensible framing; closed 2026-04-15T09:31+~35min)
 [x] iter-09-revisit-headlight-cone  Ego SpotLight cone shape tune  (✅ — angle 0.45→0.35, penumbra 0.45→0.35, distance 40→55, intensity 4→5; midday-pose byte-identical since EgoHeadlights returns null; closed 2026-04-16T09:14:00Z+~15min)
+[x] iter-11-revisit-fog-altitude-tint  Sun-altitude-driven fog hue/sat ramp  (✅ — HSL(210,4%) at noon → HSL(30,18%) at horizon; linear altFactor interp; byte-identical at midday pose by construction; closed 2026-04-16T09:29:00Z+~18min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 
