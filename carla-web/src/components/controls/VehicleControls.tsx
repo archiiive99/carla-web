@@ -100,6 +100,15 @@ export function VehicleControls({ actorId, enabled }: VehicleControlsProps) {
 
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Shift") { shiftHeldRef.current = true; return; }
+      // OS-level auto-repeat on held keys would otherwise fire keydown at
+      // ~30Hz. For "reverse" (a toggle: first keydown flips the bit,
+      // second flips it back) this produced a rapid add/remove oscillation
+      // that looked like flickering reverse gear. For the additive keys
+      // (wasd/space) the repeats are idempotent on the Set but still
+      // trigger setPressedKeys re-renders every frame. Drop all repeats
+      // up-front — a held key's state is already captured from the first
+      // press; the keyup event handles release.
+      if (e.repeat) return;
       // Mirror useKeyboardShortcuts' focus-guard so driving keys don't fire
       // while the user is typing in a Select's search box, a contentEditable
       // div, or any other text-entry surface beyond the two HTML primitives.
