@@ -243,10 +243,17 @@ class RealtimeSessionManager:
             )
 
     def _set_clear_weather_sync(self) -> None:
-        """Set clear daytime weather for proper camera visibility."""
-        import carla
+        """Set clear daytime weather for proper camera visibility.
 
+        Best-effort — if CARLA isn't importable (test mode, staged
+        shutdown) or the runtime rejects the call, log and move on.
+        Every failure path used to propagate out of the surrounding
+        ensure_running try/except and defer the whole session arm,
+        which turned a flaky weather write into a stuck VEHICLE_PENDING
+        state.
+        """
         try:
+            import carla
             world = self._carla.refresh_world()
             world.set_weather(carla.WeatherParameters(**CLEAR_DAYTIME_WEATHER))
             logger.info("Set clear daytime weather")
@@ -350,6 +357,13 @@ class RealtimeSessionManager:
         self._vehicle_id = None
         self._camera_id = None
         self._vehicle_ready_at_monotonic = None
+        # Re-apply the clear-daytime weather when the next ensure_running
+        # spawns a fresh vehicle. reset() already clears this flag, but the
+        # internal recovery path (vehicle died / CARLA restarted / session
+        # rearmed after an error) used to route here only, so _weather_set
+        # stayed True and the respawn ran against whatever weather the new
+        # world happened to default to.
+        self._weather_set = False
 
         if old_camera_id is not None:
             await self._sensor_manager.destroy_sensor(old_camera_id)
