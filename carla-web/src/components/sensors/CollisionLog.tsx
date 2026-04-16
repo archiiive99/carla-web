@@ -50,7 +50,6 @@ interface CollisionLogProps {
 export default function CollisionLog({ sensorId, className }: CollisionLogProps) {
   const [events, setEvents] = useState<CollisionEntry[]>([]);
   const { eventsRef } = useCollisionData(sensorId);
-  const actors = useActorStore((s) => s.actors);
   // Track last-seen signature so we only setEvents when the source buffer has
   // actually moved on. Length + newest-event timestamp catches both the
   // pre-cap growth phase and the post-cap shift/push phase.
@@ -63,6 +62,13 @@ export default function CollisionLog({ sensorId, className }: CollisionLogProps)
       const signature = newest ? `${source.length}:${newest.timestamp}` : "0";
       if (signature === lastSignatureRef.current) return;
       lastSignatureRef.current = signature;
+      // Read actors via getState inside the interval so we pick up newly-
+      // spawned actors on the next flush without making the useEffect
+      // depend on the actors map. A dep would re-fire this effect every
+      // 20Hz (actorStore.updateActorTransforms builds a fresh Map each
+      // tick), tearing down and recreating the 100ms interval — which
+      // resets lastSignatureRef's throttle and defeats the whole guard.
+      const actors = useActorStore.getState().actors;
       setEvents(
         source
           .slice()
@@ -76,9 +82,7 @@ export default function CollisionLog({ sensorId, className }: CollisionLogProps)
       );
     }, 100);
     return () => clearInterval(interval);
-    // `actors` is part of the dep set so newly-spawned actors get resolved
-    // on the next flush tick even if the collision event itself is stale.
-  }, [eventsRef, actors]);
+  }, [eventsRef]);
 
   return (
     <Card className={cn("flex h-full flex-col overflow-hidden", className)}>
