@@ -26,7 +26,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [ ] iter-05-revisit-pathC  HDR cubemap per TOD/cloud bucket              (queued, only if Path A+B miss)
 [x] iter-06  Shadows from sun — cascaded SM tuning  (✅-on-arrival — functional single-cascade shadow system already shipped in scene-environment.tsx:183-198; true CSM queued as iter-06-revisit-csm; closed 2026-04-16T05:05:51Z)
 [ ] iter-06-revisit-csm  True cascaded shadow maps (3-4 frustum buckets, ~3-4h)
-[ ] iter-06-revisit-bias-by-altitude  Sun-altitude-driven bias tuning (~30min)
+[x] iter-06-revisit-bias-by-altitude  Sun-altitude-driven shadow bias  (✅ — linear ramp -0.0004 at sun_alt=60 to -0.001 at sun_alt=0; no-op at iter-01 pose; closed 2026-04-16T06:57:31Z)
 [x] iter-11  Post-process calibration — tonemap, exposure, bloom  (✅ ExposureDriver landed: 0.82 midday → 1.6 dusk/night linear interp; day byte-identical to baseline; night metric regresses against broken BP-weather ref but visually correct; bloom blocked separately; closed 2026-04-16T05:07+~40min)
 [x] iter-11-revisit-smoothing  Ease exposure over sun-altitude transitions  (✅ — useRef-backed lerp at 0.4/s; steady-state byte-identical; closed 2026-04-16T05:15:26Z)
 [ ] iter-11-revisit-auto-exposure  Luminance-sampling feedback-loop auto exposure (~2-3h)

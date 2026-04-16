@@ -242,7 +242,16 @@ export function WeatherLighting({
         intensity={directIntensity * 1.7}
         castShadow={shadows && daylight > 0.05}
         shadow-mapSize={[2048, 2048]}
-        shadow-bias={-0.0004}
+        // iter-06-revisit-bias-by-altitude: bias grows as sun descends
+        // toward horizon (oblique angles → larger shadow-ray length →
+        // more self-shadowing acne without a bigger bias). At 60° alt
+        // = -0.0004 (iter-01 baseline); at 10° alt = -0.001 (6× deeper
+        // to counter the grazing-angle acne). Linear ramp between.
+        shadow-bias={
+          -0.0004 -
+          Math.max(0, 60 - Math.max(0, Math.min(60, weather.sun_altitude_angle ?? 60))) *
+            0.00001
+        }
         shadow-normalBias={0.02}
         shadow-camera-far={900}
         shadow-camera-left={-350}
