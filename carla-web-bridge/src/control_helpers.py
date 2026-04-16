@@ -2,12 +2,20 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import HTTPException
 
 from src.models.schemas import VehicleControl
 
 
-def apply_vehicle_control(actor, req: VehicleControl, carla_module, *, disable_autopilot: bool = True) -> None:
+def apply_vehicle_control(
+    actor: Any,
+    req: VehicleControl,
+    carla_module: Any,
+    *,
+    disable_autopilot: bool = True,
+) -> None:
     if actor is None:
         raise HTTPException(status_code=404, detail="Actor not found")
     if not getattr(actor, "type_id", "").startswith("vehicle."):

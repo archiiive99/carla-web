@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -61,10 +62,10 @@ WEATHER_PRESETS: tuple[str, ...] = (
 
 
 @router.get("/maps")
-async def list_maps():
+async def list_maps() -> Any:
     _require_connection()
 
-    def _get():
+    def _get() -> dict[str, Any]:
         maps = carla_manager.client.get_available_maps()
         return {"maps": [m.split("/")[-1] for m in maps]}
 
@@ -72,7 +73,7 @@ async def list_maps():
 
 
 @router.post("/load")
-async def load_map(req: LoadMapRequest):
+async def load_map(req: LoadMapRequest) -> Any:
     _require_connection()
     from src.main import realtime_session, sensor_manager
 
@@ -80,7 +81,7 @@ async def load_map(req: LoadMapRequest):
     await sensor_manager.destroy_all()
     carla_manager.clear_tracked_actors()
 
-    def _load():
+    def _load() -> dict[str, Any]:
         try:
             carla_manager.client.load_world(req.map_name)
             return {"status": "loaded", "map": req.map_name}
@@ -96,10 +97,10 @@ async def load_map(req: LoadMapRequest):
 
 
 @router.get("/weather", response_model=WeatherParams)
-async def get_weather():
+async def get_weather() -> Any:
     _require_connection()
 
-    def _get():
+    def _get() -> Any:
         w = carla_manager.world.get_weather()
         return serialize_weather(w)
 
@@ -107,10 +108,10 @@ async def get_weather():
 
 
 @router.post("/weather")
-async def set_weather(req: SetWeatherRequest):
+async def set_weather(req: SetWeatherRequest) -> Any:
     _require_connection()
 
-    def _set():
+    def _set() -> dict[str, Any]:
         try:
             import carla
 
@@ -151,12 +152,12 @@ async def set_weather(req: SetWeatherRequest):
 
 
 @router.get("/weather/presets")
-async def list_weather_presets():
+async def list_weather_presets() -> dict[str, Any]:
     return {"presets": list(WEATHER_PRESETS)}
 
 
 @router.get("/spectator")
-async def get_spectator():
+async def get_spectator() -> dict[str, Any]:
     _require_connection()
     try:
         spec = carla_manager.world.get_spectator()
@@ -169,7 +170,7 @@ async def get_spectator():
 
 
 @router.post("/spectator")
-async def set_spectator(req: Transform):
+async def set_spectator(req: Transform) -> dict[str, Any]:
     _require_connection()
     try:
         spec = carla_manager.world.get_spectator()
@@ -186,10 +187,10 @@ async def set_spectator(req: Transform):
 
 
 @router.get("/spawn-points")
-async def get_spawn_points():
+async def get_spawn_points() -> Any:
     _require_connection()
 
-    def _get():
+    def _get() -> dict[str, Any]:
         points = carla_manager.world.get_map().get_spawn_points()
         return {
             "spawn_points": [carla_transform_to_dict(sp).model_dump() for sp in points]
@@ -199,10 +200,10 @@ async def get_spawn_points():
 
 
 @router.post("/map-layers")
-async def manage_map_layer(req: MapLayerRequest):
+async def manage_map_layer(req: MapLayerRequest) -> Any:
     _require_connection()
 
-    def _manage():
+    def _manage() -> dict[str, Any]:
         import carla
 
         layer_map = {

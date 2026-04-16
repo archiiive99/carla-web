@@ -1,4 +1,5 @@
 """High-performance image compression for CARLA sensor data.
+from typing import Any
 
 Color-pipeline notes (audited 2026-04-14 under the Agent C fidelity task):
 - CARLA's RGB camera writes a BGRA buffer whose pixels are already

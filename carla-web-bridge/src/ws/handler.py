@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, WebSocket
+from typing import Any
 
 from src.ws_broadcaster import ws_broadcaster
 
 router = APIRouter()
 
 
-def _get_sensor_manager():
+def _get_sensor_manager() -> Any:
     """Lazy import to avoid circular dependency."""
     from src.main import sensor_manager
     return sensor_manager

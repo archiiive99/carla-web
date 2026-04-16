@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -19,10 +20,10 @@ def _require_connection() -> None:
 
 
 @router.get("/topology")
-async def get_topology():
+async def get_topology() -> Any:
     _require_connection()
 
-    def _get():
+    def _get() -> dict[str, Any]:
         world = carla_manager.world
         carla_map = world.get_map()
         topology = carla_map.get_topology()
@@ -48,11 +49,11 @@ async def get_topology():
 
 
 @router.get("/waypoints")
-async def get_dense_waypoints(distance: float = 5.0):
+async def get_dense_waypoints(distance: float = 5.0) -> Any:
     """Generate waypoints along all roads at the given distance interval."""
     _require_connection()
 
-    def _get():
+    def _get() -> dict[str, Any]:
         world = carla_manager.world
         carla_map = world.get_map()
         waypoints = carla_map.generate_waypoints(max(1.0, min(distance, 20.0)))
@@ -72,11 +73,11 @@ async def get_dense_waypoints(distance: float = 5.0):
 
 
 @router.get("/environment")
-async def get_environment_objects():
+async def get_environment_objects() -> Any:
     """Return all static environment objects for Three.js city rendering."""
     _require_connection()
 
-    def _get():
+    def _get() -> Any:
         import carla as carla_mod
 
         world = carla_manager.world
@@ -125,11 +126,11 @@ async def get_environment_objects():
 
 
 @router.get("/road-geometry")
-async def get_road_geometry(distance: float = 2.0):
+async def get_road_geometry(distance: float = 2.0) -> Any:
     """Return dense road waypoints with lane width for road surface mesh generation."""
     _require_connection()
 
-    def _get():
+    def _get() -> Any:
         carla_map = carla_manager.world.get_map()
         waypoints = carla_map.generate_waypoints(max(1.0, min(distance, 10.0)))
         return [
@@ -150,10 +151,10 @@ async def get_road_geometry(distance: float = 2.0):
 
 
 @router.post("/route")
-async def compute_route(req: RouteQueryRequest):
+async def compute_route(req: RouteQueryRequest) -> Any:
     _require_connection()
 
-    def _compute():
+    def _compute() -> dict[str, Any]:
         try:
             import carla
 
@@ -196,10 +197,10 @@ async def compute_route(req: RouteQueryRequest):
 
 
 @router.get("/waypoint")
-async def get_nearest_waypoint(x: float, y: float, z: float = 0.0):
+async def get_nearest_waypoint(x: float, y: float, z: float = 0.0) -> Any:
     _require_connection()
 
-    def _get():
+    def _get() -> dict[str, Any]:
         try:
             import carla
 

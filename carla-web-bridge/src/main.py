@@ -6,10 +6,14 @@ import asyncio
 import logging
 import os
 import time
+from typing import Any
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from collections.abc import Awaitable, Callable
+
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
@@ -72,7 +76,7 @@ async def _world_tick_loop() -> None:
         if simulation_routes._paused:
             continue
         try:
-            def _tick_and_get_data():
+            def _tick_and_get_data() -> Any:
                 world = carla_manager.world
                 # Advance the simulation one step (required for sync mode).
                 # Keep this call unconditional — CARLA's fixed_delta physics
@@ -105,7 +109,7 @@ async def _world_tick_loop() -> None:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Startup: connect to CARLA. Shutdown: cleanup."""
     global _tick_task
     logger.info("CARLA Web Bridge starting…")
@@ -194,7 +198,7 @@ _QUIET_POLL_PATHS = frozenset({
 
 
 @app.middleware("http")
-async def log_requests(request, call_next):
+async def log_requests(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
     # time.monotonic() instead of time.time() so the ms duration stays
     # accurate if the system clock gets adjusted (NTP, manual reset)
     # while a slow request is in-flight — time.time() can go backwards
@@ -209,7 +213,7 @@ async def log_requests(request, call_next):
 
 
 @app.get("/health")
-async def health_check():
+async def health_check() -> dict[str, Any]:
     return {
         "status": "ok",
         "carla_connected": carla_manager.is_connected,
@@ -220,7 +224,7 @@ async def health_check():
 
 
 @app.get("/api/realtime/session")
-async def get_realtime_session():
+async def get_realtime_session() -> Any:
     if carla_manager.is_connected:
         realtime_session.arm()
         try:
@@ -231,7 +235,7 @@ async def get_realtime_session():
 
 
 @app.post("/api/realtime/control")
-async def apply_realtime_control(req: VehicleControl):
+async def apply_realtime_control(req: VehicleControl) -> Any:
     if not carla_manager.is_connected:
         raise HTTPException(status_code=503, detail="Not connected to CARLA server")
 
@@ -239,7 +243,7 @@ async def apply_realtime_control(req: VehicleControl):
     if vehicle_id is None:
         raise HTTPException(status_code=409, detail="Managed ego vehicle is not ready")
 
-    def _ctrl():
+    def _ctrl() -> dict[str, Any]:
         try:
             import carla
 

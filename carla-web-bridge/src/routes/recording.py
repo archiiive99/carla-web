@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from pathlib import Path
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -20,10 +21,10 @@ def _require_connection() -> None:
 
 
 @router.post("/recording/start")
-async def start_recording(req: StartRecordingRequest):
+async def start_recording(req: StartRecordingRequest) -> Any:
     _require_connection()
 
-    def _start():
+    def _start() -> dict[str, Any]:
         try:
             carla_manager.client.start_recorder(req.filename)
             if req.filename not in _recording_history:
@@ -38,10 +39,10 @@ async def start_recording(req: StartRecordingRequest):
 
 
 @router.post("/recording/stop")
-async def stop_recording():
+async def stop_recording() -> Any:
     _require_connection()
 
-    def _stop():
+    def _stop() -> dict[str, Any]:
         try:
             carla_manager.client.stop_recorder()
             return {"status": "stopped"}
@@ -54,10 +55,10 @@ async def stop_recording():
 
 
 @router.get("/recording/files")
-async def list_recordings():
+async def list_recordings() -> Any:
     _require_connection()
 
-    def _list():
+    def _list() -> dict[str, Any]:
         cwd = Path.cwd()
         disk_files = sorted(
             {
@@ -77,10 +78,10 @@ async def list_recordings():
 
 
 @router.post("/replay/start")
-async def start_replay(req: StartReplayRequest):
+async def start_replay(req: StartReplayRequest) -> Any:
     _require_connection()
 
-    def _start():
+    def _start() -> dict[str, Any]:
         try:
             carla_manager.client.replay_file(
                 req.filename, req.start_time, req.duration, req.camera_id
@@ -95,10 +96,10 @@ async def start_replay(req: StartReplayRequest):
 
 
 @router.post("/replay/stop")
-async def stop_replay():
+async def stop_replay() -> Any:
     _require_connection()
 
-    def _stop():
+    def _stop() -> dict[str, Any]:
         try:
             carla_manager.client.stop_replayer(True)
             return {"status": "stopped"}

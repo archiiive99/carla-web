@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -25,16 +26,16 @@ def _require_connection() -> None:
 
 
 @router.get("/status", response_model=TrafficStatus)
-async def get_status():
+async def get_status() -> Any:
     _require_connection()
     return TrafficStatus(port=8000, active=True)
 
 
 @router.post("/global-speed")
-async def set_global_speed(req: GlobalSpeedRequest):
+async def set_global_speed(req: GlobalSpeedRequest) -> Any:
     _require_connection()
 
-    def _set():
+    def _set() -> dict[str, Any]:
         try:
             tm = carla_manager.get_traffic_manager()
             tm.global_percentage_speed_difference(req.speed_diff)
@@ -50,10 +51,10 @@ async def set_global_speed(req: GlobalSpeedRequest):
 
 
 @router.post("/vehicle/{vehicle_id}/speed")
-async def set_vehicle_speed(vehicle_id: int, req: VehicleSpeedRequest):
+async def set_vehicle_speed(vehicle_id: int, req: VehicleSpeedRequest) -> Any:
     _require_connection()
 
-    def _set():
+    def _set() -> dict[str, Any]:
         try:
             actor = carla_manager.world.get_actor(vehicle_id)
             if actor is None:
@@ -72,10 +73,10 @@ async def set_vehicle_speed(vehicle_id: int, req: VehicleSpeedRequest):
 
 
 @router.post("/vehicle/{vehicle_id}/lane")
-async def set_lane_behavior(vehicle_id: int, req: LaneChangeRequest):
+async def set_lane_behavior(vehicle_id: int, req: LaneChangeRequest) -> Any:
     _require_connection()
 
-    def _set():
+    def _set() -> dict[str, Any]:
         try:
             actor = carla_manager.world.get_actor(vehicle_id)
             if actor is None:
@@ -96,10 +97,10 @@ async def set_lane_behavior(vehicle_id: int, req: LaneChangeRequest):
 
 
 @router.post("/vehicle/{vehicle_id}/ignore")
-async def set_ignore(vehicle_id: int, req: IgnoreRequest):
+async def set_ignore(vehicle_id: int, req: IgnoreRequest) -> Any:
     _require_connection()
 
-    def _set():
+    def _set() -> dict[str, Any]:
         try:
             actor = carla_manager.world.get_actor(vehicle_id)
             if actor is None:
@@ -121,10 +122,10 @@ async def set_ignore(vehicle_id: int, req: IgnoreRequest):
 
 
 @router.post("/vehicle/{vehicle_id}/route")
-async def set_route(vehicle_id: int, req: RouteRequest):
+async def set_route(vehicle_id: int, req: RouteRequest) -> Any:
     _require_connection()
 
-    def _set():
+    def _set() -> dict[str, Any]:
         try:
             import carla
 

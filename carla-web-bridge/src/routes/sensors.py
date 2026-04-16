@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/sensors", tags=["sensors"])
 
 
-def _get_sensor_manager():
+def _get_sensor_manager() -> Any:
     """Lazy import to avoid circular dependency."""
     from src.main import sensor_manager
     return sensor_manager
@@ -50,12 +51,12 @@ SENSOR_TYPES = [
 
 
 @router.get("/types")
-async def list_sensor_types():
+async def list_sensor_types() -> dict[str, Any]:
     return {"sensor_types": SENSOR_TYPES}
 
 
 @router.get("/rates")
-async def list_subscriber_rates():
+async def list_subscriber_rates() -> dict[str, Any]:
     """Snapshot of every active per-(client, sensor) target_fps and ceiling.
 
     Useful for ops dashboards and for verifying the adaptive controller
@@ -78,10 +79,10 @@ async def list_subscriber_rates():
 
 
 @router.get("/{sensor_id}/config")
-async def get_sensor_config(sensor_id: int):
+async def get_sensor_config(sensor_id: int) -> Any:
     _require_connection()
 
-    def _get():
+    def _get() -> dict[str, Any]:
         actor = carla_manager.world.get_actor(sensor_id)
         if actor is None:
             raise HTTPException(status_code=404, detail=f"Sensor {sensor_id} not found")
@@ -111,7 +112,7 @@ async def get_sensor_config(sensor_id: int):
 #     their UI references atomically.
 
 @router.patch("/{sensor_id}/attributes")
-async def patch_sensor_attributes(sensor_id: int, attributes: dict[str, str]):
+async def patch_sensor_attributes(sensor_id: int, attributes: dict[str, str]) -> dict[str, Any]:
     """Adjust a running sensor's attributes (e.g. sensor_tick) at runtime.
 
     Implementation: destroy + respawn preserving the subscriber set and

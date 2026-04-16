@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -31,21 +32,21 @@ def _require_connection() -> None:
 
 
 @router.get("/count")
-async def count_actors():
+async def count_actors() -> Any:
     _require_connection()
 
-    def _count():
+    def _count() -> dict[str, Any]:
         return {"count": len(carla_manager.world.get_actors())}
 
     return await asyncio.to_thread(_count)
 
 
 @router.get("")
-async def list_actors():
+async def list_actors() -> Any:
     _require_connection()
     from src.main import realtime_session
 
-    def _get():
+    def _get() -> dict[str, Any]:
         world = carla_manager.world
         actors = world.get_actors()
         seen_ids = set()
@@ -75,14 +76,14 @@ async def list_actors():
 
 
 @router.delete("/all")
-async def destroy_all_actors():
+async def destroy_all_actors() -> Any:
     _require_connection()
     from src.main import realtime_session, sensor_manager
 
     await realtime_session.reset(destroy_managed=True, reason="destroy all actors")
     await sensor_manager.destroy_all()
 
-    def _destroy_all():
+    def _destroy_all() -> dict[str, Any]:
         try:
             world = carla_manager.world
             destroyed = 0
@@ -102,10 +103,10 @@ async def destroy_all_actors():
 
 
 @router.get("/{actor_id}")
-async def get_actor(actor_id: int):
+async def get_actor(actor_id: int) -> Any:
     _require_connection()
 
-    def _get():
+    def _get() -> Any:
         actor = carla_manager.world.get_actor(actor_id)
         if actor is None:
             raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
@@ -126,10 +127,10 @@ async def get_actor(actor_id: int):
 
 
 @router.post("/spawn/vehicle", status_code=201)
-async def spawn_vehicle(req: SpawnVehicleRequest):
+async def spawn_vehicle(req: SpawnVehicleRequest) -> Any:
     _require_connection()
 
-    def _spawn():
+    def _spawn() -> Any:
         try:
             world = carla_manager.world
             bp_lib = world.get_blueprint_library()
@@ -167,10 +168,10 @@ async def spawn_vehicle(req: SpawnVehicleRequest):
 
 
 @router.post("/spawn/walker", status_code=201)
-async def spawn_walker(req: SpawnWalkerRequest):
+async def spawn_walker(req: SpawnWalkerRequest) -> Any:
     _require_connection()
 
-    def _spawn():
+    def _spawn() -> Any:
         try:
             world = carla_manager.world
             bp_lib = world.get_blueprint_library()
@@ -197,7 +198,7 @@ async def spawn_walker(req: SpawnWalkerRequest):
 
 
 @router.post("/spawn/sensor", status_code=201)
-async def spawn_sensor(req: SpawnSensorRequest):
+async def spawn_sensor(req: SpawnSensorRequest) -> dict[str, Any]:
     _require_connection()
     from src.main import sensor_manager
 
@@ -216,7 +217,7 @@ async def spawn_sensor(req: SpawnSensorRequest):
 
 
 @router.delete("/{actor_id}")
-async def destroy_actor(actor_id: int):
+async def destroy_actor(actor_id: int) -> dict[str, Any]:
     _require_connection()
     from src.main import realtime_session, sensor_manager
 
@@ -251,10 +252,10 @@ async def destroy_actor(actor_id: int):
 
 
 @router.post("/{actor_id}/control")
-async def apply_control(actor_id: int, req: VehicleControl):
+async def apply_control(actor_id: int, req: VehicleControl) -> Any:
     _require_connection()
 
-    def _ctrl():
+    def _ctrl() -> dict[str, Any]:
         try:
             import carla
 
@@ -278,10 +279,10 @@ async def apply_control(actor_id: int, req: VehicleControl):
 
 
 @router.post("/{actor_id}/autopilot")
-async def set_autopilot(actor_id: int, req: AutopilotRequest):
+async def set_autopilot(actor_id: int, req: AutopilotRequest) -> Any:
     _require_connection()
 
-    def _set():
+    def _set() -> dict[str, Any]:
         try:
             actor = carla_manager.world.get_actor(actor_id)
             if actor is None:
@@ -299,10 +300,10 @@ async def set_autopilot(actor_id: int, req: AutopilotRequest):
 
 
 @router.post("/{actor_id}/transform")
-async def set_transform(actor_id: int, req: Transform):
+async def set_transform(actor_id: int, req: Transform) -> Any:
     _require_connection()
 
-    def _set():
+    def _set() -> dict[str, Any]:
         try:
             actor = carla_manager.world.get_actor(actor_id)
             if actor is None:
@@ -321,10 +322,10 @@ async def set_transform(actor_id: int, req: Transform):
 
 
 @router.post("/{actor_id}/lights")
-async def set_lights(actor_id: int, req: LightStateRequest):
+async def set_lights(actor_id: int, req: LightStateRequest) -> Any:
     _require_connection()
 
-    def _set():
+    def _set() -> dict[str, Any]:
         try:
             import carla
 
@@ -344,10 +345,10 @@ async def set_lights(actor_id: int, req: LightStateRequest):
 
 
 @router.get("/{actor_id}/bounding-box")
-async def get_bounding_box(actor_id: int):
+async def get_bounding_box(actor_id: int) -> Any:
     _require_connection()
 
-    def _get():
+    def _get() -> dict[str, Any]:
         actor = carla_manager.world.get_actor(actor_id)
         if actor is None:
             raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")

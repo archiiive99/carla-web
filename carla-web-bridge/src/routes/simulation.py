@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -25,12 +26,12 @@ def _require_connection() -> None:
 
 
 @router.get("/status", response_model=SimulationStatus)
-async def get_status():
+async def get_status() -> Any:
     global _paused
     if not carla_manager.is_connected:
         return SimulationStatus(connected=False)
 
-    def _get():
+    def _get() -> Any:
         world = carla_manager.world
         settings = world.get_settings()
         snapshot = world.get_snapshot()
@@ -56,11 +57,11 @@ async def get_status():
 
 
 @router.post("/play")
-async def play():
+async def play() -> Any:
     global _paused, _pre_pause_sync_mode, _pre_pause_fixed_delta
     _require_connection()
 
-    def _play():
+    def _play() -> dict[str, Any]:
         world = carla_manager.world
         if _paused:
             settings = world.get_settings()
@@ -82,11 +83,11 @@ async def play():
 
 
 @router.post("/pause")
-async def pause():
+async def pause() -> Any:
     global _paused, _pre_pause_sync_mode, _pre_pause_fixed_delta
     _require_connection()
 
-    def _pause():
+    def _pause() -> dict[str, Any]:
         world = carla_manager.world
         settings = world.get_settings()
         current_fixed_delta = settings.fixed_delta_seconds
@@ -111,10 +112,10 @@ async def pause():
 
 
 @router.post("/step")
-async def step():
+async def step() -> Any:
     _require_connection()
 
-    def _step():
+    def _step() -> dict[str, Any]:
         world = carla_manager.world
         frame = world.tick()
         return {"frame": frame}
@@ -123,20 +124,20 @@ async def step():
 
 
 @router.get("/tick")
-async def get_tick():
+async def get_tick() -> Any:
     _require_connection()
 
-    def _get():
+    def _get() -> dict[str, Any]:
         return {"tick": carla_manager.world.get_snapshot().frame}
 
     return await asyncio.to_thread(_get)
 
 
 @router.post("/settings")
-async def update_settings(req: SimulationSettings):
+async def update_settings(req: SimulationSettings) -> Any:
     _require_connection()
 
-    def _update():
+    def _update() -> dict[str, Any]:
         world = carla_manager.world
         settings = world.get_settings()
         if req.sync_mode is not None:
@@ -158,7 +159,7 @@ async def update_settings(req: SimulationSettings):
 
 
 @router.post("/reload")
-async def reload_map():
+async def reload_map() -> Any:
     _require_connection()
     from src.main import realtime_session, sensor_manager
 
@@ -166,7 +167,7 @@ async def reload_map():
     await sensor_manager.destroy_all()
     carla_manager.clear_tracked_actors()
 
-    def _reload():
+    def _reload() -> dict[str, Any]:
         try:
             carla_manager.client.reload_world()
             return {"status": "reloaded"}

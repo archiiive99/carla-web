@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -31,18 +32,18 @@ def _filter_blueprints(prefix: str) -> list[dict]:
 
 
 @router.get("/vehicles")
-async def list_vehicle_blueprints():
+async def list_vehicle_blueprints() -> dict[str, Any]:
     _require_connection()
     return {"blueprints": await asyncio.to_thread(_filter_blueprints, "vehicle")}
 
 
 @router.get("/walkers")
-async def list_walker_blueprints():
+async def list_walker_blueprints() -> dict[str, Any]:
     _require_connection()
     return {"blueprints": await asyncio.to_thread(_filter_blueprints, "walker")}
 
 
 @router.get("/sensors")
-async def list_sensor_blueprints():
+async def list_sensor_blueprints() -> dict[str, Any]:
     _require_connection()
     return {"blueprints": await asyncio.to_thread(_filter_blueprints, "sensor")}
