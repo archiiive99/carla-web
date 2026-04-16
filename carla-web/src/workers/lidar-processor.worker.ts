@@ -67,8 +67,12 @@ function processLidar(channel: number, payload: ArrayBuffer) {
     outIdx++;
   }
 
-  const finalPositions = positions.slice(0, outIdx * 3);
-  const finalColors = colors.slice(0, outIdx * 3);
+  // Stride/pointCount math guarantees outIdx === pointCount, so positions &
+  // colors are already exactly sized. Skip slice() (which allocates + memcpys
+  // a full-size copy, ~2.4MB per buffer at 200k points × 20Hz) and transfer
+  // the originals directly. The rare mismatch path slices only then.
+  const finalPositions = outIdx * 3 === positions.length ? positions : positions.slice(0, outIdx * 3);
+  const finalColors = outIdx * 3 === colors.length ? colors : colors.slice(0, outIdx * 3);
 
   self.postMessage(
     {
