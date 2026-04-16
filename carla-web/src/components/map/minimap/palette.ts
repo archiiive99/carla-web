@@ -2,41 +2,12 @@ import { readCssVar } from "@/lib/theme-colors";
 
 // Canvas fill/stroke values mirror the --chart-N / --success / --warning /
 // --destructive / --foreground tokens so canvas dots stay in lockstep with
-// the DOM legend below. MiniMap's draw function runs at 60Hz via
-// useAnimationFrame, so caching the 13 getComputedStyle reads keyed on
-// the current theme class keeps the draw loop off the layout thrash path.
-// Theme toggle (uiStore.setTheme) flips document.documentElement.classList;
-// any other live mutation to these CSS vars is out of scope.
-export type MapPalette = {
-  bg: string;
-  grid: string;
-  road: string;
-  mutedFg: string;
-  vehicle: string;
-  vehicleNpc: string;
-  vehicleAutopilot: string;
-  walker: string;
-  sensor: string;
-  trafficRed: string;
-  trafficYellow: string;
-  trafficGreen: string;
-  selected: string;
-  overlayFg: string;
-};
-
-let _cachedKey: string | null = null;
-let _cached: MapPalette | null = null;
-
-function currentThemeKey(): string {
-  if (typeof document === "undefined") return "dark";
-  return document.documentElement.classList.contains("dark") ? "dark" : "light";
-}
-
-export function readMapColors(): MapPalette {
-  const key = currentThemeKey();
-  if (_cached !== null && _cachedKey === key) return _cached;
-  _cachedKey = key;
-  _cached = {
+// the DOM legend below. readCssVar() caches per (theme, name) in
+// lib/theme-colors.ts, so the 13 calls per frame from MiniMap's 60Hz draw
+// loop all resolve via the shared cache — no per-function cache layer
+// needed here.
+export function readMapColors() {
+  return {
     bg: readCssVar("--background", "oklch(0.141 0.005 285.823)"),
     grid: readCssVar("--border", "oklch(0.205 0.005 286)"),
     road: readCssVar("--muted", "oklch(0.274 0.006 286.033)"),
@@ -54,5 +25,6 @@ export function readMapColors(): MapPalette {
     selected: "oklch(0.78 0.16 70)",
     overlayFg: readCssVar("--overlay-fg", "oklch(1 0 0)"),
   };
-  return _cached;
 }
+
+export type MapPalette = ReturnType<typeof readMapColors>;
