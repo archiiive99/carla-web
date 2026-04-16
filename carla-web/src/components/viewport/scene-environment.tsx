@@ -272,7 +272,11 @@ export function WeatherLighting({
   // SkyAtmosphere's sun-disc color shift; eliminates the iter-01 gap
   // where web's pure-white directional sun produced cool-shifted bounce.
   const altDeg = (weather.sun_altitude_angle ?? 0);
-  const sunKelvin = 5000 + Math.max(0, Math.min(60, altDeg)) * 13;
+  // iter-06-revisit-sun-kelvin-cloud: attenuate Kelvin under overcast
+  // to approximate sky-diffuse dominance (cooler-shifted). -300K at
+  // cloudFactor=1. No-op under clear sky.
+  const sunKelvin =
+    5000 + Math.max(0, Math.min(60, altDeg)) * 13 - cloudFactor * 300;
   const sunColor = useMemo(() => kelvinToColor(sunKelvin), [sunKelvin]);
   // IBL intensity collapses along with the sun; tiny floor keeps PBR
   // materials from reading as fully unlit matte at night.
