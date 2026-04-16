@@ -107,7 +107,16 @@ async def lifespan(app: FastAPI):
             await _tick_task
         except asyncio.CancelledError:
             pass
+    # Await the connect task after cancelling so in-flight connect
+    # work is collected — otherwise asyncio logs
+    # "Task was destroyed but it is pending!" on every shutdown.
     connect_task.cancel()
+    try:
+        await connect_task
+    except asyncio.CancelledError:
+        pass
+    except Exception as exc:
+        logger.debug("Connect task exited with exception: %s", exc)
     # Hot reload must not tear down live CARLA actors. The next bridge worker
     # rehydrates existing sensors/actors from the running simulator.
     await carla_manager.disconnect()
