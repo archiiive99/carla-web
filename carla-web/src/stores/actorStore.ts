@@ -176,9 +176,12 @@ export const useActorStore = create<ActorState>((set, get) => ({
       }
       throw error;
     }
-    if (state.egoVehicleId === id) {
-      set({ egoAutopilot: enabled });
-    }
+    // Previously re-set egoAutopilot here on success, guarded by the
+    // pre-await `state.egoVehicleId === id` snapshot. Both parts were
+    // wrong: the value matches what was optimistically set above, so the
+    // set is a no-op; and the snapshot check meant an ego that swapped
+    // during the await would still be "re-confirmed" via a stale
+    // comparison. Just let the optimistic set stand on success.
   },
 
   spawnMultipleVehicles: async (count: number, blueprint = "vehicle.tesla.model3") => {
