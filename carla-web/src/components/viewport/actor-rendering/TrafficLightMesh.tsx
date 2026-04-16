@@ -4,6 +4,7 @@ import * as THREE from "three";
 import type { CarlaActor } from "@/types/carla";
 import { TRAFFIC_LIGHT_MODEL } from "../CarlaAssetLoader";
 import { ErrorBoundaryFallback, carlaToThree } from "./shared";
+import { useSimulationStore } from "@/stores/simulationStore";
 import {
   TRAFFIC_RED,
   TRAFFIC_YELLOW,
@@ -20,7 +21,7 @@ import {
  *  MeshStandardMaterial so the bulb itself glows with the current
  *  traffic-light state instead of just the indicator sphere above the
  *  housing. */
-function GltfTrafficLight({ bulbColor }: { bulbColor: string }) {
+function GltfTrafficLight({ bulbColor, emissiveIntensity }: { bulbColor: string; emissiveIntensity: number }) {
   const { scene } = useGLTF(TRAFFIC_LIGHT_MODEL);
   const cloned = useMemo(() => {
     const c = scene.clone(true);
@@ -32,7 +33,7 @@ function GltfTrafficLight({ bulbColor }: { bulbColor: string }) {
           const bulbMat = new THREE.MeshStandardMaterial({
             color: 0xffffff,
             emissive: new THREE.Color(bulbColor),
-            emissiveIntensity: 1.5,
+            emissiveIntensity,
             roughness: 0.4,
             metalness: 0,
           });
@@ -42,19 +43,21 @@ function GltfTrafficLight({ bulbColor }: { bulbColor: string }) {
       }
     });
     return c;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scene, bulbColor]);
-  // When state changes (bulbColor updates), find the cached material on
-  // the cloned mesh tree and update its emissive in place — avoids a
-  // full re-clone of the scene each color change.
+  // When state changes (bulbColor / intensity updates), find the cached
+  // material on the cloned mesh tree and update in place — avoids a
+  // full re-clone of the scene each change.
   useEffect(() => {
     cloned.traverse((child) => {
       if (child instanceof THREE.Mesh && child.userData.bulbMatRef) {
         const mat = child.userData.bulbMatRef as THREE.MeshStandardMaterial;
         mat.emissive.set(bulbColor);
+        mat.emissiveIntensity = emissiveIntensity;
         mat.needsUpdate = false;
       }
     });
-  }, [bulbColor, cloned]);
+  }, [bulbColor, emissiveIntensity, cloned]);
   return <primitive object={cloned} />;
 }
 
@@ -88,14 +91,19 @@ function BoxTrafficLightFallback({ color }: { color: string }) {
 }
 
 export const TrafficLightMesh = memo(function TrafficLightMesh({ actor }: { actor: CarlaActor }) {
+  const sunAltitude = useSimulationStore((s) => s.weather.sun_altitude_angle);
   const pos = carlaToThree(actor.transform.location);
   const yaw = (-actor.transform.rotation.yaw * Math.PI) / 180;
   const bulbColor = trafficLightBulbColor(actor.traffic_light_state);
+  // Bulb emissive ramps with sun altitude: 1.0 at noon (subtle against
+  // sunlit housing), 2.6 at/below horizon (carries signal in dim scene).
+  const altFactor = Math.max(0, Math.min(1, sunAltitude / 60));
+  const bulbIntensity = 1.0 + 1.6 * (1 - altFactor);
   return (
     <group position={[pos.x, pos.y, pos.z]} rotation={[0, yaw, 0]}>
       <Suspense fallback={<BoxTrafficLightFallback color={bulbColor} />}>
         <ErrorBoundaryFallback onError={() => {}}>
-          <GltfTrafficLight bulbColor={bulbColor} />
+          <GltfTrafficLight bulbColor={bulbColor} emissiveIntensity={bulbIntensity} />
         </ErrorBoundaryFallback>
       </Suspense>
       {/* Tiny state indicator bulb above the light — always visible regardless
@@ -105,7 +113,7 @@ export const TrafficLightMesh = memo(function TrafficLightMesh({ actor }: { acto
         <meshStandardMaterial
           color={bulbColor}
           emissive={bulbColor}
-          emissiveIntensity={1.5}
+          emissiveIntensity={bulbIntensity}
         />
       </mesh>
     </group>
