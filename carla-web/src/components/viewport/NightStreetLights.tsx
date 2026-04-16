@@ -34,6 +34,11 @@ const SPOTLIGHT_DECAY = 1.5;
 export function NightStreetLights() {
   const sunAltitude = useSimulationStore((s) => s.weather.sun_altitude_angle ?? 75);
   const isNight = sunAltitude < 0;
+  // iter-09-revisit-halo-opacity-altitude: halo opacity ramps with
+  // how deep into night we are. Twilight (sun_alt ≈ 0) = 0.2;
+  // deep night (sun_alt ≤ -15) = 0.5.
+  const nightDepth = Math.max(0, Math.min(1, -sunAltitude / 15));
+  const haloOpacity = 0.2 + nightDepth * 0.3;
 
   const lampSpecs = useMemo(
     () =>
@@ -125,13 +130,16 @@ export function NightStreetLights() {
                     metalness={0}
                   />
                 </mesh>
-                {/* iter-09-revisit-lamp-halo: larger transparent additive sphere. */}
+                {/* iter-09-revisit-lamp-halo: larger transparent additive sphere.
+                   iter-09-revisit-halo-opacity-altitude: opacity ramps with
+                   night-depth so twilight reads as subtle, deep night as
+                   prominent. */}
                 <mesh position={spec.headPosition}>
                   <sphereGeometry args={[0.4, 16, 16]} />
                   <meshBasicMaterial
                     color={HEADLIGHT_BEAM}
                     transparent
-                    opacity={0.35}
+                    opacity={haloOpacity}
                     blending={THREE.AdditiveBlending}
                     depthWrite={false}
                   />

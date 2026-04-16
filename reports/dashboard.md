@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 53 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
+**Summary:** 54 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -68,6 +68,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09-revisit-lamp-arm | Horizontal arm + head at outboard end | **✅** | 16.72 | 0.3063 | 21.87 | ~25 min | be828da02 |
 | 06-revisit-shadow-softness-cloudiness | Shadow radius cloudiness ramp | **✅** | 16.71 | 0.3063 | 21.86 | ~12 min | b97f0cbbc |
 | 03-revisit-windshield-tint | Tinted glass on vehicle window mats | **✅** | 16.71 | 0.3064 | 21.87 | ~15 min | ec6fd34d5 |
+| 09-revisit-halo-opacity-altitude | Halo opacity ramps by night-depth | **✅** | 16.71 | 0.3063 | 21.87 | ~10 min | (this commit) |
 
 ## Notes
 
