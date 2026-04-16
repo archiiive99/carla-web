@@ -63,7 +63,17 @@ export function useCameraSensorData(sensorId: number) {
 
   useEffect(() => {
     if (!imageDecoderWorker) return;
+    // Reset all per-sensor counters on switch — otherwise frames received
+    // under sensor A's id keep accumulating in frameCountRef and the first
+    // post-switch FPS calculation divides (A's count + B's early frames)
+    // by B's 1s window, flashing an inflated reading. fps/latency ref
+    // carryover is hidden by CameraView's hasReceivedFrame gate, but the
+    // frameCount leak slips past because the gate only suppresses display,
+    // not the count itself.
     lastFpsTimeRef.current = performance.now();
+    frameCountRef.current = 0;
+    fpsRef.current = 0;
+    latencyRef.current = 0;
 
     const handler = (e: MessageEvent) => {
       if (e.data.type !== "camera" || e.data.sensorId !== sensorId) return;
