@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import re
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager, suppress
@@ -191,6 +192,13 @@ _QUIET_POLL_PATHS = frozenset({
     "/api/actors",
 })
 
+# VehicleDetails polls GET /api/actors/:id every 500ms while an actor is
+# selected so the throttle/steer/brake sliders reflect live values. That's
+# two INFO lines per second per open detail pane — same "interactive-use
+# heartbeat" character as the other quiet paths. Non-2xx (e.g. 404 after
+# the actor is destroyed) still bubbles up as a normal log line.
+_QUIET_POLL_PATH_PATTERN = re.compile(r"^/api/actors/\d+$")
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
@@ -201,9 +209,14 @@ async def log_requests(request: Request, call_next: Callable[[Request], Awaitabl
     start = time.monotonic()
     response = await call_next(request)
     duration = (time.monotonic() - start) * 1000
-    quiet = request.url.path in _QUIET_POLL_PATHS and 200 <= response.status_code < 300
+    path = request.url.path
+    ok = 200 <= response.status_code < 300
+    quiet = ok and (
+        path in _QUIET_POLL_PATHS
+        or (request.method == "GET" and _QUIET_POLL_PATH_PATTERN.match(path) is not None)
+    )
     if not quiet:
-        logger.info(f"{request.method} {request.url.path} → {response.status_code} ({duration:.0f}ms)")
+        logger.info(f"{request.method} {path} → {response.status_code} ({duration:.0f}ms)")
     return response
 
 
