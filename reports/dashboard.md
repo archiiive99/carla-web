@@ -64,7 +64,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09-revisit-lamp-halo | Additive-blend halo sphere around lamp heads | **✅** | 11.01 | 0.2122 | 35.95 | ~18 min | 7d4ed20a6 |
 | 05-revisit-mie-altitude | Altitude-driven Sky mieCoefficient | **✅** | 16.71 | 0.3064 | 21.86 | ~15 min | 51e11b670 |
 | 11-revisit-ambient-cloud-cool | Ambient color cools under cloudiness | **✅** | 16.72 | 0.3063 | 21.87 | ~12 min | 2cbeba589 |
-| 09-revisit-lamp-pole | Visible pole cylinder ground→lamp head | **✅** | 16.71 | 0.3063 | 21.87 | ~20 min | (this commit) |
+| 09-revisit-lamp-pole | Visible pole cylinder ground→lamp head | **✅** | 16.71 | 0.3063 | 21.87 | ~20 min | bd00bc0c9 |
 
 ## Notes
 
