@@ -99,9 +99,13 @@ export function ExposureDriver() {
   useFrame(({ gl }, delta) => {
     const sunAlt = weather.sun_altitude_angle ?? 60;
     const cloudiness = weather.cloudiness ?? 0;
+    // iter-11-revisit-exposure-deep-night: extend the below-horizon
+    // branch so exposure keeps lifting as sun_alt drops toward -20°.
+    // 1.6 at sun_alt=0, 2.0 at sun_alt=-20; saturates further below.
     const base =
       sunAlt <= 0
-        ? EXPOSURE_DUSK_NIGHT
+        ? EXPOSURE_DUSK_NIGHT +
+          (Math.min(Math.max(-sunAlt, 0), 20) / 20) * 0.4
         : EXPOSURE_MIDDAY +
           (EXPOSURE_DUSK_NIGHT - EXPOSURE_MIDDAY) *
             (1 - Math.min(Math.max(sunAlt, 0), 60) / 60);

@@ -109,6 +109,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-09-revisit-cone-fog  Cone opacity lifts with fog-density  (✅ — coneOpacity = haloOpacity * 0.4 * (1+fogFactor*1.5); clear 0.4× → heavy fog 1.0× halo; midday byte-identical (night-gated); closed 2026-04-16T14:08:00Z+~8min)
 [x] iter-06-revisit-sun-kelvin-precip  Precipitation cools sun Kelvin  (✅ — -precipFactor*200 added (smaller than cloud's -300); midday byte-identical (precip=0); reference cluster recovered to 16.xx; closed 2026-04-16T14:15:00Z+~12min)
 [x] iter-12-revisit-wetness-active-rain  Active precipitation feeds wetness  (✅ — +precipitation*0.5 term; fresh-rain state now registers wet road before deposits accumulate; midday byte-identical (precip=0); closed 2026-04-16T14:21:00Z+~10min)
+[x] iter-11-revisit-exposure-deep-night  Deep-night ramp beyond sun_alt=0  (✅ — below-horizon branch now ramps 1.6→2.0 as sun_alt goes 0→-20; midday byte-identical (sun_alt=60); closed 2026-04-16T14:28:00Z+~15min)
 [ ] iter-15  IBL cubemaps per weather/TOD pair — replace gradient sky
 ```
 
