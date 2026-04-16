@@ -533,7 +533,12 @@ class SensorManager:
             if tick_attr is None:
                 return ADAPTIVE_MAX_FPS
             tick = float(tick_attr)
-            if tick <= 0:
+            # Guard against NaN/Infinity: a non-finite tick would propagate
+            # into native_fps and every downstream min/max/ratio lose the
+            # ability to reason about it (NaN comparisons are False, so
+            # rate-control silently degrades). `tick <= 0` is False for
+            # NaN, so the original check missed it.
+            if not math.isfinite(tick) or tick <= 0:
                 return ADAPTIVE_MAX_FPS
             return min(ADAPTIVE_MAX_FPS, 1.0 / tick)
         except (TypeError, ValueError, AttributeError):
