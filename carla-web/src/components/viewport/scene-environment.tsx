@@ -289,8 +289,13 @@ export function WeatherLighting({
   // iter-06-revisit-sun-kelvin-cloud: attenuate Kelvin under overcast
   // to approximate sky-diffuse dominance (cooler-shifted). -300K at
   // cloudFactor=1. No-op under clear sky.
+  // iter-06-revisit-sun-kelvin-precip: additional -200K at heavy rain;
+  // droplet scatter compounds the cloudiness shift without doubling it.
   const sunKelvin =
-    5000 + Math.max(0, Math.min(60, altDeg)) * 13 - cloudFactor * 300;
+    5000 +
+    Math.max(0, Math.min(60, altDeg)) * 13 -
+    cloudFactor * 300 -
+    precipFactor * 200;
   const sunColor = useMemo(() => kelvinToColor(sunKelvin), [sunKelvin]);
   // IBL intensity collapses along with the sun; tiny floor keeps PBR
   // materials from reading as fully unlit matte at night.
