@@ -79,7 +79,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 06-revisit-sun-precip | Direct sun attenuated by precipitation | **✅** | 15.50 | 0.3388 | 22.79 | ~10 min | 44ed5fb80 |
 | 11-revisit-exposure-precip | Exposure target lifts with precipitation | **✅** | 15.37 | 0.3040 | 22.94 | ~8 min | 2fee3274f |
 | 04-revisit-stripe-brightness | Brighter white stripe paint (+6-7%) | **✅** | 15.36 | 0.2972 | 22.95 | ~10 min | 9ff5dbaf4 |
-| 04-revisit-wear-softer | Grunge wear depth 0.65→0.50 | **✅** | 15.36 | 0.2973 | 22.96 | ~12 min | (this commit) |
+| 04-revisit-wear-softer | Grunge wear depth 0.65→0.50 | **✅** | 15.36 | 0.2973 | 22.96 | ~12 min | 8c1be6496 |
 
 ## Notes
 
