@@ -65,8 +65,16 @@ async def _world_tick_loop() -> None:
         try:
             def _tick_and_get_data():
                 world = carla_manager.world
-                # Advance the simulation one step (required for sync mode)
+                # Advance the simulation one step (required for sync mode).
+                # Keep this call unconditional — CARLA's fixed_delta physics
+                # needs the tick regardless of whether anyone's listening.
                 world.tick()
+                # Skip the per-tick encoding when nobody is subscribed.
+                # The check lives INSIDE the thread so the snapshot +
+                # encode cost is only paid when it will actually reach a
+                # client; checking outside still built the payload in vain.
+                if ws_broadcaster.client_count == 0:
+                    return None
                 snapshot = world.get_snapshot()
                 # Include ego vehicle snapshot for real-time camera following
                 actors = []
@@ -81,7 +89,7 @@ async def _world_tick_loop() -> None:
                     actors,
                 )
             tick_data = await asyncio.to_thread(_tick_and_get_data)
-            if ws_broadcaster.client_count > 0:
+            if tick_data is not None:
                 await ws_broadcaster.broadcast_world_tick(tick_data)
         except Exception as exc:
             logger.debug("World tick error: %s", exc)
