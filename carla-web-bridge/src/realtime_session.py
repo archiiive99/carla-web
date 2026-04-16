@@ -201,20 +201,13 @@ class RealtimeSessionManager:
                     self._transition(SessionState.VEHICLE_PENDING, reason="runtime ready")
 
                 if self._state is SessionState.VEHICLE_PENDING:
-                    adopted = await asyncio.to_thread(self._adopt_orphan_managed_vehicle_sync)
-                    if adopted is not None:
-                        vehicle_id, _ = adopted
-                        self._vehicle_id = vehicle_id
-                        self._carla.track_actor(vehicle_id)
-                        self._vehicle_ready_at_monotonic = time.monotonic() - CAMERA_ARM_DELAY_SECONDS
-                        # Post single-source migration: no managed camera.
-                        # The browser renders the shared world scene; adopted
-                        # orphan cameras (if any from a pre-migration session)
-                        # are left alone and will be cleaned up by the normal
-                        # sensor destruction flow.
-                        self._transition(SessionState.READY, reason="adopted vehicle (no managed camera)")
-                        logger.info("Adopted orphan managed vehicle (vehicle=%s)", vehicle_id)
-                        return self.snapshot()
+                    # Destroy any orphan managed vehicles from prior bridge
+                    # runs before spawning fresh. The call is side-effectful
+                    # (cleanup) but always returns None — re-adopting stale
+                    # actors across reloads proved unreliable, see
+                    # _adopt_orphan_managed_vehicle_sync docstring. The old
+                    # `if adopted is not None` branch was dead.
+                    await asyncio.to_thread(self._adopt_orphan_managed_vehicle_sync)
 
                     self._vehicle_id = await asyncio.to_thread(self._ensure_vehicle_sync)
                     self._vehicle_ready_at_monotonic = time.monotonic()
