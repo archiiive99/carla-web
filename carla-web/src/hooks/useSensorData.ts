@@ -133,6 +133,7 @@ export function useLidarSensorData(sensorId: number) {
 interface ImuSample {
   accel: { x: number; y: number; z: number };
   gyro: { x: number; y: number; z: number };
+  compass: number;
   t: number;
 }
 
@@ -158,10 +159,15 @@ export function useImuSensorData(sensorId: number) {
         y: v.getFloat32(32, true),
         z: v.getFloat32(36, true),
       };
+      const compass = v.getFloat32(40, true);
       accelRef.current = accel;
       gyroRef.current = gyro;
-      compassRef.current = v.getFloat32(40, true);
-      bufferRef.current.push({ accel, gyro, t: ts });
+      compassRef.current = compass;
+      // Store compass per-sample so CSV export preserves the heading
+      // at each reading time. Without this, ImuChart.handleExport wrote
+      // the *current* compass value into every row of a historical
+      // buffer, which defeats the "time-series" purpose of the export.
+      bufferRef.current.push({ accel, gyro, compass, t: ts });
       if (bufferRef.current.length > IMU_BUFFER_MAX_SAMPLES) bufferRef.current.shift();
     },
     () => {

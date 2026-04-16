@@ -120,7 +120,7 @@ export default function ImuChart({ sensorId, className }: ImuChartProps) {
       timestamp: sample.t,
       accel: sample.accel,
       gyro: sample.gyro,
-      compass: compassRef.current,
+      compass: sample.compass,
     }));
     if (samples.length === 0) return;
     saveImuAsCsv(samples, `imu_${sensorId}.csv`);
