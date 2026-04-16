@@ -15,6 +15,13 @@ export function useEgoVehicleResolution() {
 
   useEffect(() => {
     if (egoVehicleId !== null) return;
+    // Don't poll while the bridge is unreachable. Without this, the
+    // 2s catch-retry kept firing getRealtimeSession() during extended
+    // disconnects, burning bandwidth and filling the bridge access log
+    // (and earlier the error toast in reportError pre-filter).
+    // useConnectionHealth flips connectionStatus back to "connected"
+    // and the effect re-runs naturally.
+    if (connectionStatus !== "connected") return;
 
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
