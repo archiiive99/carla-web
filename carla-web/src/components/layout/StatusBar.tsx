@@ -94,18 +94,26 @@ export function StatusBar() {
   useEffect(() => {
     const unsub = useSimulationStore.subscribe((state) => {
       const now = performance.now();
-      if (lastTickRef.current && tickRateRef.current) {
+      // Only roll the tick-rate window when we actually recompute Hz.
+      // Previously this updated lastTickRef on every subscription fire —
+      // including unrelated state changes (weather, isRunning, etc.) and
+      // the ~20Hz tick bursts — which kept timeDelta at ~50ms and held
+      // it permanently below the 0.25s gate, so the Hz readout never
+      // advanced past its first reading.
+      if (!lastTickRef.current) {
+        lastTickRef.current = { tick: state.currentTick, at: now };
+      } else if (tickRateRef.current) {
         const tickDelta = state.currentTick - lastTickRef.current.tick;
         const timeDelta = (now - lastTickRef.current.at) / 1000;
         if (tickDelta >= 0 && timeDelta > 0.25) {
           const hz = tickDelta / timeDelta;
           tickRateRef.current.textContent = `${hz.toFixed(hz >= 10 ? 0 : 1)} Hz`;
+          lastTickRef.current = { tick: state.currentTick, at: now };
         }
       }
       if (tickCountRef.current) {
         tickCountRef.current.textContent = `T${state.currentTick}`;
       }
-      lastTickRef.current = { tick: state.currentTick, at: now };
     });
     return unsub;
   }, []);
