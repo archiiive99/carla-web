@@ -74,7 +74,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09-revisit-emissive-depth | Emissive intensity ramps by night-depth | **✅** | 10.97 | 0.2109 | 36.10 | ~10 min | dbf86f64c |
 | 07-revisit-trunk-vary | Per-instance trunk color variation | **✅** | 16.76 | 0.3057 | 21.84 | ~15 min | 07d091268 |
 | 06-revisit-sun-kelvin-cloud | Sun Kelvin drops with cloudiness | **✅** | 15.66 | 0.3437 | 22.64 | ~15 min | 04105c4f5 |
-| 08-revisit-bob | Vertical torso bob at 2× step rate | **✅** | 6.61 | 0.0627 | 49.24 | ~70 min (incl CARLA recovery) | (this commit) |
+| 08-revisit-bob | Vertical torso bob at 2× step rate | **✅** | 6.61 | 0.0627 | 49.24 | ~70 min (incl CARLA recovery) | f0be4ef26 |
 
 ## Notes
 
