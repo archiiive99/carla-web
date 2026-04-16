@@ -272,6 +272,24 @@ async def destroy_actor(actor_id: int) -> dict[str, Any]:
     if actor is None:
         raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
 
+    # CARLA-managed actors that aren't lifecycle-owned by the bridge: the
+    # spectator (id=1, represents the native UE5 viewport camera), traffic
+    # lights, and traffic signs. actor.destroy() on any of these raises
+    # inside CARLA and surfaced as a generic 500. Return a clean 400 so
+    # callers (including curl / scripts) get a meaningful error — the
+    # frontend already hides the Destroy button for these types, this
+    # plugs the direct-API hole.
+    type_id = actor.type_id
+    if (
+        type_id == "spectator"
+        or type_id.startswith("traffic.traffic_light")
+        or (type_id.startswith("traffic.") and "light" not in type_id)
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Actor {actor_id} ({type_id}) is a CARLA map fixture and cannot be destroyed",
+        )
+
     if actor.type_id.startswith("sensor."):
         await sensor_manager.destroy_sensor(actor_id)
     else:
