@@ -78,15 +78,20 @@ async def _world_tick_loop() -> None:
         await asyncio.sleep(WORLD_TICK_INTERVAL)
         if not carla_manager.is_connected:
             continue
-        if simulation_routes._paused:
-            continue
+        paused = simulation_routes._paused
         try:
             def _tick_and_get_data() -> Any:
                 world = carla_manager.world
-                # Advance the simulation one step (required for sync mode).
-                # Keep this call unconditional — CARLA's fixed_delta physics
-                # needs the tick regardless of whether anyone's listening.
-                world.tick()
+                # Advance the simulation one step (required for sync mode) —
+                # but only when not paused. Still build and broadcast the
+                # snapshot while paused so the WS receiver's 3s inactivity
+                # watchdog doesn't force-close a healthy connection after
+                # the user pauses for a few seconds. The frame counter
+                # simply repeats the pre-pause value under a pause; the
+                # frontend's drop detector (`frame > lastTickFrame + 1`)
+                # is a no-op in that case.
+                if not paused:
+                    world.tick()
                 # Skip the per-tick encoding when nobody is subscribed.
                 # The check lives INSIDE the thread so the snapshot +
                 # encode cost is only paid when it will actually reach a
