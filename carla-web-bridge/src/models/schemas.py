@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 # --- Common ---
 
@@ -202,8 +202,33 @@ class BlueprintInfo(BaseModel):
 # --- Recording ---
 
 
+def _validate_recording_filename(value: str) -> str:
+    """Reject path separators + parent-dir traversal.
+
+    CARLA's start_recorder / replay_file resolve the filename against
+    the server's save directory. Letting a client submit "../etc/passwd"
+    or "/absolute/path" would let them read/write outside that sandbox.
+    Basename-only — rejected early at schema validation so the 400
+    lands with a clear message instead of an opaque CARLA error or
+    worse, silent success.
+    """
+    trimmed = value.strip()
+    if not trimmed:
+        raise ValueError("filename must not be empty")
+    if "/" in trimmed or "\\" in trimmed:
+        raise ValueError("filename must not contain path separators")
+    if ".." in trimmed:
+        raise ValueError("filename must not contain parent-dir segments")
+    return trimmed
+
+
 class StartRecordingRequest(BaseModel):
     filename: str
+
+    @field_validator("filename")
+    @classmethod
+    def _clean_filename(cls, v: str) -> str:
+        return _validate_recording_filename(v)
 
 
 class StartReplayRequest(BaseModel):
@@ -211,6 +236,11 @@ class StartReplayRequest(BaseModel):
     start_time: float = 0.0
     duration: float = 0.0
     camera_id: int = 0
+
+    @field_validator("filename")
+    @classmethod
+    def _clean_filename(cls, v: str) -> str:
+        return _validate_recording_filename(v)
 
 
 # --- Map / Navigation ---
