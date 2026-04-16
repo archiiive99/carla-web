@@ -106,6 +106,12 @@ class WebSocketBroadcaster:
             msg = json.loads(text)
         except json.JSONDecodeError:
             return
+        # A valid JSON non-dict payload (e.g. `"42"` or `"[1,2,3]"`) would
+        # crash msg.get(...) with AttributeError and propagate to
+        # handle_connection's generic catch, dropping the client. Guard
+        # the type up front — matches the binary handler's pattern.
+        if not isinstance(msg, dict):
+            return
 
         action = msg.get("action")
         sensor_id = msg.get("sensor_id")
