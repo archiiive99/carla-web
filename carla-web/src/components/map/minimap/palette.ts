@@ -13,8 +13,12 @@ export function readMapColors() {
     road: readCssVar("--muted", "oklch(0.274 0.006 286.033)"),
     mutedFg: readCssVar("--muted-foreground", "oklch(0.552 0.016 285.938)"),
     vehicle: readCssVar("--chart-4", "oklch(0.68 0.2 250)"),
-    vehicleNpc: readCssVar("--chart-3", "oklch(0.72 0.17 145)"),
-    vehicleAutopilot: readCssVar("--chart-7", "oklch(0.74 0.2 20)"),
+    // Bridge-managed ego uses chart-3 (the green dot in the legend).
+    // Earlier revisions named this "vehicleNpc" — misleading, since the
+    // bridge-managed ego is not an NPC — and defined a "vehicleAutopilot"
+    // chart-7 entry that had no consumer. Dropped the dead field;
+    // renamed to match its actual semantics.
+    vehicleEgo: readCssVar("--chart-3", "oklch(0.72 0.17 145)"),
     walker: readCssVar("--chart-2", "oklch(0.82 0.17 85)"),
     sensor: readCssVar("--chart-6", "oklch(0.75 0.13 200)"),
     trafficRed: readCssVar("--destructive", "oklch(0.704 0.191 22.216)"),

@@ -18,7 +18,7 @@ export function drawActor(
   switch (actor.type) {
     case "vehicle": {
       // Ego (bridge-managed) stands out in green; other vehicles blue.
-      ctx.fillStyle = isEgo ? palette.vehicleNpc : palette.vehicle;
+      ctx.fillStyle = isEgo ? palette.vehicleEgo : palette.vehicle;
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(heading);
