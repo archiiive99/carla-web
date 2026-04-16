@@ -59,11 +59,22 @@ async def list_recordings() -> Any:
     _require_connection()
 
     def _list() -> dict[str, Any]:
+        # Only scan the cwd's top level, not the whole tree. The previous
+        # rglob("*.log") walked recursively from Path.cwd(), which for a
+        # bridge launched out of the repo root picked up node_modules,
+        # test-artifact, and uvicorn logs — the dedupe is filename-only
+        # so a stray "test.log" nested deep in a dev dependency shows
+        # up as a bogus "recording" the user can't actually replay
+        # (CARLA's replayer resolves against its own save dir, not ours).
+        # Top-level glob limits false positives to files actually sitting
+        # next to where the bridge was launched, while still catching
+        # cross-session recordings that existed before _recording_history
+        # was populated.
         cwd = Path.cwd()
         disk_files = sorted(
             {
                 path.name
-                for path in cwd.rglob("*.log")
+                for path in cwd.glob("*.log")
                 if path.is_file()
             },
             reverse=True,
