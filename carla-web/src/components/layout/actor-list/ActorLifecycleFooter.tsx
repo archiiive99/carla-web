@@ -121,6 +121,8 @@ export function ActorLifecycleFooter() {
               variant="destructive"
               size="sm"
               className="w-full gap-1.5"
+              disabled={!isConnected}
+              title={isConnected ? undefined : "Connect to CARLA first"}
               aria-label="Destroy all spawned actors"
             >
               <Trash2 className="size-3.5" aria-hidden="true" />
