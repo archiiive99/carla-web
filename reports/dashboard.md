@@ -48,7 +48,9 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 14-revisit-runtime-incremental | Incremental cull batching | **✅** | 16.71 | 0.3062 | 21.86 | ~25 min | 8c5254a64 |
 | 08-walk-yaw-from-velocity | Walker faces direction of travel | **✅** | 11.02 | 0.2123 | 35.95 | ~25 min | a0c24abfc |
 | 08-knee-bend | Thigh + shin with knee pivot | **✅** | 16.71 | 0.3062 | 21.86 | ~35 min | 20bba8595 |
-| 07-revisit-wind | Foliage vertex-shader wind sway | **✅** | 16.70 | 0.3064 | 21.87 | ~40 min | (this commit) |
+| 07-revisit-wind | Foliage vertex-shader wind sway | **✅** | 16.70 | 0.3064 | 21.87 | ~40 min | 5b886e6b9 |
+| 11-revisit-auto-exposure | Spotlight-count heuristic (reverted) | ⚠️ §6.3 | 15.15 | 0.2987 | 23.19 | ~35 min | ded15af2c |
+| 06-revisit-csm | Adaptive ortho shadow frustum | **✅** | 16.71 | 0.3063 | 21.86 | ~20 min | 7a139627e |
 
 ## Notes
 
