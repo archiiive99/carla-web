@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
@@ -137,14 +138,12 @@ class WebSocketBroadcaster:
             except (TypeError, ValueError) as exc:
                 logger.debug("set_rate ignored for client %s: %s", conn.client_id, exc)
                 return
-            try:
+            with contextlib.suppress(Exception):
                 await conn.ws.send_text(json.dumps({
                     "type": "rate_ack",
                     "sensor_id": int(sensor_id),
                     "target_fps": applied,
                 }))
-            except Exception:
-                pass
 
     async def _handle_binary_message(
         self, conn: ClientConnection, data: bytes,
@@ -288,10 +287,8 @@ class WebSocketBroadcaster:
                 active_conn.on_unsubscribe(sid, client_id)
                 active_conn.subscriptions.discard(sid)
 
-        try:
+        with contextlib.suppress(Exception):
             await active_conn.ws.close()
-        except Exception:
-            pass
 
         logger.info("Client %s disconnected (%d remain)", client_id, len(self._clients))
 

@@ -7,7 +7,7 @@ import logging
 import os
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, Response
@@ -129,10 +129,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await adaptive_controller.stop()
     if _tick_task:
         _tick_task.cancel()
-        try:
+        with suppress(asyncio.CancelledError):
             await _tick_task
-        except asyncio.CancelledError:
-            pass
     # Await the connect task after cancelling so in-flight connect
     # work is collected — otherwise asyncio logs
     # "Task was destroyed but it is pending!" on every shutdown.

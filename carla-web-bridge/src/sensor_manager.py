@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import struct
 import time
@@ -169,10 +170,8 @@ class SensorManager:
         queue = self._sensor_queues.pop(sensor_id, None)
         if task is not None:
             task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
         if queue is not None:
             while not queue.empty():
                 try:
@@ -648,10 +647,8 @@ class SensorManager:
 
         # Regular drop-oldest policy for bounded streams.
         if queue.full():
-            try:
+            with contextlib.suppress(asyncio.QueueEmpty):
                 queue.get_nowait()
-            except asyncio.QueueEmpty:
-                pass
         try:
             queue.put_nowait(packet)
         except asyncio.QueueFull:

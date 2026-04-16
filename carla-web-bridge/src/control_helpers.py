@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 from typing import Any
 
 from fastapi import HTTPException
@@ -21,10 +22,8 @@ def apply_vehicle_control(
     if not getattr(actor, "type_id", "").startswith("vehicle."):
         raise HTTPException(status_code=400, detail="Actor is not a vehicle")
     if disable_autopilot:
-        try:
+        with contextlib.suppress(Exception):
             actor.set_autopilot(False)
-        except Exception:
-            pass
     ctrl = carla_module.VehicleControl(
         throttle=req.throttle,
         steer=req.steer,
