@@ -184,9 +184,22 @@ export function SensorPanel({ className }: { className?: string }) {
     if (!egoRgbSensor) return;
     subscribe(egoRgbSensor.id);
     setGridSize("1x1");
-    setCells([{ sensorId: egoRgbSensor.id, typeId: egoRgbSensor.type }]);
+    setCells((prev) => {
+      // Same leak that handleGridChange / resetGrid used to have — the
+      // cells array was replaced wholesale without unsubscribing the
+      // sensors the dropped cells held. With a 3x3 grid filled,
+      // "Focus ego RGB" orphaned up to 8 bridge subscriptions. Drop them
+      // first; the new ego-RGB cell re-subscribes via the `subscribe()`
+      // call above (which is a no-op if egoRgbSensor was already in prev).
+      for (const cell of prev) {
+        if (cell && !cell.preset3d && cell.sensorId !== egoRgbSensor.id) {
+          unsubscribe(cell.sensorId);
+        }
+      }
+      return [{ sensorId: egoRgbSensor.id, typeId: egoRgbSensor.type }];
+    });
     setMaximizedSensor(null);
-  }, [egoRgbSensor, setMaximizedSensor, subscribe]);
+  }, [egoRgbSensor, setMaximizedSensor, subscribe, unsubscribe]);
 
   // Reset to the primary compare layout so clicks on "Reset grid" restore
   // the same default the user first opened the app with, not an empty 2x2
