@@ -85,6 +85,14 @@ async def set_lane_behavior(vehicle_id: int, req: LaneChangeRequest) -> Any:
             tm.auto_lane_change(actor, req.auto_lane_change)
             if req.force_lane_change:
                 tm.force_lane_change(actor, True)
+            # `lane_offset` was previously accepted by the schema and silently
+            # dropped here — the frontend's setVehicleAutoLaneChange sends it
+            # on every call, so the endpoint pretended to honor offsets it
+            # never applied. `vehicle_lane_offset` is a 0.9.14+ TM method;
+            # hasattr-guard so older CARLA runtimes keep returning 200
+            # instead of 500'ing on the missing API.
+            if hasattr(tm, "vehicle_lane_offset"):
+                tm.vehicle_lane_offset(actor, req.lane_offset)
             return {"status": "lane_set", "id": vehicle_id}
         except HTTPException:
             raise
