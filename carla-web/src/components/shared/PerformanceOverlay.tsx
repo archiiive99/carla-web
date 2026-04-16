@@ -26,12 +26,19 @@ export function PerformanceOverlay() {
   const sensorCount = useActorStore((s) => s.actorsByType.sensors.length);
 
   // Compute server tick rate from simulation currentTick changes.
-  // Initial `at` is 0 and seeded inside the effect — `performance.now()`
-  // is impure and must not run during render (react-hooks rule).
+  // Both `tick` and `at` must seed from the live store/now at effect
+  // mount, not default to {0,0}: if the overlay is toggled on mid-
+  // session the simulation's currentTick is already in the thousands,
+  // so the first state-change fire would compute dTick = thousands and
+  // report a wildly inflated Server FPS until the next 0.5s window
+  // reset the baseline. Seed both values when the subscription arms.
   const [serverFps, setServerFps] = useState(0);
   const lastTickRef = useRef({ tick: 0, at: 0 });
   useEffect(() => {
-    lastTickRef.current.at = performance.now();
+    lastTickRef.current = {
+      tick: useSimulationStore.getState().currentTick,
+      at: performance.now(),
+    };
     const unsub = useSimulationStore.subscribe((state) => {
       const now = performance.now();
       const dt = (now - lastTickRef.current.at) / 1000;
