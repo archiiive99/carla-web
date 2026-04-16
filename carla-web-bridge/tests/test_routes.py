@@ -132,6 +132,54 @@ def test_maps_requires_connection():
     assert resp.status_code == 503
 
 
+def test_maps_filters_templates_and_town15_sublevels(monkeypatch):
+    """The /api/world/maps endpoint skips CARLA-internal templates and
+    Town15 streaming sublevels so the frontend dropdown only surfaces
+    playable worlds."""
+    import src.routes.world as world_routes
+
+    fake_maps = [
+        "/Game/Carla/Maps/Town01_Opt",
+        "/Game/Carla/Maps/Town10HD_Opt",
+        "/Game/Carla/Maps/Town15",
+        "/Game/Carla/Maps/BaseMap",
+        "/Game/Carla/Maps/DigitalTwinsTemplate",
+        "/Game/Carla/Maps/MapGeneratorBaseMap",
+        "/Game/Carla/Maps/Town15_Vegetation",
+        "/Game/Carla/Maps/Town15_Buildings",
+        "/Game/Carla/Maps/RiverPreset01",
+        "/Game/Carla/Maps/LargeMap",
+    ]
+
+    monkeypatch.setattr(world_routes, "_require_connection", lambda: None)
+    monkeypatch.setattr(
+        world_routes,
+        "carla_manager",
+        SimpleNamespace(
+            is_connected=True,
+            client=SimpleNamespace(get_available_maps=lambda: fake_maps),
+        ),
+    )
+
+    resp = client.get("/api/world/maps")
+    assert resp.status_code == 200
+    maps = resp.json()["maps"]
+
+    # Playable maps kept
+    assert "Town01_Opt" in maps
+    assert "Town10HD_Opt" in maps
+    assert "Town15" in maps
+    assert "LargeMap" in maps
+    # Templates skipped
+    assert "BaseMap" not in maps
+    assert "DigitalTwinsTemplate" not in maps
+    assert "MapGeneratorBaseMap" not in maps
+    assert "RiverPreset01" not in maps
+    # Town15 streaming sublevels skipped, Town15 itself kept
+    assert "Town15_Vegetation" not in maps
+    assert "Town15_Buildings" not in maps
+
+
 def test_get_spectator_returns_transform(monkeypatch):
     import src.routes.world as world_routes
 
