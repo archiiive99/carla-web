@@ -68,8 +68,16 @@ export default function SettingsPage() {
   const handleTestConnection = useCallback(async () => {
     try {
       const health = await new CarlaApi(normalizeBridgeUrl(settings.bridgeUrl)).getHealth();
-      setTestResult(health.status === "ok" ? "ok" : "fail");
-      toast.success(`Bridge OK. CARLA: ${health.carla_connected ? "connected" : "not connected"}`);
+      if (health.status === "ok") {
+        setTestResult("ok");
+        toast.success(`Bridge OK. CARLA: ${health.carla_connected ? "connected" : "not connected"}`);
+      } else {
+        // Bridge responded but reported a non-ok status. Previously the icon
+        // flipped to the fail-X but the toast still said "Bridge OK", which
+        // was self-contradictory feedback.
+        setTestResult("fail");
+        toast.error(`Bridge reported status: ${health.status}`);
+      }
     } catch {
       setTestResult("fail");
       toast.error("Cannot reach bridge");
