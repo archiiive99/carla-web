@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 35 rows ✅, 6 rows ⚠️, 8 rows queued. §6.5 raise still active.
+**Summary:** 35 rows ✅, 7 rows ⚠️, 8 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|

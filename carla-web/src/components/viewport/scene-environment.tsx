@@ -83,6 +83,16 @@ const EXPOSURE_DUSK_NIGHT = 1.6;
 // ≈ 0.78, a rate of 0.4/s takes ~2s to ease from full day to full night;
 // matches real-camera iris-adaption time-constants (~1-3s typical).
 const EXPOSURE_DAMP_RATE = 0.4;
+// iter-11-revisit-auto-exposure REVERTED — the spotlight-count
+// heuristic reduced night exposure 14% but the measured PSNR at
+// night regressed from 30.67 → 10.18. Root cause: reducing exposure
+// at night doesn't bring the web render closer to the unfixed
+// broken-black UE5 reference in a way that matches — the web scene
+// has real spotlight cones that vary in luminance, reducing overall
+// exposure dims everything including the already-bright cones, which
+// hurts both PSNR and SSIM. True luminance-feedback auto-exposure
+// (iter-11-revisit-auto-exposure-v2) needs a WebGL render-target
+// sample path rather than a scene-traverse heuristic. ⚠️ §6.3.
 export function ExposureDriver() {
   const weather = useSimulationStore((s) => s.weather);
   const currentExposure = useRef<number | null>(null);
