@@ -97,13 +97,10 @@ function VehicleSpawnTab() {
                   {bp.id.replace("vehicle.", "")}
                 </CommandItem>
               ))}
-              {blueprints.length === 0 && (
-                <>
-                  <CommandItem value="vehicle.tesla.model3" onSelect={setSelectedBp} className="text-xs"><Car className="mr-2 size-3" aria-hidden="true" />tesla.model3</CommandItem>
-                  <CommandItem value="vehicle.audi.a2" onSelect={setSelectedBp} className="text-xs"><Car className="mr-2 size-3" aria-hidden="true" />audi.a2</CommandItem>
-                  <CommandItem value="vehicle.lincoln.mkz_2020" onSelect={setSelectedBp} className="text-xs"><Car className="mr-2 size-3" aria-hidden="true" />lincoln.mkz_2020</CommandItem>
-                </>
-              )}
+              {/* Hardcoded 0.9.x fallbacks removed — they 400 on CARLA 0.10
+                  where "vehicle.tesla.model3" etc. don't exist. Empty list
+                  falls through to CommandEmpty's "No vehicles found"
+                  message, which is honest rather than offering dead ids. */}
             </CommandGroup>
           </CommandList>
         </Command>

@@ -91,12 +91,10 @@ function WalkerSpawnTab() {
                   {bp.id.replace("walker.", "")}
                 </CommandItem>
               ))}
-              {blueprints.length === 0 && (
-                <>
-                  <CommandItem value="walker.pedestrian.0001" onSelect={setSelectedBp} className="text-xs"><PersonStanding className="mr-2 size-3" aria-hidden="true" />pedestrian.0001</CommandItem>
-                  <CommandItem value="walker.pedestrian.0014" onSelect={setSelectedBp} className="text-xs"><PersonStanding className="mr-2 size-3" aria-hidden="true" />pedestrian.0014</CommandItem>
-                </>
-              )}
+              {/* Hardcoded 0.9.x fallbacks removed — walker.pedestrian.0001
+                  doesn't exist on CARLA 0.10 (starts at 0014). Empty list
+                  falls through to CommandEmpty rather than offering ids
+                  that 400 on spawn. */}
             </CommandGroup>
           </CommandList>
         </Command>
