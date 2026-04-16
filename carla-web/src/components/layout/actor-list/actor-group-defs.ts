@@ -6,16 +6,25 @@ export interface ActorGroupDef {
   icon: React.ReactNode;
 }
 
-/** Human-readable label derived from an actor's `type_id` ("sensor.camera.rgb" →
- *  "Camera Rgb"). Used by the LeftPanel actor-list filter and the row labels in
- *  ActorGroupSection. Kept in its own module so the component file stays
- *  Fast-Refresh-eligible (React Refresh bails out when a component file also
- *  exports non-component helpers). */
+/** Human-readable label derived from an actor's `type_id`. Drops the
+ *  top-level category (`vehicle.` / `walker.` / `sensor.` — which the
+ *  ActorGroupSection header already shows) and joins the rest:
+ *  - "sensor.camera.rgb"        → "Camera Rgb"
+ *  - "vehicle.tesla.model3"     → "Tesla Model3"
+ *  - "walker.pedestrian.0001"   → "Pedestrian 0001"
+ *  - "traffic.traffic_light"    → "Traffic Light"
+ *
+ *  Previously this took parts.slice(2), so `sensor.camera.rgb` collapsed
+ *  to just "Rgb" — losing the "Camera" discriminator the comment had
+ *  promised and making every camera type look interchangeable.
+ *  Kept in its own module so the component file stays Fast-Refresh-eligible
+ *  (React Refresh bails out when a component file also exports
+ *  non-component helpers). */
 export function actorDisplayName(actor: CarlaActor): string {
   const parts = actor.type_id.split(".");
   // String.split always returns a non-empty array for any string
   // (even "" splits to [""]), so parts[parts.length - 1] is always
   // defined in practice; `?? ""` satisfies noUncheckedIndexedAccess.
-  const name = parts.length > 2 ? parts.slice(2).join(" ") : parts[parts.length - 1] ?? "";
+  const name = parts.length > 1 ? parts.slice(1).join(" ") : parts[parts.length - 1] ?? "";
   return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
