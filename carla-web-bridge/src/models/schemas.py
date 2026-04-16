@@ -138,7 +138,11 @@ class LightStateRequest(BaseModel):
 class TrafficStatus(BaseModel):
     port: int = 8000
     active: bool = False
-    global_speed_diff: float = 0.0
+    # Note: global_speed_diff used to be here but was never populated by
+    # /api/traffic/status — the endpoint returns a fixed (port, active)
+    # stub and no consumer reads the value. If the Traffic Manager ever
+    # exposes a readable speed-diff state, re-add here and derive it
+    # from tm in the endpoint.
 
 
 class GlobalSpeedRequest(BaseModel):
