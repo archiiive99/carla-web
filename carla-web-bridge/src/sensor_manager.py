@@ -453,7 +453,14 @@ class SensorManager:
         return world.spawn_actor(bp, t)
 
     def _destroy_sync(self, sensor: carla.Actor) -> None:
-        sensor.stop()
+        # Isolate stop() from destroy() so a failing stop doesn't skip the
+        # destroy. The outer destroy_sensor catches on the to_thread call,
+        # so a raised stop() would swallow the destroy alongside it and
+        # leave an alive-but-unlistened sensor on CARLA's side — which is
+        # the exact orphan state tracked_actor_ids cleanup was meant to
+        # prevent. Matches _destroy_all_managed in realtime_session.
+        with contextlib.suppress(Exception):
+            sensor.stop()
         sensor.destroy()
 
     def _extract_native_fps(self, sensor: Any) -> float:

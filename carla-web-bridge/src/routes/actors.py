@@ -98,8 +98,14 @@ async def destroy_all_actors() -> Any:
                     actor = world.get_actor(actor_id)
                     if actor is None:
                         continue
+                    # stop() failure used to skip destroy() via the outer
+                    # except and leave the sensor actor alive on CARLA's
+                    # side — same stop+destroy race pattern fixed in
+                    # realtime_session and sensor_manager. Isolate the
+                    # listener-unregister attempt so destroy() always runs.
                     if actor.type_id.startswith("sensor."):
-                        actor.stop()
+                        with contextlib.suppress(Exception):
+                            actor.stop()
                     actor.destroy()
                     destroyed += 1
                 except Exception:
