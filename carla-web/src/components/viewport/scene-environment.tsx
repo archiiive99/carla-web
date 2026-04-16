@@ -242,7 +242,12 @@ export function WeatherLighting({
   // lunar/skyglow term so the scene doesn't go pitch-black. Street lights
   // and NPC headlights are a follow-up — see rendering-100-percent-parity.
   const daylight = Math.max(0, Math.sin(sunAlt));
-  const directIntensity = daylight * (1 - cloudFactor * 0.55);
+  // iter-06-revisit-sun-precip: precipitation further dims direct sun.
+  // 25% attenuation at full rain. Floor via Math.max so heavy cloud
+  // + heavy rain can't produce a negative intensity.
+  const precipFactor = Math.max(0, Math.min(1, (weather.precipitation ?? 0) / 100));
+  const directIntensity =
+    daylight * Math.max(0, 1 - cloudFactor * 0.55 - precipFactor * 0.25);
   const isNight = sunAlt < 0;
   const nightFactor = Math.max(0, Math.min(1, -sunAlt / (Math.PI / 4)));
   const fillBoost = 0.12 + cloudFactor * 0.28 + nightFactor * 0.06;

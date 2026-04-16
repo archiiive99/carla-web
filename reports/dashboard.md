@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 61 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
+**Summary:** 62 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -76,6 +76,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 06-revisit-sun-kelvin-cloud | Sun Kelvin drops with cloudiness | **✅** | 15.66 | 0.3437 | 22.64 | ~15 min | 04105c4f5 |
 | 08-revisit-bob | Vertical torso bob at 2× step rate | **✅** | 6.61 | 0.0627 | 49.24 | ~70 min (incl CARLA recovery) | f0be4ef26 |
 | 06-revisit-ambient-fog | Ambient fill lifts with fog-density | **✅** | 15.45 | 0.3433 | 22.85 | ~12 min | f898a86c1 |
+| 06-revisit-sun-precip | Direct sun attenuated by precipitation | **✅** | 15.50 | 0.3388 | 22.79 | ~10 min | (this commit) |
 
 ## Notes
 
