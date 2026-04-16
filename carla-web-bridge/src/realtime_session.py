@@ -21,9 +21,19 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 DEFAULT_VEHICLE_BLUEPRINTS = (
+    # 0.9.x canonicals — preserved for backwards compatibility. CARLA 0.10
+    # renamed / removed most of these, so the _ensure_vehicle_sync filter
+    # fallback to any vehicle.* is the one that runs today on 0.10, but
+    # listing the 0.10 likelies here too means we don't roulette the ego
+    # to a firetruck or sprinter when a passenger car is available.
     "vehicle.tesla.model3",
     "vehicle.lincoln.mkz_2020",
     "vehicle.audi.a2",
+    # 0.10 passenger cars (seen in bridge_list /api/blueprints/vehicles).
+    "vehicle.lincoln.mkz",
+    "vehicle.dodge.charger",
+    "vehicle.mini.cooper",
+    "vehicle.nissan.patrol",
 )
 
 MANAGED_ROLE_NAME = "bridge_ego"
