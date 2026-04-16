@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { useLaneInvasionData } from "@/hooks/useSensorData";
 
 interface LaneInvasionEntry {
-  id: number;
   timestamp: number;
   markingTypes: string[];
 }
@@ -24,15 +23,22 @@ export default function LaneInvasionLog({
 }: LaneInvasionLogProps) {
   const [events, setEvents] = useState<LaneInvasionEntry[]>([]);
   const { eventsRef } = useLaneInvasionData(sensorId);
+  // Track last-seen signature so we only setEvents when the source buffer has
+  // actually moved on — see CollisionLog for the same pattern.
+  const lastSignatureRef = useRef("");
 
   useEffect(() => {
     const interval = setInterval(() => {
+      const source = eventsRef.current;
+      const newest = source[source.length - 1];
+      const signature = newest ? `${source.length}:${newest.timestamp}` : "0";
+      if (signature === lastSignatureRef.current) return;
+      lastSignatureRef.current = signature;
       setEvents(
-        eventsRef.current
+        source
           .slice()
           .reverse()
-          .map((event, index) => ({
-            id: index,
+          .map((event) => ({
             timestamp: event.timestamp,
             markingTypes: event.markingTypes.map(String),
           })),
@@ -67,13 +73,13 @@ export default function LaneInvasionLog({
             <div className="space-y-0.5 p-2">
               {events.map((event) => (
                 <div
-                  key={event.id}
+                  key={`${event.timestamp}-${event.markingTypes.join(",")}`}
                   className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted"
                 >
                   <div className="flex flex-1 gap-1">
                     {event.markingTypes.map((type, i) => (
                       <Badge
-                        key={i}
+                        key={`${type}-${i}`}
                         variant="secondary"
                         className="h-4 px-1 text-2xs"
                       >

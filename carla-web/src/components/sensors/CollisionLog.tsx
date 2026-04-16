@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 import { useCollisionData } from "@/hooks/useSensorData";
 
 interface CollisionEntry {
-  id: number;
   timestamp: number;
+  otherActorId: number;
   otherActorType: string;
   impulse: number;
 }
@@ -31,16 +31,25 @@ interface CollisionLogProps {
 export default function CollisionLog({ sensorId, className }: CollisionLogProps) {
   const [events, setEvents] = useState<CollisionEntry[]>([]);
   const { eventsRef } = useCollisionData(sensorId);
+  // Track last-seen signature so we only setEvents when the source buffer has
+  // actually moved on. Length + newest-event timestamp catches both the
+  // pre-cap growth phase and the post-cap shift/push phase.
+  const lastSignatureRef = useRef("");
 
   useEffect(() => {
     const interval = setInterval(() => {
+      const source = eventsRef.current;
+      const newest = source[source.length - 1];
+      const signature = newest ? `${source.length}:${newest.timestamp}` : "0";
+      if (signature === lastSignatureRef.current) return;
+      lastSignatureRef.current = signature;
       setEvents(
-        eventsRef.current
+        source
           .slice()
           .reverse()
-          .map((event, index) => ({
-            id: index,
+          .map((event) => ({
             timestamp: event.timestamp,
+            otherActorId: event.otherActorId,
             otherActorType: event.otherActorId ? `Actor #${event.otherActorId}` : "Unknown",
             impulse: event.magnitude,
           })),
@@ -79,7 +88,7 @@ export default function CollisionLog({ sensorId, className }: CollisionLogProps)
                 const severity = getSeverity(event.impulse);
                 return (
                   <div
-                    key={event.id}
+                    key={`${event.timestamp}-${event.otherActorId}`}
                     className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted"
                   >
                     <Badge
