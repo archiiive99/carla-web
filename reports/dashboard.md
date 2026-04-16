@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 50 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
+**Summary:** 51 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -65,6 +65,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 05-revisit-mie-altitude | Altitude-driven Sky mieCoefficient | **✅** | 16.71 | 0.3064 | 21.86 | ~15 min | 51e11b670 |
 | 11-revisit-ambient-cloud-cool | Ambient color cools under cloudiness | **✅** | 16.72 | 0.3063 | 21.87 | ~12 min | 2cbeba589 |
 | 09-revisit-lamp-pole | Visible pole cylinder ground→lamp head | **✅** | 16.71 | 0.3063 | 21.87 | ~20 min | bd00bc0c9 |
+| 09-revisit-lamp-arm | Horizontal arm + head at outboard end | **✅** | 16.72 | 0.3063 | 21.87 | ~25 min | (this commit) |
 
 ## Notes
 

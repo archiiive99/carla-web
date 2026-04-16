@@ -37,12 +37,22 @@ export function NightStreetLights() {
 
   const lampSpecs = useMemo(
     () =>
-      LAMP_POSITIONS_CARLA.map(([cx, cy, cz]) => ({
+      LAMP_POSITIONS_CARLA.map(([cx, cy, cz]) => {
+        // iter-09-revisit-lamp-arm: lamp head offsets 0.5 m along +x
+        // or -x so the light hangs over the road rather than sitting
+        // directly atop its pole. Lamps at carla.x=110 reach toward
+        // +x (road center at 120); lamps at 130 reach toward -x.
+        const armDir = cx < 120 ? 0.5 : -0.5;
         // Three.js position: x→x, z→y (up), -y→z. The lamp body sits at
-        // LAMP_HEIGHT m above ground, target at ground below.
-        position: [cx, cz, -cy] as [number, number, number],
-        target: [cx, 0, -cy] as [number, number, number],
-      })),
+        // LAMP_HEIGHT m above ground, target at ground below the head.
+        return {
+          poleBase: [cx, 0, -cy] as [number, number, number],
+          poleTop: [cx, cz, -cy] as [number, number, number],
+          armDir,
+          headPosition: [cx + armDir, cz, -cy] as [number, number, number],
+          target: [cx + armDir, 0, -cy] as [number, number, number],
+        };
+      }),
     [],
   );
 
@@ -60,15 +70,25 @@ export function NightStreetLights() {
   return (
     <>
       {lampSpecs.map((spec, i) => {
-        const [lx, ly, lz] = spec.position;
+        const [px, py, pz] = spec.poleTop;
+        const armMidX = px + spec.armDir / 2;
         return (
           <group key={i}>
-            {/* iter-09-revisit-lamp-pole: always-visible pole cylinder.
-               Lamp-heads used to float at y=6 with nothing under them;
-               the pole grounds them visually. Cylinder goes from y=0 to
-               y=5.8 (just below the 6m head sphere). */}
-            <mesh position={[lx, ly / 2, lz]} castShadow receiveShadow>
-              <cylinderGeometry args={[0.06, 0.08, ly, 10]} />
+            {/* iter-09-revisit-lamp-pole: always-visible pole cylinder. */}
+            <mesh position={[px, py / 2, pz]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.06, 0.08, py, 10]} />
+              <meshStandardMaterial color="#2a2a30" roughness={0.7} metalness={0.4} />
+            </mesh>
+            {/* iter-09-revisit-lamp-arm: horizontal arm from pole top to
+               head position. Cylinder is default y-up, so rotate by π/2
+               around z to lay it along x. Length = |armDir| = 0.5 m. */}
+            <mesh
+              position={[armMidX, py, pz]}
+              rotation={[0, 0, Math.PI / 2]}
+              castShadow
+              receiveShadow
+            >
+              <cylinderGeometry args={[0.04, 0.04, 0.5, 8]} />
               <meshStandardMaterial color="#2a2a30" roughness={0.7} metalness={0.4} />
             </mesh>
             {isNight && (
@@ -77,7 +97,7 @@ export function NightStreetLights() {
                    something to point at. */}
                 <primitive object={targetRefs.current[i]} />
                 <spotLight
-                  position={spec.position}
+                  position={spec.headPosition}
                   target={targetRefs.current[i]}
                   color={HEADLIGHT_BEAM}
                   intensity={SPOTLIGHT_INTENSITY}
@@ -89,16 +109,9 @@ export function NightStreetLights() {
                 />
                 {/* iter-09-revisit-emissive: small emissive sphere at the lamp
                    head position so the source of the light is visible in the
-                   scene — without it the SpotLights just appear as bright
-                   cones with nothing emitting them. The CARLA static-prop
-                   streetlamp GLBs are dormant in the scene (exported but
-                   unused), so this plays the role of the lamp head visual.
-                   iter-09-revisit-bloom-v2: layer 1 marks this for
-                   SelectiveBloom while leaving the rest of the scene render
-                   on layer 0 (default) so the multi-camera composition isn't
-                   intercepted. */}
+                   scene. */}
                 <mesh
-                  position={spec.position}
+                  position={spec.headPosition}
                   ref={(m) => {
                     if (m) m.layers.enable(BLOOM_LAYER);
                   }}
@@ -112,11 +125,8 @@ export function NightStreetLights() {
                     metalness={0}
                   />
                 </mesh>
-                {/* iter-09-revisit-lamp-halo: larger transparent additive sphere
-                   so the lamp head reads as glowing against the dim night sky
-                   without needing EffectComposer bloom (which broke the
-                   multi-camera WorldCanvas composition in v1/v2 attempts). */}
-                <mesh position={spec.position}>
+                {/* iter-09-revisit-lamp-halo: larger transparent additive sphere. */}
+                <mesh position={spec.headPosition}>
                   <sphereGeometry args={[0.4, 16, 16]} />
                   <meshBasicMaterial
                     color={HEADLIGHT_BEAM}
