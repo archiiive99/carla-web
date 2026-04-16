@@ -491,7 +491,12 @@ class RateController:
             return False
         recent = list(samples)[-ADAPTIVE_BACKLOG_TREND_SAMPLES:]
         values = [self._metric(sample, sensor_id, "queue_backlog") for sample in recent]
-        return values[0] < values[1] < values[2]
+        # Require a strict monotonic rise across the entire window — previously
+        # the check hardcoded values[0] < values[1] < values[2], so raising
+        # ADAPTIVE_BACKLOG_TREND_SAMPLES above 3 silently grew the history
+        # window without extending the trend check, and the operator-facing
+        # env knob became a lie past its initial 3-sample default.
+        return all(values[i] < values[i + 1] for i in range(len(values) - 1))
 
     def _is_healthy(
         self,
