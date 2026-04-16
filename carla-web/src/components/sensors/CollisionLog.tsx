@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCollisionData } from "@/hooks/useSensorData";
+import { useActorStore } from "@/stores/actorStore";
 
 interface CollisionEntry {
   timestamp: number;
@@ -23,6 +24,24 @@ function getSeverity(impulse: number): {
   return { label: "Light", className: "bg-success/10 text-success" };
 }
 
+function describeOther(
+  otherId: number,
+  actors: ReadonlyMap<number, { type_id: string }>,
+): string {
+  // CARLA reports other_actor_id=0 when the ego collides with scenery
+  // (walls, terrain, props) — the collision has no Actor handle on the
+  // server side. Show "Environment" instead of the previous "Unknown",
+  // which read like a bridge failure.
+  if (otherId === 0) return "Environment";
+  const other = actors.get(otherId);
+  if (!other) return `Actor #${otherId}`;
+  // Drop the top-level category ("vehicle." / "walker." / "sensor.") —
+  // the ego's collision target is always drawn from those, so carrying
+  // the prefix just wastes width. "vehicle.tesla.model3" → "tesla.model3".
+  const short = other.type_id.split(".").slice(1).join(".") || other.type_id;
+  return `${short} #${otherId}`;
+}
+
 interface CollisionLogProps {
   sensorId: number;
   className?: string;
@@ -31,6 +50,7 @@ interface CollisionLogProps {
 export default function CollisionLog({ sensorId, className }: CollisionLogProps) {
   const [events, setEvents] = useState<CollisionEntry[]>([]);
   const { eventsRef } = useCollisionData(sensorId);
+  const actors = useActorStore((s) => s.actors);
   // Track last-seen signature so we only setEvents when the source buffer has
   // actually moved on. Length + newest-event timestamp catches both the
   // pre-cap growth phase and the post-cap shift/push phase.
@@ -50,13 +70,15 @@ export default function CollisionLog({ sensorId, className }: CollisionLogProps)
           .map((event) => ({
             timestamp: event.timestamp,
             otherActorId: event.otherActorId,
-            otherActorType: event.otherActorId ? `Actor #${event.otherActorId}` : "Unknown",
+            otherActorType: describeOther(event.otherActorId, actors),
             impulse: event.magnitude,
           })),
       );
     }, 100);
     return () => clearInterval(interval);
-  }, [eventsRef]);
+    // `actors` is part of the dep set so newly-spawned actors get resolved
+    // on the next flush tick even if the collision event itself is stale.
+  }, [eventsRef, actors]);
 
   return (
     <Card className={cn("flex h-full flex-col overflow-hidden", className)}>
