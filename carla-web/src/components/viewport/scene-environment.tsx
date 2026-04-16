@@ -326,7 +326,16 @@ export function WeatherLighting({
           // car panels receive the warm fill UE5 produces from its
           // SkyAtmosphere ground-color reflectance term. Closes part of the
           // iter-01 R/B inversion gap on the road ROI.
-          isNight ? "#1c1f26" : "#5a4f44",
+          //
+          // iter-06-revisit-ground-bounce-altitude: day ground-bounce now
+          // interpolates between #7a4c30 (warm dusk, altFactor=0) and
+          // #5a4f44 (neutral warm, altFactor=1). No-op at midday (altFactor=1
+          // reproduces prior literal).
+          isNight
+            ? "#1c1f26"
+            : `#${new THREE.Color()
+                .lerpColors(new THREE.Color(0x7a4c30), new THREE.Color(0x5a4f44), altFactor)
+                .getHexString()}`,
           fillBoost,
         ]}
       />
