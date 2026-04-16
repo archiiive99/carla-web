@@ -72,8 +72,17 @@ export function EventLog({ events, onClear, className }: EventLogProps) {
       : events.filter((e) => filters.has(e.type));
 
   useEffect(() => {
-    if (autoScroll && scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (!autoScroll || !scrollRef.current) return;
+    // ScrollArea wraps the content in a separate Viewport element that owns
+    // the overflow-y scroll; the root that receives the ref is non-scrolling
+    // (see ui/scroll-area.tsx). Setting scrollTop on the root was a silent
+    // no-op and "Follow latest" visibly did nothing. Target the viewport
+    // via the `data-slot` our wrapper stamps on it.
+    const viewport = scrollRef.current.querySelector<HTMLElement>(
+      '[data-slot="scroll-area-viewport"]',
+    );
+    if (viewport) {
+      viewport.scrollTop = viewport.scrollHeight;
     }
   }, [filteredEvents.length, autoScroll]);
 
