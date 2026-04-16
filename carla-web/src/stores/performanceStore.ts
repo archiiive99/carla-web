@@ -69,5 +69,20 @@ export const usePerformanceStore = create<PerformanceState>((set) => ({
   // clock jumps (laptop sleep across time-zones, NTP step, manual
   // reset). connectedSince has no wall-clock consumers.
   markConnected: () => set({ connectedSince: performance.now() }),
-  markDisconnected: () => set({ connectedSince: null }),
+  // Reset session-scoped metrics together with connectedSince. Previously
+  // only connectedSince flipped, so TelemetryPanel's "Uptime" counter
+  // reset while "Peak FPS / Latency / Bandwidth" kept stale values from
+  // the last session — misleading when reconnecting after a break or
+  // bridge restart. History arrays clear too so the sparklines don't
+  // splice pre-disconnect samples next to post-reconnect ones.
+  markDisconnected: () =>
+    set({
+      connectedSince: null,
+      peakFps: 0,
+      peakBandwidth: 0,
+      peakLatency: 0,
+      fpsHistory: [],
+      latencyHistory: [],
+      bandwidthHistory: [],
+    }),
 }));
