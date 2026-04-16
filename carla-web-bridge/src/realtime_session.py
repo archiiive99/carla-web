@@ -399,7 +399,7 @@ class RealtimeSessionManager:
         except Exception:
             return None
 
-    def _adopt_orphan_managed_vehicle_sync(self) -> tuple[int, int | None] | None:
+    def _adopt_orphan_managed_vehicle_sync(self) -> None:
         """Destroy stale managed leftovers from prior bridge runs.
 
         Re-adopting a preserved `bridge_ego` actor across reloads has proven
@@ -408,6 +408,11 @@ class RealtimeSessionManager:
         Rather than keep a potentially stale vehicle, we eagerly clean up any
         orphan managed vehicles/cameras and let `ensure_running()` respawn a
         fresh managed ego + camera pair.
+
+        Always returns None — the old `tuple[int, int | None] | None` return
+        was from the pre-migration design that could adopt an orphan. Post-
+        migration this is pure cleanup; keeping the function name because
+        callers + tests reference it.
         """
         try:
             world = self._carla.refresh_world()
