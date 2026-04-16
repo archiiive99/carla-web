@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash2, Crosshair } from "lucide-react";
 import { useActorStore } from "@/stores/actorStore";
+import { useIsConnected } from "@/stores/simulationStore";
 import { ApiError, carlaApi } from "@/lib/carla-api";
 import { reportError } from "@/lib/utils";
 import { toast } from "sonner";
@@ -40,11 +41,21 @@ export function ActorDetails() {
   const actors = useActorStore((s) => s.actors);
   const destroyActor = useActorStore((s) => s.destroyActor);
   const selectActor = useActorStore((s) => s.selectActor);
+  const isConnected = useIsConnected();
   const [spectatorAvailable, setSpectatorAvailable] = useState<boolean | null>(null);
 
   const actor = selectedActorId !== null ? actors.get(selectedActorId) : undefined;
 
   useEffect(() => {
+    // Only probe once the bridge is reachable. Previously the empty-deps
+    // mount probe fired immediately, so if ActorDetails mounted before
+    // useConnectionHealth's first poll completed, getSpectator hit a 503
+    // from _require_connection. The 503 isn't a 501, so the catch's
+    // default branch set spectatorAvailable=true — a false positive that
+    // enabled the Teleport button, which then failed on click. Gate on
+    // isConnected so the probe only runs when the endpoint can actually
+    // report its support state.
+    if (!isConnected) return;
     let cancelled = false;
 
     carlaApi
@@ -64,7 +75,7 @@ export function ActorDetails() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isConnected]);
 
   const handleDestroy = useCallback(async () => {
     if (!actor) return;
