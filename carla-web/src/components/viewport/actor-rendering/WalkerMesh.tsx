@@ -49,10 +49,37 @@ export const WalkerMesh = memo(function WalkerMesh({
   const rightArmRef = useRef<THREE.Group>(null);
   const leftLegRef = useRef<THREE.Group>(null);
   const rightLegRef = useRef<THREE.Group>(null);
+  const bodyGroupRef = useRef<THREE.Group>(null);
   const walkPhaseRef = useRef(0);
+  const currentYawRef = useRef<number | null>(null);
   useFrame((_, delta) => {
     const v = actor.velocity;
     const speed = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    // iter-08-walk-yaw-from-velocity: walker body faces direction of
+    // travel when moving. Compute target yaw from horizontal velocity
+    // (vx in CARLA ↔ vx in Three; vy in CARLA ↔ -vz in Three via c2t
+    // coord convention). Lerp toward target at 6 rad/s (~1 rev per
+    // second) to avoid jittery direction changes from velocity noise.
+    if (speed >= 0.1 && bodyGroupRef.current) {
+      // Three-space facing: atan2(Three.x_vel, Three.z_vel) where
+      // forward convention = +X. Three.z = -CARLA.y so Three.z_vel = -v.y.
+      const targetYaw = Math.atan2(v.x, -v.y);
+      if (currentYawRef.current === null) {
+        currentYawRef.current = targetYaw;
+      } else {
+        // Shortest-path angle lerp (wrap through ±π)
+        let diff = targetYaw - currentYawRef.current;
+        while (diff > Math.PI) diff -= 2 * Math.PI;
+        while (diff < -Math.PI) diff += 2 * Math.PI;
+        const maxStep = 6 * delta;
+        if (Math.abs(diff) <= maxStep) {
+          currentYawRef.current = targetYaw;
+        } else {
+          currentYawRef.current += Math.sign(diff) * maxStep;
+        }
+      }
+      bodyGroupRef.current.rotation.y = currentYawRef.current;
+    }
     if (speed < 0.1) {
       // Reset to neutral pose
       if (leftArmRef.current) leftArmRef.current.rotation.x = 0;
@@ -73,6 +100,7 @@ export const WalkerMesh = memo(function WalkerMesh({
 
   return (
     <group
+      ref={bodyGroupRef}
       position={[pos.x, pos.y, pos.z]}
       onClick={(e) => {
         e.stopPropagation();
