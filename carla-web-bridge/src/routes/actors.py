@@ -209,8 +209,14 @@ async def spawn_vehicle(req: SpawnVehicleRequest) -> Any:
             transform = dict_to_carla_transform(req.transform)
             vehicle = world.try_spawn_actor(bp, transform)
             if vehicle is None:
-                # Try random spawn points as fallback
-                for sp in world.get_map().get_spawn_points()[:50]:
+                # The user-specified transform is occupied — fall back to any
+                # available spawn point. Previously iteration was capped at
+                # the first 50 spawn_points, which failed on crowded-traffic
+                # scenarios where dozens of NPCs already filled those slots
+                # even though valid points remained further in the list.
+                # Large-map spawn lists cap around 300; the linear scan is
+                # cheap and matches the realtime_session ego-spawn loop.
+                for sp in world.get_map().get_spawn_points():
                     vehicle = world.try_spawn_actor(bp, sp)
                     if vehicle:
                         break

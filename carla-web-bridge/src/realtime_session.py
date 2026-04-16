@@ -303,15 +303,21 @@ class RealtimeSessionManager:
         if not spawn_points:
             raise RuntimeError("Map does not expose any vehicle spawn point")
 
+        # Iterate the whole spawn-point list, not the first 50. If a session
+        # of NPCs happens to occupy the first 50 (common on crowded-traffic
+        # scenarios), capping here made the managed ego spawn fail even
+        # though dozens of valid points remained. Large-map spawn lists
+        # cap around 300; the linear scan is cheap.
         vehicle = None
-        for transform in spawn_points[:50]:
+        for transform in spawn_points:
             vehicle = world.try_spawn_actor(vehicle_bp, transform)
             if vehicle is not None:
                 break
         if vehicle is None:
-            # Second pass: retry the first N points with a small z-lift in case
-            # every candidate collided with ground-level residue.
-            for sp in spawn_points[:50]:
+            # Second pass: retry every point with a small z-lift in case
+            # ground-level residue blocked the first pass. Same full-list
+            # iteration so the capacity matches.
+            for sp in spawn_points:
                 lifted = carla.Transform(
                     carla.Location(x=sp.location.x, y=sp.location.y, z=sp.location.z + 0.5),
                     sp.rotation,
