@@ -124,9 +124,15 @@ class SpawnSensorRequest(BaseModel):
 
 
 class VehicleControl(BaseModel):
-    throttle: float = 0.0
-    steer: float = 0.0
-    brake: float = 0.0
+    # CARLA's VehicleControl clamps nothing at the API boundary — a
+    # throttle=999 or steer=-5 passes straight into the PhysX solver and
+    # produces unstable physics. Match CARLA's documented ranges at the
+    # schema so a UI bug / fat-fingered external caller trips 422 instead
+    # of a silently-wrong sim. Bounds inclusive: 1.0 steer is legal
+    # (full-lock), 0.0 throttle is legal (no gas).
+    throttle: float = Field(0.0, ge=0.0, le=1.0)
+    steer: float = Field(0.0, ge=-1.0, le=1.0)
+    brake: float = Field(0.0, ge=0.0, le=1.0)
     hand_brake: bool = False
     reverse: bool = False
 

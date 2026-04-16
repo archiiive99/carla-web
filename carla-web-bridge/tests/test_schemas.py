@@ -16,6 +16,7 @@ from src.models.schemas import (
     SimulationSettings,
     StartRecordingRequest,
     StartReplayRequest,
+    VehicleControl,
 )
 
 
@@ -140,3 +141,39 @@ def test_map_layer_accepts_load_and_unload(good_action: str) -> None:
 
 def test_map_layer_defaults_to_load_when_action_omitted() -> None:
     assert MapLayerRequest(layer="foliage").action == "load"
+
+
+# --- VehicleControl bounds ------------------------------------------------
+
+
+@pytest.mark.parametrize("bad", [-0.1, 1.1, 999.0, -999.0])
+def test_vehicle_control_rejects_out_of_range_throttle(bad: float) -> None:
+    # CARLA passes the raw float into PhysX without validating — a typoed
+    # 999 from an external caller would destabilize the solver silently.
+    # Schema bound catches it with a 422 before the route ever runs.
+    with pytest.raises(ValidationError):
+        VehicleControl(throttle=bad)
+
+
+@pytest.mark.parametrize("bad", [-0.1, 1.1, 5.0])
+def test_vehicle_control_rejects_out_of_range_brake(bad: float) -> None:
+    with pytest.raises(ValidationError):
+        VehicleControl(brake=bad)
+
+
+@pytest.mark.parametrize("bad", [-1.1, 1.1, -5.0, 5.0])
+def test_vehicle_control_rejects_out_of_range_steer(bad: float) -> None:
+    with pytest.raises(ValidationError):
+        VehicleControl(steer=bad)
+
+
+def test_vehicle_control_accepts_canonical_values() -> None:
+    ctrl = VehicleControl(throttle=0.5, steer=-0.3, brake=0.0)
+    assert ctrl.throttle == 0.5
+    assert ctrl.steer == -0.3
+    assert ctrl.brake == 0.0
+    # Endpoints are legal.
+    assert VehicleControl(throttle=1.0).throttle == 1.0
+    assert VehicleControl(steer=1.0).steer == 1.0
+    assert VehicleControl(steer=-1.0).steer == -1.0
+    assert VehicleControl(brake=1.0).brake == 1.0
