@@ -13,6 +13,12 @@ from src.models.schemas import StartRecordingRequest, StartReplayRequest
 
 router = APIRouter(prefix="/api", tags=["recording"])
 _recording_history: list[str] = []
+# In-memory recent-filenames list consulted by GET /api/recording/files.
+# Cap so a long session with many unique names doesn't balloon the list
+# (and the frontend dropdown it feeds). Oldest entries fall off the tail
+# via the slice in start_recording; disk_files still carries anything
+# that's actually on disk.
+_RECORDING_HISTORY_MAX = 100
 
 
 def _require_connection() -> None:
@@ -29,6 +35,8 @@ async def start_recording(req: StartRecordingRequest) -> Any:
             carla_manager.client.start_recorder(req.filename)
             if req.filename not in _recording_history:
                 _recording_history.insert(0, req.filename)
+                if len(_recording_history) > _RECORDING_HISTORY_MAX:
+                    del _recording_history[_RECORDING_HISTORY_MAX:]
             return {"status": "recording", "filename": req.filename}
         except RuntimeError as e:
             raise HTTPException(status_code=400, detail=str(e)) from e
