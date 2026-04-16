@@ -88,7 +88,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 08-revisit-body-hash-spread | Prime-scatter walker body color | **✅** | 15.37 | 0.2972 | 22.95 | ~6 min | a7ae13a5f |
 | 09-revisit-light-cone | Beam-volume cone mesh under lamp | **✅** | 15.36 | 0.2973 | 22.96 | ~12 min | 3205fe3e5 |
 | 09-revisit-cone-fog | Cone opacity lifts with fog-density | **✅** | 15.10 | 0.2949 | 23.24 | ~8 min | 268edb22a |
-| 06-revisit-sun-kelvin-precip | Precipitation cools sun Kelvin | **✅** | 16.71 | 0.3056 | 21.79 | ~12 min | (this commit) |
+| 06-revisit-sun-kelvin-precip | Precipitation cools sun Kelvin | **✅** | 16.71 | 0.3056 | 21.79 | ~12 min | eeb17b9e0 |
 
 ## Notes
 
