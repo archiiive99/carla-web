@@ -25,8 +25,20 @@ export function normalizeBridgeUrl(value: string): string {
     return getDefaultBridgeUrl();
   }
 
+  // Prepend "http://" when the input has no scheme so the WHATWG URL
+  // parser treats it as a special URL. Without this, user-typed inputs
+  // like "localhost:8080" parse as an opaque-path URL with
+  // `protocol: "localhost:"`, and the scheme/port/pathname setters below
+  // are silent no-ops per the spec. That silently stored a malformed URL
+  // the rest of the app then tried to fetch from. Detect the scheme with
+  // a narrow `^[a-z][a-z0-9+.-]*://` so we don't double-prefix an input
+  // that already has one.
+  const withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)
+    ? trimmed
+    : `http://${trimmed}`;
+
   try {
-    const normalized = new URL(trimmed);
+    const normalized = new URL(withScheme);
 
     if (!normalized.port) {
       normalized.port = String(DEFAULT_BRIDGE_PORT);
