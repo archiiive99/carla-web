@@ -80,7 +80,6 @@ export function VehicleControls({ actorId, enabled }: VehicleControlsProps) {
 
   useEffect(() => {
     if (!enabled) return;
-    let autopilotDisabled = false;
 
     function startSendingIfNeeded() {
       if (!intervalRef.current) {
@@ -116,8 +115,16 @@ export function VehicleControls({ actorId, enabled }: VehicleControlsProps) {
       const action = KEY_MAP[e.key];
       if (action) {
         e.preventDefault();
-        if (!autopilotDisabled && useActorStore.getState().egoAutopilot) {
-          autopilotDisabled = true;
+        // The backend's apply_vehicle_control always disables autopilot,
+        // so the ego's server-side autopilot flips off on every WASD press.
+        // Mirror that in the store whenever it's currently on — the old
+        // guard flag (`autopilotDisabled`) only cleared the store once per
+        // effect lifetime, so re-enabling autopilot via the toggle button
+        // mid-session left the UI showing "autopilot ON" while the backend
+        // had disabled it on the next keypress. Zustand de-dupes
+        // unchanged values so the extra getState().setState calls while
+        // already off are cheap no-ops.
+        if (useActorStore.getState().egoAutopilot) {
           useActorStore.setState({ egoAutopilot: false });
         }
         if (action === "reverse") {
