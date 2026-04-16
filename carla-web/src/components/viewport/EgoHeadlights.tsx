@@ -80,10 +80,10 @@ export function EgoHeadlights() {
       <spotLight
         ref={leftRef}
         color={HEADLIGHT_BEAM}
-        intensity={4}
-        distance={40}
-        angle={0.45}
-        penumbra={0.45}
+        intensity={5}
+        distance={55}
+        angle={0.35}
+        penumbra={0.35}
         decay={1.6}
         castShadow={false}
         target={leftTargetRef.current}
@@ -91,10 +91,10 @@ export function EgoHeadlights() {
       <spotLight
         ref={rightRef}
         color={HEADLIGHT_BEAM}
-        intensity={4}
-        distance={40}
-        angle={0.45}
-        penumbra={0.45}
+        intensity={5}
+        distance={55}
+        angle={0.35}
+        penumbra={0.35}
         decay={1.6}
         castShadow={false}
         target={rightTargetRef.current}
