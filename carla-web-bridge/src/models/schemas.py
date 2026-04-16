@@ -162,14 +162,21 @@ class VehicleSpeedRequest(BaseModel):
 class LaneChangeRequest(BaseModel):
     force_lane_change: bool = False
     auto_lane_change: bool = True
-    lane_offset: float = 0.0
+    # tm.vehicle_lane_offset treats -1.0 as the right lane edge and 1.0
+    # as the left. Out-of-range values drift the vehicle onto the
+    # shoulder or into oncoming traffic. Bound at the schema so a typo
+    # like 5.0 returns 422 rather than causing a collision.
+    lane_offset: float = Field(0.0, ge=-1.0, le=1.0)
 
 
 class IgnoreRequest(BaseModel):
-    lights: float = 0.0
-    signs: float = 0.0
-    walkers: float = 0.0
-    vehicles: float = 0.0
+    # All four are percentages in [0, 100] per CARLA's TM docs. CARLA
+    # clips internally but validating upstream gives the caller a
+    # meaningful 422 on obvious typos (e.g. 1000 meaning "very much").
+    lights: float = Field(0.0, ge=0.0, le=100.0)
+    signs: float = Field(0.0, ge=0.0, le=100.0)
+    walkers: float = Field(0.0, ge=0.0, le=100.0)
+    vehicles: float = Field(0.0, ge=0.0, le=100.0)
 
 
 class RouteRequest(BaseModel):
