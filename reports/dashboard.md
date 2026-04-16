@@ -89,7 +89,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 09-revisit-light-cone | Beam-volume cone mesh under lamp | **✅** | 15.36 | 0.2973 | 22.96 | ~12 min | 3205fe3e5 |
 | 09-revisit-cone-fog | Cone opacity lifts with fog-density | **✅** | 15.10 | 0.2949 | 23.24 | ~8 min | 268edb22a |
 | 06-revisit-sun-kelvin-precip | Precipitation cools sun Kelvin | **✅** | 16.71 | 0.3056 | 21.79 | ~12 min | eeb17b9e0 |
-| 12-revisit-wetness-active-rain | Live rain feeds wetness driver | **✅** | 11.08 | 0.2137 | 35.78 | ~10 min | (this commit) |
+| 12-revisit-wetness-active-rain | Live rain feeds wetness driver | **✅** | 11.08 | 0.2137 | 35.78 | ~10 min | d4807ddc3 |
 
 ## Notes
 
