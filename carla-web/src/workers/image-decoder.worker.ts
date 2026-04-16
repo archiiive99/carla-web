@@ -20,10 +20,15 @@ async function decodeImage(_channel: number, payload: ArrayBuffer) {
   // timestamp sits at byte 16, 8 bytes (float64) — capture receive time for latency
   const receiveTime = performance.now();
 
-  const jpegData = payload.slice(CAMERA_HEADER_SIZE);
+  // View, not copy: Uint8Array over the incoming buffer avoids the
+  // payload.slice() memcpy of ~100KB JPEG data. Blob will then make its
+  // own internal copy of the view's bytes, so we still end up at one
+  // copy total (down from two) and the JIT can fold the Uint8Array
+  // construction to a pointer + length without allocating storage.
+  const jpegBytes = new Uint8Array(payload, CAMERA_HEADER_SIZE);
 
   try {
-    const blob = new Blob([jpegData], { type: "image/jpeg" });
+    const blob = new Blob([jpegBytes], { type: "image/jpeg" });
     const bitmap = await createImageBitmap(blob);
 
     self.postMessage(
