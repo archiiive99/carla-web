@@ -249,6 +249,21 @@ class StartReplayRequest(BaseModel):
 class LoadMapRequest(BaseModel):
     map_name: str
 
+    @field_validator("map_name")
+    @classmethod
+    def _validate_map_name(cls, v: str) -> str:
+        # CARLA's load_world expects a basename like "Town01" or "Town01_Opt".
+        # Defense-in-depth — reject anything that looks like a path escape
+        # before CARLA's own resolver sees it.
+        trimmed = v.strip()
+        if not trimmed:
+            raise ValueError("map_name must not be empty")
+        if "/" in trimmed or "\\" in trimmed:
+            raise ValueError("map_name must not contain path separators")
+        if ".." in trimmed:
+            raise ValueError("map_name must not contain parent-dir segments")
+        return trimmed
+
 
 class MapLayerRequest(BaseModel):
     layer: str
