@@ -334,6 +334,12 @@ async def set_autopilot(actor_id: int, req: AutopilotRequest) -> Any:
             actor = carla_manager.world.get_actor(actor_id)
             if actor is None:
                 raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
+            # set_autopilot is a vehicle-only API — calling it on a walker
+            # or sensor raises AttributeError and surfaced as a generic
+            # 500. Mirror apply_control's 400 so the error message tells
+            # the caller what actually went wrong.
+            if not getattr(actor, "type_id", "").startswith("vehicle."):
+                raise HTTPException(status_code=400, detail="Actor is not a vehicle")
             actor.set_autopilot(req.enabled, req.tm_port)
             return {"status": "autopilot_set", "enabled": req.enabled}
         except HTTPException:
@@ -379,6 +385,10 @@ async def set_lights(actor_id: int, req: LightStateRequest) -> Any:
             actor = carla_manager.world.get_actor(actor_id)
             if actor is None:
                 raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
+            # set_light_state is vehicle-only — same rationale as
+            # set_autopilot above.
+            if not getattr(actor, "type_id", "").startswith("vehicle."):
+                raise HTTPException(status_code=400, detail="Actor is not a vehicle")
             actor.set_light_state(carla.VehicleLightState(req.light_state))
             return {"status": "lights_set", "id": actor_id}
         except HTTPException:
