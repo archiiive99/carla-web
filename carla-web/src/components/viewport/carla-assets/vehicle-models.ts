@@ -61,4 +61,26 @@ export const VEHICLE_MODELS: Record<string, string> = {
 
   // ---- Tazzari (micro EV) ----
   "vehicle.micro.tazzari":              assetPath("Car_SM_Tazzari.glb"),          // 3.4 MB
+
+  // iter-03-revisit-coverage: aliases for CARLA 0.10's re-shaped
+  // blueprint namespace (vehicle.<make>.<model> reorganized into
+  // vehicle.<role>.<make> and vehicle.ue4.<make>.<model>). Each entry
+  // points at the same underlying GLB the canonical name maps to —
+  // the silhouette is correct, only the blueprint identifier changed.
+  "vehicle.ambulance.ford":             assetPath("Truck_SM_sc_Ambulance.glb"),
+  "vehicle.carlacola.actors":           assetPath("Truck_SM_sc_Carlacola.glb"),
+  "vehicle.dodge.charger":              assetPath("Car_SM_DodgeCharger_Parked.glb"),
+  "vehicle.dodgecop.charger":           assetPath("Car_SM_DodgeChargerCop_Parked.glb"),
+  "vehicle.firetruck.actors":           assetPath("Truck_SM_sc_ActrosFiretruck.glb"),
+  "vehicle.fuso.mitsubishi":            assetPath("Bus_SM_SC_MitsubishiFusoRosa.glb"),
+  "vehicle.lincoln.mkz":                assetPath("Car_SM_LincolnMKZ_Parked.glb"),
+  "vehicle.mini.cooper":                assetPath("Car_SM_MiniCooper_Parked.glb"),
+  "vehicle.sprinter.mercedes":          assetPath("Truck_SM_sc_MercedesSprinter.glb"),
+  "vehicle.taxi.ford":                  assetPath("Car_SM_FordCrown01_Parked.glb"),
+  "vehicle.ue4.audi.tt":                assetPath("Car_SM_AudiTT_Parked.glb"),
+  "vehicle.ue4.bmw.grantourer":         assetPath("Car_SM_sc_BMWGranTourer.glb"),
+  "vehicle.ue4.chevrolet.impala":       assetPath("Car_SM_ChevroletImpala_Parked.glb"),
+  "vehicle.ue4.ford.crown":             assetPath("Car_SM_FordCrown01_Parked.glb"),
+  "vehicle.ue4.ford.mustang":           assetPath("Car_SM_Mustang_Parked.glb"),
+  "vehicle.ue4.mercedes.ccc":           assetPath("Car_SM_MercedesCCC_Parked.glb"),
 }
