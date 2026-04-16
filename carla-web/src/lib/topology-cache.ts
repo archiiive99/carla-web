@@ -28,8 +28,15 @@ export async function getTopologyCached(mapName: string): Promise<TopologyEdge[]
   const promise = carlaApi
     .getTopology()
     .then((edges) => {
-      cache = { map: mapName, edges };
-      if (inflight?.map === mapName) inflight = null;
+      // Cache only if invalidate hasn't run since we started. Otherwise the
+      // response arrives after the world has moved on (e.g. loadMap(Town02)
+      // fired while a Town01 fetch was in flight) and we'd pollute the
+      // cache with stale edges for a map the user is no longer on. Still
+      // return the edges to the caller — they requested this specific map.
+      if (inflight?.map === mapName) {
+        cache = { map: mapName, edges };
+        inflight = null;
+      }
       return edges;
     })
     .catch((e) => {
