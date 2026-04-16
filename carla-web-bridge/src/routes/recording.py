@@ -33,10 +33,17 @@ async def start_recording(req: StartRecordingRequest) -> Any:
     def _start() -> dict[str, Any]:
         try:
             carla_manager.client.start_recorder(req.filename)
-            if req.filename not in _recording_history:
-                _recording_history.insert(0, req.filename)
-                if len(_recording_history) > _RECORDING_HISTORY_MAX:
-                    del _recording_history[_RECORDING_HISTORY_MAX:]
+            # Move-to-front on re-use: if the user starts recording a
+            # previously-seen filename (overwriting the prior take), surface
+            # it at the top of the dropdown rather than leaving it buried
+            # below newer names. The frontend reads this list order
+            # directly from GET /api/recording/files, so the recency
+            # ordering here is what the dropdown shows.
+            if req.filename in _recording_history:
+                _recording_history.remove(req.filename)
+            _recording_history.insert(0, req.filename)
+            if len(_recording_history) > _RECORDING_HISTORY_MAX:
+                del _recording_history[_RECORDING_HISTORY_MAX:]
             return {"status": "recording", "filename": req.filename}
         except RuntimeError as e:
             raise HTTPException(status_code=400, detail=str(e)) from e

@@ -702,3 +702,35 @@ def test_get_actor_surfaces_runtime_error_as_400(monkeypatch):
     resp = client.get("/api/actors/5")
     assert resp.status_code == 400
     assert "stale actor reference" in resp.json()["detail"]
+
+
+def test_start_recording_moves_duplicate_filename_to_front(monkeypatch):
+    """Previously, starting a recording with a name already in history was a
+    no-op for the history list — the re-used name stayed buried under newer
+    entries. Overwrite semantics: the filename is the most-recently-used;
+    surface it at the top of the dropdown so the user isn't confused when
+    their "just-used" recording sits below older takes."""
+    import src.routes.recording as rec_routes
+
+    start_recorder_calls: list[str] = []
+
+    fake_manager = SimpleNamespace(
+        is_connected=True,
+        client=SimpleNamespace(
+            start_recorder=lambda fn: start_recorder_calls.append(fn),
+        ),
+    )
+    monkeypatch.setattr(rec_routes, "carla_manager", fake_manager)
+    # Reset history to a known state. The list is module-level so a leak from
+    # another test would break this assert; seed it explicitly.
+    monkeypatch.setattr(rec_routes, "_recording_history", ["older.log", "take1.log", "middle.log"])
+
+    # Re-start recording with a filename already in the list.
+    resp = client.post("/api/recording/start", json={"filename": "take1.log"})
+    assert resp.status_code == 200
+    assert start_recorder_calls == ["take1.log"]
+
+    # take1.log moved to front; others keep their relative order. No duplicates.
+    assert rec_routes._recording_history[0] == "take1.log"
+    assert rec_routes._recording_history.count("take1.log") == 1
+    assert rec_routes._recording_history == ["take1.log", "older.log", "middle.log"]
