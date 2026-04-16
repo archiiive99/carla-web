@@ -35,6 +35,13 @@ export function StatusBar() {
   const fpsRef = useRef<HTMLSpanElement>(null);
   const sparklineRef = useRef<SVGPolylineElement>(null);
   const fpsHistoryRef = useRef<number[]>([]);
+  // Remember the last fps value we sampled so bandwidth/latency-only updates
+  // don't double-push the same fps into the sparkline history. The perf
+  // store subscription fires on any of {fps, latency, bandwidth, ...} — if
+  // we push unconditionally, a second where fps updates once + bandwidth
+  // updates once + latency updates once lands 3 identical samples instead
+  // of 1, shrinking the 60-slot window from 60s of history to ~20s.
+  const lastFpsRef = useRef<number | null>(null);
   const connectedAtRef = useRef<number | null>(null);
   const lastTickRef = useRef<{ tick: number; at: number } | null>(null);
   const [tier, setTier] = useState<LatencyTier>("low");
@@ -87,14 +94,18 @@ export function StatusBar() {
       if (fpsRef.current) {
         fpsRef.current.textContent = `${state.fps} FPS`;
       }
-      // Update FPS sparkline
-      fpsHistoryRef.current.push(state.fps);
-      if (fpsHistoryRef.current.length > 60) fpsHistoryRef.current.shift();
-      if (sparklineRef.current) {
-        sparklineRef.current.setAttribute(
-          "points",
-          fpsHistoryRef.current.map((v, i) => `${i * (40 / 60)},${12 - Math.min(v, 60) / 60 * 12}`).join(" "),
-        );
+      // Update FPS sparkline only when fps actually changed — see lastFpsRef
+      // declaration for why bandwidth/latency updates must not reshape it.
+      if (lastFpsRef.current !== state.fps) {
+        lastFpsRef.current = state.fps;
+        fpsHistoryRef.current.push(state.fps);
+        if (fpsHistoryRef.current.length > 60) fpsHistoryRef.current.shift();
+        if (sparklineRef.current) {
+          sparklineRef.current.setAttribute(
+            "points",
+            fpsHistoryRef.current.map((v, i) => `${i * (40 / 60)},${12 - Math.min(v, 60) / 60 * 12}`).join(" "),
+          );
+        }
       }
       if (connectedAtRef.current !== null) {
         setUptime(formatUptime(performance.now() - connectedAtRef.current));
