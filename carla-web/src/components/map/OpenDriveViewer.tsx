@@ -36,11 +36,11 @@ export function OpenDriveViewer({ className }: OpenDriveViewerProps) {
   const viewRef = useRef({ cx: 0, cy: 0, zoom: 0.5 });
   const draggingRef = useRef(false);
   const lastMouseRef = useRef({ x: 0, y: 0 });
-  // Cache the last-seen CSS rect so the useAnimationFrame loop doesn't
-  // reassign canvas.width/height every frame — the assignment forces a
-  // layout sync and internally resets the backing store, both wasted
-  // when size is unchanged (which is the 60fps steady state).
-  const lastRectRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
+  // Cache last-seen CSS rect + devicePixelRatio so drawing only
+  // reassigns canvas.width/height when any of them change. DPR is
+  // included because browser zoom flips it without changing the CSS
+  // rect, and we'd render blurry drawings at the stale backing size.
+  const lastRectRef = useRef<{ w: number; h: number; dpr: number }>({ w: 0, h: 0, dpr: 0 });
 
   const currentMap = useSimulationStore((s) => s.currentMap);
   const isConnected = useIsConnected();
@@ -71,11 +71,12 @@ export function OpenDriveViewer({ className }: OpenDriveViewerProps) {
     const dpr = devicePixelRatio;
     if (
       rect.width !== lastRectRef.current.w ||
-      rect.height !== lastRectRef.current.h
+      rect.height !== lastRectRef.current.h ||
+      dpr !== lastRectRef.current.dpr
     ) {
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
-      lastRectRef.current = { w: rect.width, h: rect.height };
+      lastRectRef.current = { w: rect.width, h: rect.height, dpr };
     }
     const ctx = canvas.getContext("2d");
     if (!ctx) return;

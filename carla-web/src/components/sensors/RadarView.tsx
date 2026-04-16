@@ -32,12 +32,13 @@ function radarThemeColors() {
 export default function RadarView({ sensorId, className }: RadarViewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const countRef = useRef<HTMLSpanElement>(null);
-  // Cache the last-seen rect dimensions so drawGrid only assigns
-  // canvas.width/height (which triggers a full internal clear AND
-  // forces a layout read) when the element actually resizes.
-  // useAnimationFrame fires at 60Hz; the ResizeObserver already kicks
-  // an extra draw on real resize events.
-  const lastRectRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
+  // Cache the last-seen rect dimensions AND devicePixelRatio so
+  // drawGrid only assigns canvas.width/height (which triggers a full
+  // internal clear + layout read) when any of them actually change.
+  // DPR is included because browser zoom flips it without changing
+  // the CSS rect — missing that would leave the backing store at the
+  // old DPR and render blurry drawings.
+  const lastRectRef = useRef<{ w: number; h: number; dpr: number }>({ w: 0, h: 0, dpr: 0 });
   const { detectionsRef } = useRadarSensorData(sensorId);
 
   const drawGrid = useCallback(() => {
@@ -47,11 +48,12 @@ export default function RadarView({ sensorId, className }: RadarViewProps) {
     const rect = canvas.getBoundingClientRect();
     if (
       rect.width !== lastRectRef.current.w ||
-      rect.height !== lastRectRef.current.h
+      rect.height !== lastRectRef.current.h ||
+      devicePixelRatio !== lastRectRef.current.dpr
     ) {
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
-      lastRectRef.current = { w: rect.width, h: rect.height };
+      lastRectRef.current = { w: rect.width, h: rect.height, dpr: devicePixelRatio };
     }
 
     const ctx = canvas.getContext("2d");

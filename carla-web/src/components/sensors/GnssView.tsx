@@ -29,11 +29,11 @@ export default function GnssView({ sensorId, className }: GnssViewProps) {
   const altRef = useRef<HTMLSpanElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<{ x: number; y: number }[]>([]);
-  // Cache the last-seen CSS rect so drawTrail's 10Hz interval doesn't
-  // reassign canvas.width/height every tick — same pattern as
-  // RadarView / OpenDriveViewer / MiniMap. Cheaper at 10Hz than the
-  // 60Hz siblings, but still wasted layout work when size is stable.
-  const lastRectRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
+  // Cache last-seen CSS rect + devicePixelRatio so drawTrail's 10Hz
+  // interval only resizes the canvas when any of them change. DPR is
+  // included because browser zoom flips it without changing the CSS
+  // rect. Same pattern as RadarView / OpenDriveViewer / MiniMap.
+  const lastRectRef = useRef<{ w: number; h: number; dpr: number }>({ w: 0, h: 0, dpr: 0 });
   const {
     latRef: latValueRef,
     lonRef: lonValueRef,
@@ -48,11 +48,12 @@ export default function GnssView({ sensorId, className }: GnssViewProps) {
     const rect = canvas.getBoundingClientRect();
     if (
       rect.width !== lastRectRef.current.w ||
-      rect.height !== lastRectRef.current.h
+      rect.height !== lastRectRef.current.h ||
+      devicePixelRatio !== lastRectRef.current.dpr
     ) {
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
-      lastRectRef.current = { w: rect.width, h: rect.height };
+      lastRectRef.current = { w: rect.width, h: rect.height, dpr: devicePixelRatio };
     }
 
     const ctx = canvas.getContext("2d");

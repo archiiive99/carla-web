@@ -20,11 +20,11 @@ export function MiniMap({ className }: MiniMapProps) {
   const viewRef = useRef({ cx: 0, cy: 0, zoom: MINIMAP_DEFAULT_ZOOM });
   const draggingRef = useRef(false);
   const lastMouseRef = useRef({ x: 0, y: 0 });
-  // Cache the last-seen CSS rect so the 60Hz rAF draw doesn't reassign
-  // canvas.width/height every frame — see RadarView / OpenDriveViewer
-  // for the same pattern. Avoids a layout sync + backing-store reset
-  // when nothing about the element's size has changed.
-  const lastRectRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
+  // Cache last-seen CSS rect + devicePixelRatio so the 60Hz rAF draw
+  // only reassigns canvas.width/height when any of them change. DPR is
+  // included because browser zoom flips it without changing the CSS
+  // rect. See RadarView / OpenDriveViewer for the same pattern.
+  const lastRectRef = useRef<{ w: number; h: number; dpr: number }>({ w: 0, h: 0, dpr: 0 });
 
   const actors = useActorStore((s) => s.actors);
   const selectedActorId = useActorStore((s) => s.selectedActorId);
@@ -100,11 +100,12 @@ export function MiniMap({ className }: MiniMapProps) {
     const dpr = devicePixelRatio;
     if (
       rect.width !== lastRectRef.current.w ||
-      rect.height !== lastRectRef.current.h
+      rect.height !== lastRectRef.current.h ||
+      dpr !== lastRectRef.current.dpr
     ) {
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
-      lastRectRef.current = { w: rect.width, h: rect.height };
+      lastRectRef.current = { w: rect.width, h: rect.height, dpr };
     }
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
