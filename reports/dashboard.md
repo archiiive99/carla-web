@@ -4,7 +4,7 @@ Cumulative parity numbers per harness `prompts/specs/rendering-iteration-harness
 Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE ≤ 5
 (iter-01 used relaxed 28/0.80/6).
 
-**Summary:** 70 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
+**Summary:** 71 rows ✅, 7 rows ⚠️, 7 rows queued. §6.5 raise still active.
 
 | Iter | Row | Status | PSNR (dB) | SSIM | ΔE | Effort | Commit |
 |---|---|---|---|---|---|---|---|
@@ -85,6 +85,7 @@ Updated after every Phase H. Acceptance bars: PSNR ≥ 30 dB, SSIM ≥ 0.85, ΔE
 | 04-revisit-yellow-stripe-brighten | Centerline yellow +5% | **✅** | 15.36 | 0.2974 | 22.96 | ~8 min | 6786edb36 |
 | 06-revisit-hemi-ground-fog | Hemisphere ground fog lerp | **✅** | 15.37 | 0.2973 | 22.95 | ~8 min | 4e857d703 |
 | 08-revisit-arm-stride-speed | Arm swing amp scales with walker speed | **✅** | 15.37 | 0.2973 | 22.95 | ~8 min | 9385ab02a |
+| 08-revisit-body-hash-spread | Prime-scatter walker body color | **✅** | 15.37 | 0.2972 | 22.95 | ~6 min | (this commit) |
 
 ## Notes
 

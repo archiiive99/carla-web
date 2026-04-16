@@ -16,8 +16,10 @@ import {
 // a uniform orange swarm. All variations live in scene-palette as
 // WALKER_BODY_VARIATIONS (high-vis safety hue band).
 function walkerBodyColor(actorId: number): string {
+  // iter-08-revisit-body-hash-spread: prime-multiplier scatter so
+  // sequential CARLA IDs don't cluster on adjacent palette entries.
   return WALKER_BODY_VARIATIONS[
-    Math.abs(actorId) % WALKER_BODY_VARIATIONS.length
+    Math.abs(actorId * 13 + 5) % WALKER_BODY_VARIATIONS.length
   ];
 }
 
