@@ -47,12 +47,20 @@ async def _world_tick_loop() -> None:
     CARLA runs in synchronous mode with fixed_delta_seconds=0.05 (20 FPS).
     We must call world.tick() each cycle to advance the physics simulation.
     Without this, vehicles don't move and the world is frozen.
+
+    Honors the pause flag flipped by POST /api/simulation/pause —
+    without this check the "Pause" button was cosmetic only: status
+    reported paused=True but the sim kept advancing at 20 Hz because
+    this loop ticked unconditionally.
     """
     from src.utils.serialization import encode_world_tick
+    from src.routes import simulation as simulation_routes
 
     while True:
         await asyncio.sleep(WORLD_TICK_INTERVAL)
         if not carla_manager.is_connected:
+            continue
+        if simulation_routes._paused:
             continue
         try:
             def _tick_and_get_data():
