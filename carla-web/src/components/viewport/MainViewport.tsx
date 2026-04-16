@@ -3,6 +3,7 @@ import { Bird, Eye, Move3d, User, Video } from "lucide-react";
 import { useUIStore, type CameraMode } from "@/stores/uiStore";
 import { PerformanceOverlay } from "@/components/shared/PerformanceOverlay";
 import { useActorStore } from "@/stores/actorStore";
+import { useIsConnected } from "@/stores/simulationStore";
 import { VehicleControls } from "@/components/controls/VehicleControls";
 import { BRIDGE_EGO_ROLE } from "@/constants";
 import { useEgoVehicleResolution } from "@/hooks/useEgoVehicleResolution";
@@ -27,6 +28,7 @@ export function MainViewport({ className }: MainViewportProps) {
   const selectedActorId = useActorStore((s) => s.selectedActorId);
   const egoVehicleId = useActorStore((s) => s.egoVehicleId);
   const actors = useActorStore((s) => s.actors);
+  const isConnected = useIsConnected();
   useEgoVehicleResolution();
 
   const wasdTargetId = egoVehicleId;
@@ -90,7 +92,12 @@ export function MainViewport({ className }: MainViewportProps) {
       {showPerformanceOverlay && <PerformanceOverlay />}
 
       {wasdTargetId != null && (
-        <VehicleControls actorId={wasdTargetId} enabled />
+        // Gate the WASD keyboard listeners on connection — when the bridge
+        // is unreachable, applyRealtimeControl's 20Hz sends would all hit
+        // the silent catch path. Better to not install the listeners at
+        // all: user key presses then reach normal browser handling and
+        // we don't log 20 rejections per second.
+        <VehicleControls actorId={wasdTargetId} enabled={isConnected} />
       )}
     </main>
   );
