@@ -680,3 +680,25 @@ def test_set_lights_rejects_non_vehicle_actor(monkeypatch):
     resp = client.post("/api/actors/5/lights", json={"light_state": 0})
     assert resp.status_code == 400
     assert resp.json()["detail"] == "Actor is not a vehicle"
+
+
+def test_get_actor_surfaces_runtime_error_as_400(monkeypatch):
+    """VehicleDetails polls /api/actors/:id every 500ms. Without the try/except
+    wrapper, a CARLA RuntimeError on a dying actor reference (transiently
+    stale during a map reload) bubbled up as a bare 500 with no body and
+    the frontend toast rendered as "Unknown error". Pin the 400-with-detail
+    shape so the polling UI gets a real message."""
+    import src.routes.actors as actors_routes
+
+    def _raise(*_a, **_kw):
+        raise RuntimeError("stale actor reference")
+
+    fake_manager = SimpleNamespace(
+        is_connected=True,
+        world=SimpleNamespace(get_actor=_raise),
+    )
+    monkeypatch.setattr(actors_routes, "carla_manager", fake_manager)
+
+    resp = client.get("/api/actors/5")
+    assert resp.status_code == 400
+    assert "stale actor reference" in resp.json()["detail"]

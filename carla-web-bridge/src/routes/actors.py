@@ -57,7 +57,12 @@ async def count_actors() -> Any:
     _require_connection()
 
     def _count() -> dict[str, Any]:
-        return {"count": len(carla_manager.world.get_actors())}
+        try:
+            return {"count": len(carla_manager.world.get_actors())}
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_count)
 
@@ -155,21 +160,34 @@ async def get_actor(actor_id: int) -> Any:
     _require_connection()
 
     def _get() -> Any:
-        actor = carla_manager.world.get_actor(actor_id)
-        if actor is None:
-            raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
-        info = serialize_actor(actor).model_dump()
-        if actor.type_id.startswith("vehicle."):
-            ctrl = actor.get_control()
-            info["control"] = {
-                "throttle": ctrl.throttle,
-                "steer": ctrl.steer,
-                "brake": ctrl.brake,
-                "hand_brake": ctrl.hand_brake,
-                "reverse": ctrl.reverse,
-                "gear": ctrl.gear,
-            }
-        return info
+        # Polled by VehicleDetails every 500ms for the live throttle/steer/
+        # brake readout, so stale-actor / RPC-blip windows are routinely
+        # traversed during map reloads. Without the wrapper, CARLA's
+        # RuntimeError on a dying actor reference surfaced as a bare 500
+        # with no body and the frontend reportError toast rendered as
+        # "Unknown error". Match the rest of the module's shape.
+        try:
+            actor = carla_manager.world.get_actor(actor_id)
+            if actor is None:
+                raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
+            info = serialize_actor(actor).model_dump()
+            if actor.type_id.startswith("vehicle."):
+                ctrl = actor.get_control()
+                info["control"] = {
+                    "throttle": ctrl.throttle,
+                    "steer": ctrl.steer,
+                    "brake": ctrl.brake,
+                    "hand_brake": ctrl.hand_brake,
+                    "reverse": ctrl.reverse,
+                    "gear": ctrl.gear,
+                }
+            return info
+        except HTTPException:
+            raise
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_get)
 
@@ -424,18 +442,25 @@ async def get_bounding_box(actor_id: int) -> Any:
     _require_connection()
 
     def _get() -> dict[str, Any]:
-        actor = carla_manager.world.get_actor(actor_id)
-        if actor is None:
-            raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
-        bb = actor.bounding_box
-        return {
-            "extent": {"x": bb.extent.x, "y": bb.extent.y, "z": bb.extent.z},
-            "location": {"x": bb.location.x, "y": bb.location.y, "z": bb.location.z},
-            "rotation": {
-                "pitch": bb.rotation.pitch,
-                "yaw": bb.rotation.yaw,
-                "roll": bb.rotation.roll,
-            },
-        }
+        try:
+            actor = carla_manager.world.get_actor(actor_id)
+            if actor is None:
+                raise HTTPException(status_code=404, detail=f"Actor {actor_id} not found")
+            bb = actor.bounding_box
+            return {
+                "extent": {"x": bb.extent.x, "y": bb.extent.y, "z": bb.extent.z},
+                "location": {"x": bb.location.x, "y": bb.location.y, "z": bb.location.z},
+                "rotation": {
+                    "pitch": bb.rotation.pitch,
+                    "yaw": bb.rotation.yaw,
+                    "roll": bb.rotation.roll,
+                },
+            }
+        except HTTPException:
+            raise
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     return await asyncio.to_thread(_get)
