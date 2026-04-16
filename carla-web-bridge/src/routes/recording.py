@@ -81,10 +81,15 @@ async def start_replay(req: StartReplayRequest):
     _require_connection()
 
     def _start():
-        carla_manager.client.replay_file(
-            req.filename, req.start_time, req.duration, req.camera_id
-        )
-        return {"status": "replaying", "filename": req.filename}
+        try:
+            carla_manager.client.replay_file(
+                req.filename, req.start_time, req.duration, req.camera_id
+            )
+            return {"status": "replaying", "filename": req.filename}
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
     return await asyncio.to_thread(_start)
 
@@ -94,7 +99,12 @@ async def stop_replay():
     _require_connection()
 
     def _stop():
-        carla_manager.client.stop_replayer(True)
-        return {"status": "stopped"}
+        try:
+            carla_manager.client.stop_replayer(True)
+            return {"status": "stopped"}
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
     return await asyncio.to_thread(_stop)
