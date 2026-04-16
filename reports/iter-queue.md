@@ -27,7 +27,7 @@ Bumped lighting-stack rows ahead of geometry rows.
 [x] iter-06  Shadows from sun — cascaded SM tuning  (✅-on-arrival — functional single-cascade shadow system already shipped in scene-environment.tsx:183-198; true CSM queued as iter-06-revisit-csm; closed 2026-04-16T05:05:51Z)
 [ ] iter-06-revisit-csm  True cascaded shadow maps (3-4 frustum buckets, ~3-4h)
 [ ] iter-06-revisit-bias-by-altitude  Sun-altitude-driven bias tuning (~30min)
-[ ] iter-11  Post-process calibration — tonemap, exposure, bloom   (closes warm/cool color balance)
+[~] iter-11  Post-process calibration — tonemap, exposure, bloom  (opened 2026-04-16T05:07:09Z, Phase A — tonemap ✅ shipped, exposure being wired to weather, bloom blocked ⚠️)
 [ ] iter-02  Building façades — windows, materials, silhouettes
 [x] iter-03  Vehicle silhouettes — extracted GLBs for every blueprint  (✅-on-arrival — 42 blueprint→GLB mappings shipped in carla-assets/vehicle-models.ts; queued iter-03-revisit-coverage for the remaining ~60 less-common blueprints; closed 2026-04-15T09:59+~10min)
 [ ] iter-03-revisit-coverage  Extend VEHICLE_MODELS to all CARLA blueprints (~30 min, web-only)
