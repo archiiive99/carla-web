@@ -40,14 +40,21 @@ export function EmptyCell({
   const [query, setQuery] = useState("");
   const sensorList = Array.from(sensors.values())
     .sort((a, b) => {
-      const rank = (sensor: { id: number; type: string; parent_id: number }) => {
-        const attachedToEgo =
-          egoVehicleId !== null && sensor.parent_id === egoVehicleId ? 0 : 1;
-        const subscribed = subscriptions.has(sensor.id) ? 0 : 1;
-        const camera = sensor.type.startsWith("sensor.camera.") ? 0 : 1;
-        return [attachedToEgo, subscribed, camera, sensor.id] as const;
-      };
-      return rank(a) < rank(b) ? -1 : 1;
+      // Previously ranked via `[ego, sub, cam, id] as const` and compared
+      // with `<`, which JS coerces to string and compares
+      // lexicographically — id "100" < "5" in that world, so sensors with
+      // id ≥ 10 would jump above smaller ids. Compare field-by-field so
+      // the sort is stable and numerically correct.
+      const aEgo = egoVehicleId !== null && a.parent_id === egoVehicleId ? 0 : 1;
+      const bEgo = egoVehicleId !== null && b.parent_id === egoVehicleId ? 0 : 1;
+      if (aEgo !== bEgo) return aEgo - bEgo;
+      const aSub = subscriptions.has(a.id) ? 0 : 1;
+      const bSub = subscriptions.has(b.id) ? 0 : 1;
+      if (aSub !== bSub) return aSub - bSub;
+      const aCam = a.type.startsWith("sensor.camera.") ? 0 : 1;
+      const bCam = b.type.startsWith("sensor.camera.") ? 0 : 1;
+      if (aCam !== bCam) return aCam - bCam;
+      return a.id - b.id;
     })
     .filter((sensor) => {
       const haystack = `${sensor.id} ${sensor.type} ${getSensorDisplayName(sensor.type)}`.toLowerCase();
