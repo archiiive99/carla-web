@@ -128,7 +128,8 @@ export const useSensorStore = create<SensorState>((set, get) => ({
     // spawned sensor has its attributes set via spawnSensor directly.
     const actorList = Array.from(useActorStore.getState().actors.values());
     const sensors = new Map<number, SensorConfig>();
-    const previous = get().sensors;
+    const state = get();
+    const previous = state.sensors;
     for (const a of actorList) {
       if (a.type === "sensor") {
         sensors.set(a.id, {
@@ -140,6 +141,25 @@ export const useSensorStore = create<SensorState>((set, get) => ({
         });
       }
     }
-    set({ sensors });
+    // Drop subscription / pending entries for sensors that no longer exist.
+    // Without this the sets accumulated dead IDs forever: map reload or
+    // DELETE /api/actors/all tore the sensors out of actorStore, but the
+    // subscription set kept the stale ids. On a later WS reconnect (new
+    // bridge URL, or the sensor id getting reused across sessions) we'd
+    // broadcast unsubscribe/subscribe for ids that the new bridge had
+    // never issued, and the 2s pending-clear timer fired in the void.
+    let subscriptions = state.subscriptions;
+    let pendingSubscriptions = state.pendingSubscriptions;
+    const subsStale = [...subscriptions].filter((id) => !sensors.has(id));
+    if (subsStale.length > 0) {
+      subscriptions = new Set(subscriptions);
+      for (const id of subsStale) subscriptions.delete(id);
+    }
+    const pendingStale = [...pendingSubscriptions].filter((id) => !sensors.has(id));
+    if (pendingStale.length > 0) {
+      pendingSubscriptions = new Set(pendingSubscriptions);
+      for (const id of pendingStale) pendingSubscriptions.delete(id);
+    }
+    set({ sensors, subscriptions, pendingSubscriptions });
   },
 }));
