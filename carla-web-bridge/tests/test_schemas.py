@@ -287,3 +287,37 @@ def test_route_request_accepts_realistic_waypoint_counts() -> None:
     assert len(RouteRequest(waypoints=big).waypoints) == 5_000
     # Edge: empty list is legal — tm.set_path([]) is the route-clear call.
     assert RouteRequest(waypoints=[]).waypoints == []
+
+
+# --- StartReplayRequest bounds -------------------------------------------
+
+
+@pytest.mark.parametrize("bad_duration", [-0.1, -1.0, -1000.0])
+def test_start_replay_rejects_negative_duration(bad_duration: float) -> None:
+    # 0 = "replay to end" per CARLA; negative makes no sense.
+    with pytest.raises(ValidationError):
+        StartReplayRequest(filename="x.log", duration=bad_duration)
+
+
+@pytest.mark.parametrize("bad_camera", [-1, -42])
+def test_start_replay_rejects_negative_camera_id(bad_camera: int) -> None:
+    # camera_id=0 is the CARLA sentinel for "no follow"; actor IDs are
+    # always non-negative, so a negative value is a typo.
+    with pytest.raises(ValidationError):
+        StartReplayRequest(filename="x.log", camera_id=bad_camera)
+
+
+def test_start_replay_accepts_negative_start_time() -> None:
+    # CARLA's replay_file treats negative start_time as "seconds from end"
+    # — preserve that semantic by NOT bounding start_time.
+    req = StartReplayRequest(filename="x.log", start_time=-5.0)
+    assert req.start_time == -5.0
+
+
+def test_start_replay_accepts_canonical_values() -> None:
+    req = StartReplayRequest(
+        filename="x.log", start_time=10.0, duration=30.0, camera_id=42
+    )
+    assert req.start_time == 10.0
+    assert req.duration == 30.0
+    assert req.camera_id == 42

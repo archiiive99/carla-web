@@ -274,9 +274,18 @@ class StartRecordingRequest(BaseModel):
 
 class StartReplayRequest(BaseModel):
     filename: str
+    # NOTE on start_time: CARLA's replay_file treats negative values as
+    # "seconds from the end of the recording" — so the negative half of
+    # the number line is intentional, don't bound it.
     start_time: float = 0.0
-    duration: float = 0.0
-    camera_id: int = 0
+    # 0 means "play until end" per CARLA docs. Negative values are never
+    # meaningful for a duration; bound at 0 to catch caller typos before
+    # they reach the replayer.
+    duration: float = Field(0.0, ge=0.0)
+    # camera_id=0 is the CARLA sentinel for "no follow". Actor IDs are
+    # always non-negative; reject negative ids at the schema so a typo
+    # trips 422 instead of silently passing through to the replayer.
+    camera_id: int = Field(0, ge=0)
 
     @field_validator("filename")
     @classmethod
