@@ -111,10 +111,16 @@ async def pause() -> Any:
             "fixed_delta": settings.fixed_delta_seconds,
         }
 
-    world = carla_manager.world
-    settings = await asyncio.to_thread(world.get_settings)
-    _pre_pause_sync_mode = settings.synchronous_mode
-    _pre_pause_fixed_delta = settings.fixed_delta_seconds
+    # Only capture pre-pause settings on the FIRST pause in a series —
+    # a second pause without an intervening play would otherwise stomp
+    # the originals with the pause's own sync_mode=True state, and play
+    # would restore that stomped value instead of the real pre-pause
+    # configuration.
+    if not _paused:
+        world = carla_manager.world
+        settings = await asyncio.to_thread(world.get_settings)
+        _pre_pause_sync_mode = settings.synchronous_mode
+        _pre_pause_fixed_delta = settings.fixed_delta_seconds
     result = await asyncio.to_thread(_pause)
     _paused = True
     return result
