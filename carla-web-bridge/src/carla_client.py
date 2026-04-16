@@ -120,6 +120,18 @@ class CarlaClientManager:
                 self._heartbeat_task = asyncio.create_task(self._heartbeat_loop())
                 return
             except Exception as exc:
+                # Roll back partially-committed connect state. _connect_sync
+                # may succeed before _ensure_sync_mode / get_server_version
+                # fails — without this reset, `is_connected` would report
+                # True between the failure and the next retry, letting route
+                # handlers operate on a world that wasn't put into sync
+                # mode yet (or with a client whose server-version probe
+                # already raised, indicating a flaky connection).
+                self._connected = False
+                self._connected_at_monotonic = None
+                self._client = None
+                self._world = None
+                self._server_version = ""
                 message = str(exc)
                 if "std::exception" in message:
                     # Hold std-exception retries at a fixed short delay
