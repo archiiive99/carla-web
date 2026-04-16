@@ -399,6 +399,53 @@ def test_spawn_sensor_fails_loud_when_parent_gone(monkeypatch):
     assert "destroyed" in str(exc.value)
 
 
+def test_spawn_sensor_rejects_non_finite_transform(monkeypatch):
+    """sensor_manager._spawn_sync raises RuntimeError (→ 400 via route) when
+    the supplied transform dict carries NaN/Infinity. This path bypasses
+    dict_to_carla_transform (routes/actors.spawn_sensor hands a raw
+    model_dump() dict down), so the guard has to live in _spawn_sync
+    itself — pin that reject so a future refactor can't regress."""
+    carla_stub = SimpleNamespace(
+        Transform=lambda *_a, **_kw: None,
+        Location=SimpleNamespace,
+        Rotation=SimpleNamespace,
+    )
+
+    class _BpLib:
+        def find(self, type_id: str):
+            return SimpleNamespace(
+                has_attribute=lambda _k: False,
+                set_attribute=lambda _k, _v: None,
+            )
+
+    class _World:
+        def get_blueprint_library(self):
+            return _BpLib()
+
+    class _FakeCarlaMgr:
+        is_connected = True
+        def refresh_world(self):
+            return _World()
+
+    from src.sensor_manager import SensorManager
+    mgr = SensorManager(_FakeCarlaMgr(), broadcaster=SimpleNamespace())
+
+    monkeypatch.setitem(sys.modules, "carla", carla_stub)
+
+    nan = float("nan")
+    with pytest.raises(RuntimeError) as exc:
+        mgr._spawn_sync(  # noqa: SLF001
+            "sensor.other.gnss",
+            {
+                "location": {"x": nan, "y": 0, "z": 0},
+                "rotation": {"pitch": 0, "yaw": 0, "roll": 0},
+            },
+            parent_id=0,  # world-attached, so no parent lookup in the way
+            attributes={},
+        )
+    assert "finite" in str(exc.value).lower()
+
+
 def test_blueprints_vehicles_requires_connection():
     resp = client.get("/api/blueprints/vehicles")
     assert resp.status_code == 503
