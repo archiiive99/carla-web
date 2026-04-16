@@ -7,8 +7,6 @@
 // Camera header: 4B sid, 4B w, 4B h, 4B frame, 8B ts = 24 bytes
 const CAMERA_HEADER_SIZE = 24;
 
-let port: MessagePort | null = null;
-
 async function decodeImage(_channel: number, payload: ArrayBuffer) {
   if (payload.byteLength < CAMERA_HEADER_SIZE) return;
 
@@ -51,8 +49,8 @@ async function decodeImage(_channel: number, payload: ArrayBuffer) {
 // Receive from ws-receiver via MessagePort
 self.onmessage = (event: MessageEvent) => {
   if (event.data?.type === "init" && event.data.port) {
-    port = event.data.port as MessagePort;
-    port!.onmessage = (e: MessageEvent) => {
+    const incoming = event.data.port as MessagePort;
+    incoming.onmessage = (e: MessageEvent) => {
       const { channel, payload } = e.data;
       decodeImage(channel, payload);
     };
