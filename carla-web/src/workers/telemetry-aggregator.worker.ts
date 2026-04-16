@@ -83,7 +83,20 @@ function emitBatch() {
 // Emit at 10Hz
 setInterval(emitBatch, EMIT_INTERVAL_MS);
 
+// Accept either an init message that transfers the ws-receiver MessageChannel
+// port directly (skips the main-thread forwarding hop) or direct postMessage
+// delivery. Matches image-decoder.worker.ts so all three data-plane workers
+// share the same port-init pattern.
 self.onmessage = (event: MessageEvent) => {
+  if (event.data?.type === "init" && event.data.port) {
+    const incoming = event.data.port as MessagePort;
+    incoming.onmessage = (e: MessageEvent) => {
+      if (e.data?.channel === 0x10 && e.data?.payload) {
+        processTick(e.data.payload);
+      }
+    };
+    return;
+  }
   if (event.data?.channel === 0x10 && event.data?.payload) {
     processTick(event.data.payload);
   }

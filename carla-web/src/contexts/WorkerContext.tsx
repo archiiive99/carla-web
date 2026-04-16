@@ -44,7 +44,12 @@ export function WorkerProvider({ children }: { children: ReactNode }) {
     lidarProcessor.onerror = (e) => console.error("[lidar-processor]", e);
     telemetryAgg.onerror = (e) => console.error("[telemetry]", e);
 
-    // Inter-worker channels
+    // Inter-worker channels — transfer port2 directly to each consumer
+    // worker so ws-receiver's per-frame postMessage lands in the worker
+    // without a main-thread forwarding hop. Previously lidar/telemetry
+    // channels bounced through `port2.onmessage` on the main thread,
+    // paying an extra copy + scheduler round-trip per frame at 20Hz —
+    // wasted time on the thread that's also running Three.js.
     const imageChannel = new MessageChannel();
     const lidarChannel = new MessageChannel();
     const telemetryChannel = new MessageChannel();
@@ -53,12 +58,14 @@ export function WorkerProvider({ children }: { children: ReactNode }) {
       { type: "init", port: imageChannel.port2 },
       [imageChannel.port2],
     );
-    lidarChannel.port2.onmessage = (e) => {
-      lidarProcessor.postMessage(e.data, e.data.payload ? [e.data.payload] : []);
-    };
-    telemetryChannel.port2.onmessage = (e) => {
-      telemetryAgg.postMessage(e.data, e.data.payload ? [e.data.payload] : []);
-    };
+    lidarProcessor.postMessage(
+      { type: "init", port: lidarChannel.port2 },
+      [lidarChannel.port2],
+    );
+    telemetryAgg.postMessage(
+      { type: "init", port: telemetryChannel.port2 },
+      [telemetryChannel.port2],
+    );
 
     // Connect ws-receiver (it will auto-reconnect internally)
     wsReceiver.postMessage(

@@ -87,7 +87,20 @@ function processLidar(channel: number, payload: ArrayBuffer) {
   );
 }
 
+// Accept either an init message that transfers the ws-receiver MessageChannel
+// port directly (skips the main-thread forwarding hop) or direct postMessage
+// delivery. Matches image-decoder.worker.ts so all three workers share the
+// same port-init pattern.
 self.onmessage = (event: MessageEvent) => {
+  if (event.data?.type === "init" && event.data.port) {
+    const incoming = event.data.port as MessagePort;
+    incoming.onmessage = (e: MessageEvent) => {
+      if (e.data?.channel !== undefined && e.data?.payload) {
+        processLidar(e.data.channel, e.data.payload);
+      }
+    };
+    return;
+  }
   if (event.data?.channel !== undefined && event.data?.payload) {
     processLidar(event.data.channel, event.data.payload);
   }
