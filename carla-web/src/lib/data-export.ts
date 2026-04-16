@@ -2,19 +2,29 @@
  * Data export utilities for sensor snapshots.
  */
 
+/** Save the given canvas as a PNG. Resolves `true` on success; `false` if
+ *  `canvas.toBlob` returned null (cross-origin tainted canvas or encoder
+ *  failure). Promise lets callers surface feedback — previously the silent
+ *  no-op made the Save buttons look broken on a tainted feed. */
 export function saveCanvasAsPng(
   canvas: HTMLCanvasElement,
   filename = "frame.png",
-): void {
-  canvas.toBlob((blob) => {
-    if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, "image/png");
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        resolve(false);
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      resolve(true);
+    }, "image/png");
+  });
 }
 
 export function saveLidarAsPly(
@@ -104,24 +114,32 @@ export function saveJson(data: unknown, filename = "data.json"): void {
   URL.revokeObjectURL(url);
 }
 
+/** JPEG counterpart to saveCanvasAsPng. Same Promise<boolean> contract —
+ *  `false` means the canvas was tainted or the encoder failed. */
 export function saveCanvasAsJpeg(
   canvas: HTMLCanvasElement,
   filename = "frame.jpg",
   quality = 0.9,
-): void {
-  canvas.toBlob(
-    (blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    },
-    "image/jpeg",
-    quality,
-  );
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          resolve(false);
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        resolve(true);
+      },
+      "image/jpeg",
+      quality,
+    );
+  });
 }
 
 export async function copyCanvasToClipboard(

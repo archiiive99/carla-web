@@ -154,10 +154,22 @@ export default function CameraView({
             </div>
           </ContextMenuTrigger>
           <ContextMenuContent>
-            <ContextMenuItem onClick={() => canvasRef.current && saveCanvasAsPng(canvasRef.current, `camera_${sensorId}.png`)}>
+            <ContextMenuItem onClick={async () => {
+              if (!canvasRef.current) return;
+              const ok = await saveCanvasAsPng(canvasRef.current, `camera_${sensorId}.png`);
+              toast[ok ? "success" : "error"](
+                ok ? "Saved PNG" : "Save failed — the camera canvas may be tainted",
+              );
+            }}>
               Save as PNG
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => canvasRef.current && saveCanvasAsJpeg(canvasRef.current, `camera_${sensorId}.jpg`)}>
+            <ContextMenuItem onClick={async () => {
+              if (!canvasRef.current) return;
+              const ok = await saveCanvasAsJpeg(canvasRef.current, `camera_${sensorId}.jpg`);
+              toast[ok ? "success" : "error"](
+                ok ? "Saved JPEG" : "Save failed — the camera canvas may be tainted",
+              );
+            }}>
               Save as JPEG
             </ContextMenuItem>
             <ContextMenuItem onClick={async () => {
