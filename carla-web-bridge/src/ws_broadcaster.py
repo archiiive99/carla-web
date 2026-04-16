@@ -241,7 +241,7 @@ class WebSocketBroadcaster:
         # cancellation and shouldn't nuke the client registry.
         stale = [
             conn.client_id
-            for conn, result in zip(recipients, results)
+            for conn, result in zip(recipients, results, strict=True)
             if isinstance(result, Exception)
         ]
         await self._drop_clients(stale)

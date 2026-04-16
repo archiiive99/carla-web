@@ -248,7 +248,7 @@ class SensorManager:
         client_id: str,
         target_fps: float,
         *,
-        is_ceiling: bool = True,
+        is_ceiling: bool = True,  # noqa: ARG002 — compat shim, see docstring
     ) -> float:
         """Set per-(client, sensor) target fps. Returns the clamped value.
 

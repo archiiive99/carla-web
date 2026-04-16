@@ -16,3 +16,30 @@ testpaths = ["tests"]
 markers = [
     "flaky: quarantined live-runtime instability scenario",
 ]
+
+[tool.ruff]
+# Python backend files lean long because of FastAPI decorator chains
+# and CARLA-typed function signatures; 100 keeps readable one-liners
+# without forcing micro-wraps.
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+# Default `E + F + W` is too narrow for a backend. These add:
+# - B: bugbear (exception chaining, mutable defaults, zip strict)
+# - UP: pyupgrade (use the project's 3.10+ idioms)
+# - I: import sorting
+# - SIM: simplifications (contextlib.suppress, dict shortcuts)
+# - C4: comprehension cleanups
+# - RET: return-statement cleanups
+# - PIE: small refactors
+select = ["E", "F", "W", "B", "UP", "I", "SIM", "C4", "RET", "PIE"]
+# Keep the line-too-long check off here — we run the project-wide
+# formatter for actual wrapping, and 100 is our agreed ceiling.
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+# disallow_untyped_defs = true
+# — turn this on after the tests/ directory catches up.

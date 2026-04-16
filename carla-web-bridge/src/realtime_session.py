@@ -27,18 +27,18 @@ DEFAULT_VEHICLE_BLUEPRINTS = (
 
 MANAGED_ROLE_NAME = "bridge_ego"
 
-CLEAR_DAYTIME_WEATHER = dict(
-    cloudiness=10.0,
-    precipitation=0.0,
-    precipitation_deposits=0.0,
-    wind_intensity=5.0,
-    sun_azimuth_angle=220.0,
-    sun_altitude_angle=60.0,
-    fog_density=0.0,
-    fog_distance=0.0,
-    fog_falloff=0.0,
-    wetness=0.0,
-)
+CLEAR_DAYTIME_WEATHER = {
+    "cloudiness": 10.0,
+    "precipitation": 0.0,
+    "precipitation_deposits": 0.0,
+    "wind_intensity": 5.0,
+    "sun_azimuth_angle": 220.0,
+    "sun_altitude_angle": 60.0,
+    "fog_density": 0.0,
+    "fog_distance": 0.0,
+    "fog_falloff": 0.0,
+    "wetness": 0.0,
+}
 
 
 class SessionState(Enum):

@@ -106,7 +106,7 @@ async def _world_tick_loop() -> None:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: ARG001 — FastAPI lifespan protocol
     """Startup: connect to CARLA. Shutdown: cleanup."""
     global _tick_task
     logger.info("CARLA Web Bridge starting…")
