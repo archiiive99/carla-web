@@ -32,6 +32,12 @@ function radarThemeColors() {
 export default function RadarView({ sensorId, className }: RadarViewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const countRef = useRef<HTMLSpanElement>(null);
+  // Cache the last-seen rect dimensions so drawGrid only assigns
+  // canvas.width/height (which triggers a full internal clear AND
+  // forces a layout read) when the element actually resizes.
+  // useAnimationFrame fires at 60Hz; the ResizeObserver already kicks
+  // an extra draw on real resize events.
+  const lastRectRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
   const { detectionsRef } = useRadarSensorData(sensorId);
 
   const drawGrid = useCallback(() => {
@@ -39,12 +45,19 @@ export default function RadarView({ sensorId, className }: RadarViewProps) {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * devicePixelRatio;
-    canvas.height = rect.height * devicePixelRatio;
+    if (
+      rect.width !== lastRectRef.current.w ||
+      rect.height !== lastRectRef.current.h
+    ) {
+      canvas.width = rect.width * devicePixelRatio;
+      canvas.height = rect.height * devicePixelRatio;
+      lastRectRef.current = { w: rect.width, h: rect.height };
+    }
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(devicePixelRatio, devicePixelRatio);
     const w = rect.width;
     const h = rect.height;
