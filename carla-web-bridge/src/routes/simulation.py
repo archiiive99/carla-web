@@ -167,7 +167,12 @@ async def reload_map():
     carla_manager.clear_tracked_actors()
 
     def _reload():
-        carla_manager.client.reload_world()
-        return {"status": "reloaded"}
+        try:
+            carla_manager.client.reload_world()
+            return {"status": "reloaded"}
+        except RuntimeError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
     return await asyncio.to_thread(_reload)

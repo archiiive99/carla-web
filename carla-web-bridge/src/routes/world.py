@@ -81,8 +81,16 @@ async def load_map(req: LoadMapRequest):
     carla_manager.clear_tracked_actors()
 
     def _load():
-        carla_manager.client.load_world(req.map_name)
-        return {"status": "loaded", "map": req.map_name}
+        try:
+            carla_manager.client.load_world(req.map_name)
+            return {"status": "loaded", "map": req.map_name}
+        except RuntimeError as e:
+            # CARLA raises RuntimeError for invalid map name. Surface the
+            # detail so the frontend's "Map load failed: ..." toast is
+            # informative instead of a generic 500.
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
     return await asyncio.to_thread(_load)
 
