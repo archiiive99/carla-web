@@ -31,7 +31,12 @@ export function useEgoVehicleResolution() {
       try {
         const session = await carlaApi.getRealtimeSession();
         if (cancelled) return;
-        if (session.default_vehicle_id) {
+        // Explicit null/undefined check — `if (id)` would also treat id===0
+        // as "not ready" and loop forever. CARLA actor ids are normally
+        // positive, but the HealthResponse schema types default_vehicle_id
+        // as `number | null | undefined`, so any numeric value (including
+        // 0) is a valid signal that the session has a vehicle attached.
+        if (session.default_vehicle_id != null) {
           useActorStore.getState().setEgoVehicleId(session.default_vehicle_id);
         } else {
           timer = setTimeout(resolve, 1000);
