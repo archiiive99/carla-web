@@ -51,6 +51,11 @@ export default function CameraView({
   const resDisplayRef = useRef<HTMLSpanElement>(null);
   const hasReceivedFrameRef = useRef(false);
   const [hasReceivedFrame, setHasReceivedFrame] = useState(false);
+  // Aspect ratio lives in state (driven by `draw` when the first bitmap
+  // arrives) so the style reads a stable value during render. The previous
+  // `canvasRef.current?.width / .height` read in the style prop tripped
+  // React-19's "Cannot access refs during render" rule.
+  const [aspect, setAspect] = useState<string>("16 / 9");
   const { bitmapRef, fpsRef, latencyRef } = useCameraSensorData(sensorId);
 
   const displayName =
@@ -66,6 +71,7 @@ export default function CameraView({
   if (lastSensorId !== sensorId) {
     setLastSensorId(sensorId);
     setHasReceivedFrame(false);
+    setAspect("16 / 9");
   }
   useEffect(() => {
     hasReceivedFrameRef.current = false;
@@ -90,6 +96,7 @@ export default function CameraView({
         canvas.height = bitmap.height;
         if (resDisplayRef.current)
           resDisplayRef.current.textContent = `${bitmap.width}x${bitmap.height}`;
+        setAspect(`${bitmap.width} / ${bitmap.height}`);
       }
       const ctx = canvas.getContext("2d");
       if (ctx) ctx.drawImage(bitmap, 0, 0);
@@ -142,7 +149,7 @@ export default function CameraView({
                 ref={canvasRef}
                 aria-label="Camera sensor feed"
                 className="h-full w-full object-contain"
-                style={{ aspectRatio: canvasRef.current ? `${canvasRef.current.width} / ${canvasRef.current.height}` : "16 / 9" }}
+                style={{ aspectRatio: aspect }}
               />
             </div>
           </ContextMenuTrigger>
